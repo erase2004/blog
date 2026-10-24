@@ -302,11 +302,6 @@ describe('blocks left for later tickets', () => {
 		'core/html': `<!-- wp:html -->
 <figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1762" src="https://aniya.moe/wp-content/uploads/2025/05/8a6a5bf6243acbe99900d2e8417652e7.jpg" alt="" width="1624" height="915" class="image-compare__image-before"/><img id="727" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_104948.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的展望台</figcaption></figure>
 <!-- /wp:html -->`,
-		'core/code': `<!-- wp:code {"lineNumbers":false} -->
-<pre title="src/router/index.js" class="wp-block-code"><code lang="javascript" class="language-javascript">{ // Nested Route 的 Route 物件
-  component: () =&gt; import('@/views/NestedRoute.vue'),
-}</code></pre>
-<!-- /wp:code -->`,
 		'core/footnotes': '<!-- wp:footnotes /-->',
 		'core/embed': `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=x3_Pcru8SS8","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
 <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
