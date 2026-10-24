@@ -7,8 +7,13 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
 	<div class="inner">
 		<p>&copy; {year} {SITE_TITLE}</p>
-		{/* rel="me" verifies the site on the Mastodon profile, as the WordPress site's hidden link did. */}
-		<p><a href="https://g0v.social/@erase2004" rel="me">Mastodon</a></p>
+		{
+			/*
+			 * rel="me" verifies the site on the Mastodon profile. Hidden, as on the
+			 * WordPress site: Mastodon reads it from the HTML, readers never see it.
+			 */
+		}
+		<a href="https://g0v.social/@erase2004" rel="me" hidden>Mastodon</a>
 	</div>
 </footer>
 
@@ -28,12 +33,6 @@ const year = new Date().getFullYear();
 	}
 	p {
 		margin: 0;
-	}
-	a {
-		color: var(--color-on-frame);
-	}
-	a:hover {
-		color: var(--color-link-on-frame);
 	}
 
 	@media (max-width: 64rem) {

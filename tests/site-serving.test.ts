@@ -7,9 +7,16 @@ import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
-import { type Browser, type BrowserContextOptions, chromium, type Locator, type Page } from 'playwright';
+import {
+	type Browser,
+	type BrowserContext,
+	type BrowserContextOptions,
+	chromium,
+	type Locator,
+	type Page,
+} from 'playwright';
 import sharp from 'sharp';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
 const buildScript = fileURLToPath(new URL('./support/build-site.mjs', import.meta.url));
@@ -587,12 +594,24 @@ describe('layout', () => {
 		expect(first?.querySelector('pagefind-searchbox')).not.toBeNull();
 	});
 
-	it.each(PAGES)('%s has the site footer, with the rel="me" link that verifies the Mastodon account', async (path) => {
+	it.each(PAGES)('%s has the site footer, with the hidden rel="me" link that verifies the Mastodon account', async (path) => {
 		const footer = (await html(path)).querySelectorAll('footer').find((element) => !element.closest('main'));
+		const mastodon = footer?.querySelector('a[href="https://g0v.social/@erase2004"]');
 
 		expect(footer?.text).toContain('TsukiStudio');
-		// As on the WordPress site, for Mastodon's profile link verification.
-		expect(footer?.querySelector('a[href="https://g0v.social/@erase2004"]')?.getAttribute('rel')).toContain('me');
+		// As on the WordPress site: in the HTML, for Mastodon's profile link
+		// verification, but not shown, focused or read out.
+		expect(mastodon?.getAttribute('rel')?.split(/\s+/)).toContain('me');
+		expect(mastodon?.hasAttribute('hidden')).toBe(true);
+	});
+
+	it.each(PAGES)('%s has a 回到頂部 button', async (path) => {
+		const buttons = (await html(path))
+			.querySelectorAll('button')
+			.filter((button) => (button.getAttribute('aria-label') ?? button.text).trim() === '回到頂部');
+
+		expect(buttons).toHaveLength(1);
+		expect(buttons[0].getAttribute('type')).toBe('button');
 	});
 
 	describe('a post', () => {
@@ -699,6 +718,260 @@ describe('layout', () => {
 
 			expect(overflowing).toEqual({});
 		}, 120_000);
+	});
+
+	describe('the 回到頂部 button', () => {
+		const LONG_POST = '/2021/11/30/電子紙閱讀器使用心得/';
+		const DESKTOP = { width: 1280, height: 720 };
+
+		let browser: Browser | undefined;
+		let context: BrowserContext | undefined;
+
+		beforeAll(async () => {
+			// Headless Chromium jumps where a page asks for a smooth scroll, unless told not to.
+			browser = await chromium.launch({ args: ['--enable-smooth-scrolling'] });
+		}, 60_000);
+
+		afterEach(async () => {
+			await context?.close();
+		});
+
+		afterAll(async () => {
+			await browser?.close();
+		});
+
+		/** The long post, in a fresh browser tab with these options; only the site itself loads. */
+		async function openLongPost(options: BrowserContextOptions = {}) {
+			context = await browser!.newContext({ viewport: DESKTOP, ...options });
+			await context.route((url) => url.origin !== server!.url, (route) => route.abort());
+			const page = await context.newPage();
+			await page.goto(new URL(LONG_POST, server!.url).href, { waitUntil: 'load' });
+			return { page, button: page.getByRole('button', { name: '回到頂部' }) };
+		}
+
+		/** Lets the page react to what just happened: scroll events come with the next frame. */
+		async function settle(page: Page) {
+			await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))));
+		}
+
+		/** Scrolls to `screens` screen heights down the page, and lets the page react. */
+		async function scrollDown(page: Page, screens: number) {
+			await page.evaluate((screens) => window.scrollTo({ top: screens * window.innerHeight, behavior: 'instant' }), screens);
+			await settle(page);
+		}
+
+		/** Clicks the button; where the page was, and where it scrolls through until it is back at the top. */
+		async function clickAndFollowTheScroll(page: Page) {
+			const from = await page.evaluate(() => {
+				const positions: number[] = [];
+				Object.assign(window, { positions });
+				addEventListener('scroll', () => positions.push(window.scrollY));
+				return window.scrollY;
+			});
+			await page.getByRole('button', { name: '回到頂部' }).click();
+			await page.waitForFunction(() => window.scrollY === 0, undefined, { timeout: 5_000 });
+			const positions = await page.evaluate(() => (window as unknown as { positions: number[] }).positions);
+			return { from, positions };
+		}
+
+		/** Whether the element `locator` finds has the keyboard focus. */
+		const isFocused = (locator: ReturnType<Page['locator']>) =>
+			locator.evaluate((element) => element === document.activeElement);
+
+		/** WCAG 2's contrast ratio between two `rgb(r, g, b)` colours. */
+		function contrast(...colours: string[]) {
+			const luminance = (colour: string) => {
+				const [r, g, b] = colour.match(/\d+(\.\d+)?/g)!.slice(0, 3).map((value) => {
+					const channel = Number(value) / 255;
+					return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+				});
+				return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+			};
+			const [lighter, darker] = colours.map(luminance).sort((a, b) => b - a);
+			return (lighter + 0.05) / (darker + 0.05);
+		}
+
+		it('is hidden at the top of the page, and shows once the reader has scrolled down more than a screen', async () => {
+			const { page, button } = await openLongPost();
+
+			expect(await button.isVisible()).toBe(false);
+			await scrollDown(page, 0.5);
+			expect(await button.isVisible()).toBe(false);
+			await scrollDown(page, 1.5);
+			expect(await button.isVisible()).toBe(true);
+			await scrollDown(page, 0);
+			expect(await button.isVisible()).toBe(false);
+		}, 30_000);
+
+		it('never shows without JavaScript, which it needs to work', async () => {
+			const { page, button } = await openLongPost({ javaScriptEnabled: false });
+
+			// No animation frames to wait for: without JavaScript the page runs none.
+			const scrolled = await page.evaluate(() => {
+				window.scrollTo({ top: 3 * window.innerHeight, behavior: 'instant' });
+				return window.scrollY;
+			});
+
+			expect(scrolled).toBeGreaterThan(2 * DESKTOP.height);
+			expect(await button.isVisible()).toBe(false);
+		}, 30_000);
+
+		it('sits at the bottom right of the screen: a white arrow on the frame colour, #1a1a1a', async () => {
+			const { page, button } = await openLongPost();
+			await scrollDown(page, 3);
+
+			const box = (await button.boundingBox())!;
+			expect(DESKTOP.width - (box.x + box.width)).toBeLessThanOrEqual(32);
+			expect(DESKTOP.height - (box.y + box.height)).toBeLessThanOrEqual(32);
+			// Big enough to hit with a finger (WCAG 2.5.5's 44px).
+			expect(box.width).toBeGreaterThanOrEqual(44);
+			expect(box.height).toBeGreaterThanOrEqual(44);
+			const colours = await button.evaluate((element) => ({
+				background: getComputedStyle(element).backgroundColor,
+				arrow: getComputedStyle(element.querySelector('svg path')!).stroke,
+			}));
+			expect(colours).toEqual({ background: 'rgb(26, 26, 26)', arrow: 'rgb(255, 255, 255)' });
+			// WCAG AA, even held to the 4.5:1 of text.
+			expect(contrast(colours.background, colours.arrow)).toBeGreaterThanOrEqual(4.5);
+		}, 30_000);
+
+		it('is reached with Tab after the sidebar, shows a clear focus ring, and works with Enter', async () => {
+			const { page, button } = await openLongPost();
+			await page.locator('aside a').last().focus();
+			await settle(page);
+
+			await page.keyboard.press('Tab');
+
+			expect(await isFocused(button)).toBe(true);
+			const ring = await button.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return { style: style.outlineStyle, width: parseFloat(style.outlineWidth), colour: style.outlineColor };
+			});
+			expect(ring.style).toBe('solid');
+			expect(ring.width).toBeGreaterThanOrEqual(2);
+			// WCAG's 3:1 for focus indicators, on the white page and on the dark frame.
+			expect(contrast(ring.colour, 'rgb(255, 255, 255)')).toBeGreaterThanOrEqual(3);
+			expect(contrast(ring.colour, 'rgb(26, 26, 26)')).toBeGreaterThanOrEqual(3);
+			await page.keyboard.press('Enter');
+			await page.waitForFunction(() => window.scrollY === 0, undefined, { timeout: 5_000 });
+		}, 30_000);
+
+		it('scrolls smoothly back to the top when clicked', async () => {
+			const { page } = await openLongPost();
+			await scrollDown(page, 3);
+
+			const { from, positions } = await clickAndFollowTheScroll(page);
+
+			// On the way up, not straight there.
+			expect(from).toBeGreaterThan(2 * DESKTOP.height);
+			expect(positions.filter((y) => y > 0 && y < from).length).toBeGreaterThan(1);
+		}, 30_000);
+
+		it('jumps straight to the top for readers who ask for reduced motion', async () => {
+			const { page } = await openLongPost({ reducedMotion: 'reduce' });
+			await scrollDown(page, 3);
+
+			const { positions } = await clickAndFollowTheScroll(page);
+
+			expect(positions).toEqual([0]);
+		}, 30_000);
+
+		it('moves the keyboard focus to the start of the page at once: Tab goes on from there', async () => {
+			const { page, button } = await openLongPost();
+			await scrollDown(page, 3);
+			await button.focus();
+			await settle(page);
+			// Where the focus is when the page starts to move, while the button is
+			// still shown: not left on the button, to be lost when it hides.
+			await page.evaluate(() => {
+				const focusWhenMoving = new Promise((done) =>
+					addEventListener('scroll', () => done(document.activeElement?.tagName), { once: true }),
+				);
+				Object.assign(window, { focusWhenMoving });
+			});
+
+			await page.keyboard.press('Enter');
+			await page.waitForFunction(() => window.scrollY === 0, undefined, { timeout: 5_000 });
+
+			expect(await page.evaluate(() => (window as unknown as { focusWhenMoving: Promise<string> }).focusWhenMoving)).toBe(
+				'BODY',
+			);
+			await page.keyboard.press('Tab');
+			// The first thing on the page to Tab to.
+			expect(await isFocused(page.getByRole('link', { name: '跳到主要內容' }))).toBe(true);
+		}, 30_000);
+
+		describe('on a phone', () => {
+			const PHONE = { width: 320, height: 640 };
+
+			/** What the button covers: the text and the things to click or watch under it. */
+			async function coveredByTheButton(page: Page) {
+				return page.evaluate(() => {
+					const button = document.querySelector('button[aria-label="回到頂部"]')!.getBoundingClientRect();
+					const overlaps = (rect: DOMRect) =>
+						rect.width > 0 &&
+						rect.height > 0 &&
+						rect.left < button.right &&
+						rect.right > button.left &&
+						rect.top < button.bottom &&
+						rect.bottom > button.top;
+					const covered: string[] = [];
+					const texts = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+					for (let text = texts.nextNode(); text; text = texts.nextNode()) {
+						if (!text.textContent!.trim()) continue;
+						const range = document.createRange();
+						range.selectNodeContents(text);
+						if ([...range.getClientRects()].some(overlaps)) covered.push(`text: ${text.textContent!.trim().slice(0, 40)}`);
+					}
+					for (const element of document.querySelectorAll('a, button, input, select, textarea, iframe, img, video')) {
+						if (element.closest('button[aria-label="回到頂部"]')) continue;
+						if (overlaps(element.getBoundingClientRect())) covered.push(element.outerHTML.slice(0, 80));
+					}
+					return covered;
+				});
+			}
+
+			it('at the end of the page, covers no text or link, and does not make the page scroll sideways', async () => {
+				const { page, button } = await openLongPost({ viewport: PHONE });
+				await page.evaluate(() =>
+					window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }),
+				);
+				await settle(page);
+
+				expect(await button.isVisible()).toBe(true);
+				expect(await coveredByTheButton(page)).toEqual([]);
+				expect(
+					await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+				).toBeLessThanOrEqual(0);
+			}, 30_000);
+
+			// WCAG 2.4.11: what has the keyboard focus is not hidden under it.
+			it('never covers the link being Tabbed to', async () => {
+				const { page } = await openLongPost({ viewport: PHONE });
+
+				// Tab through the page, from the top to the button.
+				const covered: string[] = [];
+				let reachedTheButton = false;
+				for (let presses = 0; presses < 300 && !reachedTheButton; presses++) {
+					await page.keyboard.press('Tab');
+					await settle(page);
+					const focus = await page.evaluate(() => {
+						const focused = document.activeElement!;
+						const button = document.querySelector<HTMLButtonElement>('button[aria-label="回到頂部"]')!;
+						if (focused === button) return { onTheButton: true };
+						if (button.hidden) return { onTheButton: false };
+						const [a, b] = [focused.getBoundingClientRect(), button.getBoundingClientRect()];
+						const overlaps = a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+						return { onTheButton: false, covered: overlaps ? focused.outerHTML.slice(0, 80) : undefined };
+					});
+					reachedTheButton = focus.onTheButton;
+					if (focus.covered) covered.push(focus.covered);
+				}
+
+				expect(reachedTheButton).toBe(true);
+				expect(covered).toEqual([]);
+			}, 60_000);
+		});
 	});
 });
 

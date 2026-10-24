@@ -1,0 +1,88 @@
+---
+// The 回到頂部 button, at the bottom right of every page. Hidden until the
+// reader has scrolled down more than a screen; without JavaScript, never shown.
+---
+
+<button type="button" class="back-to-top" aria-label="回到頂部" hidden>
+	<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+		<path d="M12 19V5M5 12l7-7 7 7" />
+	</svg>
+</button>
+
+<script>
+	const button = document.querySelector<HTMLButtonElement>('.back-to-top')!;
+
+	function update() {
+		const hide = window.scrollY <= window.innerHeight;
+		if (button.hidden !== hide) button.hidden = hide;
+	}
+	addEventListener('scroll', update, { passive: true });
+	addEventListener('resize', update, { passive: true });
+	update();
+
+	const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+	button.addEventListener('click', () => {
+		// The keyboard focus goes to the start of the page, so Tab goes on from
+		// there, and is not left on the button as it hides.
+		const start = document.body;
+		start.tabIndex = -1;
+		start.addEventListener('blur', () => start.removeAttribute('tabindex'), { once: true });
+		start.focus({ preventScroll: true });
+		window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+	});
+</script>
+
+<style>
+	/* A white arrow on the frame colour; the faint ring shows it on the frame too. */
+	.back-to-top {
+		position: fixed;
+		right: 1rem;
+		bottom: 1rem;
+		z-index: 5;
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		padding: 0;
+		border: 1px solid rgb(255 255 255 / 25%);
+		border-radius: 50%;
+		background: var(--color-frame);
+		color: #fff;
+		box-shadow: 0 2px 6px rgb(0 0 0 / 30%);
+		cursor: pointer;
+	}
+	.back-to-top[hidden] {
+		display: none;
+	}
+	.back-to-top:hover {
+		background: var(--color-link);
+	}
+	.back-to-top:focus-visible {
+		outline: 3px solid var(--color-link);
+		outline-offset: 3px;
+	}
+	svg {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2.5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	@media print {
+		.back-to-top {
+			display: none;
+		}
+	}
+
+	/* What gets the keyboard focus scrolls into view above the button, not under it. */
+	:global(html) {
+		scroll-padding-bottom: 4.25rem;
+	}
+
+	/* The page itself, focused by the button: no focus ring around everything. */
+	:global(body:focus) {
+		outline: none;
+	}
+</style>
