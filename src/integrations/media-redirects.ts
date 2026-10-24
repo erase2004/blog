@@ -1,6 +1,6 @@
 import type { AstroIntegration } from 'astro';
 import { mediaFiles, oldUrlsOf } from '../lib/old-url-map';
-import { appendRedirects } from './redirects-file';
+import { appendRedirects, type RedirectRule } from './redirects-file';
 
 /**
  * Adds a `<old URL> <URL on R2> 301` rule to `_redirects` for each old URL of
@@ -15,7 +15,7 @@ export default function mediaRedirects(): AstroIntegration {
 		hooks: {
 			'astro:build:done': async ({ dir, logger }) => {
 				const rules = mediaFiles().flatMap((file) =>
-					oldUrlsOf(file).map((old) => `${encodeURI(old)} ${encodeURI(file.url)} 301`),
+					oldUrlsOf(file).map((old): RedirectRule => ({ from: old, to: file.url, status: 301 })),
 				);
 
 				await appendRedirects(dir, rules);

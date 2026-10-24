@@ -1,13 +1,16 @@
 import type { AstroIntegration } from 'astro';
 import { expectedUrls } from '../lib/old-url-map';
-import { appendRedirects } from './redirects-file';
+import { appendRedirects, type RedirectRule } from './redirects-file';
 
 /**
  * The feed of each post, page, category and tag, `<URL>feed/`, redirects to
  * `<URL>`, with or without its trailing slash: dynamic rules for all of
  * them (`/feed/` itself does not match).
  */
-const FEED_RULES = ['/*/feed/ /:splat/ 301', '/*/feed /:splat/ 301'];
+const FEED_RULES: RedirectRule[] = [
+	{ from: '/*/feed/', to: '/:splat/', status: 301 },
+	{ from: '/*/feed', to: '/:splat/', status: 301 },
+];
 const isFeedOf = (url: string, location: string) => url === `${location}feed/`;
 
 /**
@@ -36,8 +39,9 @@ export default function pageRedirects(): AstroIntegration {
 				);
 				const rules = redirects
 					.filter(({ url, location }) => !url.includes('?') && !isFeedOf(url, location))
-					.flatMap(({ url, location }) => (url.endsWith('/') ? [url, url.slice(0, -1)] : [url]).map((from) => ({ from, location })))
-					.map(({ from, location }) => `${encodeURI(from)} ${encodeURI(location)} 301`);
+					.flatMap(({ url, location }) =>
+						(url.endsWith('/') ? [url, url.slice(0, -1)] : [url]).map((from): RedirectRule => ({ from, to: location, status: 301 })),
+					);
 				const feeds = redirects.filter(({ url, location }) => isFeedOf(url, location)).length;
 
 				await appendRedirects(dir, [...rules, ...FEED_RULES]);
