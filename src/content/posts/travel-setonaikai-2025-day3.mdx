@@ -11,6 +11,26 @@ draft: false
 wordpressId: 701
 ---
 
+import Compare from '../../components/Compare.astro';
+import compare1After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_090709.jpg';
+import compare1Before from '../../assets/images/travel-setonaikai-2025-day3/FiVPPKNVQAArrUS.jpeg';
+import compare2After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_104948.jpg';
+import compare2Before from '../../assets/images/travel-setonaikai-2025-day3/8a6a5bf6243acbe99900d2e8417652e7.jpg';
+import compare3After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_153412.jpg';
+import compare3Before from '../../assets/images/travel-setonaikai-2025-day3/1745662586-0d2g1sYwMuSL8AiyEU7eJXbc.webp';
+import compare4After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_153115.jpg';
+import compare4Before from '../../assets/images/travel-setonaikai-2025-day3/1745662749-bqZoefOdXUQ2zR1gvViu4SLA.webp';
+import compare5After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_154141.jpg';
+import compare5Before from '../../assets/images/travel-setonaikai-2025-day3/1745663102-o2I54GWN3PQlRMT8z1mrucHX.webp';
+import compare6After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_154804.jpg';
+import compare6Before from '../../assets/images/travel-setonaikai-2025-day3/66b25ab72aed5f1c28e38cae704ddb62.jpg';
+import compare7After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_153558.jpg';
+import compare7Before from '../../assets/images/travel-setonaikai-2025-day3/1745665872-VOgzJbqjvRP3CHIlahfMmXT9.webp';
+import compare8After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_180724.jpg';
+import compare8Before from '../../assets/images/travel-setonaikai-2025-day3/si_20250422_062630.jpg';
+import compare9After from '../../assets/images/travel-setonaikai-2025-day3/pi_20250422_180821.jpg';
+import compare9Before from '../../assets/images/travel-setonaikai-2025-day3/si_20250422_062630_1.jpg';
+
 旅遊第三天，早上，我從丸龜搭電車坂出站，接下來，藉由公車和走路，穿梭於瀨戶藝春會期限定的沙彌島和瀨居島的景點。下午，搭乘公車回到坂出站，接著，搭乘電車到高松，最後入住東橫 INN 高松站前。
 
 今天早上只要在坂出站搭上 8:35 的公車，又丸龜到坂出僅隔兩站，列車通勤時間約 10 分鐘，相較於昨天到高松站有較多的餘裕，因此，起床時間可以設定為 6:30 之後。起床後簡單梳洗，然後到旅館一樓大廳享用免費的早餐，用餐結束後回到房間整理一下行李，接著拖著行李到旅館大廳，在自動化櫃台辦理退房手續，最後前往丸龜站準備搭車。
@@ -27,11 +47,7 @@ wordpressId: 701
 
 在公車抵達[沙弥島万葉会館站](https://maps.app.goo.gl/8J9EPp2Xk5vF5Zse8)後，我便下車，準備先從「[幻海をのぞく](https://setouchi-artfest.jp/artworks/detail/54e19d17-6baf-4369-8335-e77318c61100)」開始看，在前往的途中，看到告示牌，告知該作品的開始時間調整為 9:30，由於時間尚未允許，只好馬上調整行程，先去[沙弥ナカンダ浜](https://maps.app.goo.gl/XJBx8644yffoSz4h8)拍照。
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1228,"url":"https://aniya.moe/wp-content/uploads/2025/05/FiVPPKNVQAArrUS.jpeg","alt":"","width":853,"height":480},"imageAfter":{"id":713,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250422_090709.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"結城友奈は勇者である中出現的海邊與後方的瀨戶大橋，拍攝地點為沙弥ナカンダ浜"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1228" src="https://aniya.moe/wp-content/uploads/2025/05/FiVPPKNVQAArrUS.jpeg" alt="" width="853" height="480" class="image-compare__image-before"/><img id="713" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_090709.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的海邊與後方的瀨戶大橋，拍攝地點為沙弥ナカンダ浜</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare1Before} after={compare1After}>結城友奈は勇者である中出現的海邊與後方的瀨戶大橋，拍攝地點為沙弥ナカンダ浜</Compare>
 
 拍照完後，折返回去看「幻海をのぞく」。該作品主要呈現瀨戶內海區域曾經是中國和四國之間的盆地的樣貌，只是在冰河期結束後，因為海平面上升，海水灌入這大片盆地，所以形成現在的樣貌，另外，該作品也展示曾經在這一帶發現的象牙化石。
 
@@ -54,11 +70,7 @@ wordpressId: 701
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/html"
-<!-- wp:html -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1762" src="https://aniya.moe/wp-content/uploads/2025/05/8a6a5bf6243acbe99900d2e8417652e7.jpg" alt="" width="1624" height="915" class="image-compare__image-before"/><img id="727" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_104948.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的展望台</figcaption></figure>
-<!-- /wp:html -->
-```
+<Compare before={compare2Before} after={compare2After}>結城友奈は勇者である中出現的展望台</Compare>
 
 ---
 
@@ -86,35 +98,15 @@ wordpressId: 701
 
 公車抵達後，我搭乘公車回到瀨戶大橋紀念公園，路途上整理等會要拍照的項目，抵達公園會便開始拍照，拍照完回到公車站，等待回坂出站的公車。由於往竹浦方向的公車（15:59）比往坂出站方向的公車（16:00）還要早到站，又兩者的資訊看板沒有明顯區別，結果我搭到了往竹浦方向的公車，多繞了一大段路，等公車從竹浦折返後，才回到坂出站。
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1231,"url":"https://aniya.moe/wp-content/uploads/2025/05/1745662586-0d2g1sYwMuSL8AiyEU7eJXbc.webp","alt":"","width":1920,"height":1080},"imageAfter":{"id":736,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250422_153412.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"結城友奈は勇者である中出現的天の泉"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1231" src="https://aniya.moe/wp-content/uploads/2025/05/1745662586-0d2g1sYwMuSL8AiyEU7eJXbc.webp" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="736" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_153412.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的天の泉</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare3Before} after={compare3After}>結城友奈は勇者である中出現的天の泉</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1232,"url":"https://aniya.moe/wp-content/uploads/2025/05/1745662749-bqZoefOdXUQ2zR1gvViu4SLA.webp","alt":"","width":1920,"height":1080},"imageAfter":{"id":738,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250422_153115.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"結城友奈は勇者である中出現的紀念館"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1232" src="https://aniya.moe/wp-content/uploads/2025/05/1745662749-bqZoefOdXUQ2zR1gvViu4SLA.webp" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="738" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_153115.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的紀念館</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare4Before} after={compare4After}>結城友奈は勇者である中出現的紀念館</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1233,"url":"https://aniya.moe/wp-content/uploads/2025/05/1745663102-o2I54GWN3PQlRMT8z1mrucHX.webp","alt":"","width":1920,"height":1080},"imageAfter":{"id":740,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250422_154141.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"結城友奈は勇者である中出現的瀨戶大橋，拍攝位置為展望台的右側"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1233" src="https://aniya.moe/wp-content/uploads/2025/05/1745663102-o2I54GWN3PQlRMT8z1mrucHX.webp" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="740" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_154141.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的瀨戶大橋，拍攝位置為展望台的右側</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare5Before} after={compare5After}>結城友奈は勇者である中出現的瀨戶大橋，拍攝位置為展望台的右側</Compare>
 
-```html title="wp-unconverted: core/html"
-<!-- wp:html -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1764" src="https://aniya.moe/wp-content/uploads/2025/05/66b25ab72aed5f1c28e38cae704ddb62.jpg" alt="" width="1624" height="915" class="image-compare__image-before"/><img id="744" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_154804.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的マリンドーム內部</figcaption></figure>
-<!-- /wp:html -->
-```
+<Compare before={compare6Before} after={compare6After}>結城友奈は勇者である中出現的マリンドーム內部</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1235,"url":"https://aniya.moe/wp-content/uploads/2025/05/1745665872-VOgzJbqjvRP3CHIlahfMmXT9.webp","alt":"","width":1920,"height":1080},"imageAfter":{"id":746,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250422_153558.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"結城友奈は勇者である中出現的紀念公園一景"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1235" src="https://aniya.moe/wp-content/uploads/2025/05/1745665872-VOgzJbqjvRP3CHIlahfMmXT9.webp" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="746" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_153558.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的紀念公園一景</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare7Before} after={compare7After}>結城友奈は勇者である中出現的紀念公園一景</Compare>
 
 ---
 
@@ -126,17 +118,9 @@ wordpressId: 701
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":760,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":761,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_180724.jpg","alt":"","width":1920,"height":1080},"caption":"ざつ旅第三集出現的高松站"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="760" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="761" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_180724.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>ざつ旅第三集出現的高松站</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare8Before} after={compare8After}>ざつ旅第三集出現的高松站</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":762,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630_1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":763,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_180821.jpg","alt":"","width":1920,"height":1080},"caption":"ざつ旅第三集出現的高松站前廣場"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="762" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630_1.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="763" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_180821.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>ざつ旅第三集出現的高松站前廣場</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare9Before} after={compare9After}>ざつ旅第三集出現的高松站前廣場</Compare>
 
 在站前分館的自助櫃台辦理入住手續時，或許是輸入英文聯絡地址佔用太多時間，服務人員介入處理，於是我在沒輸入完整聯絡資訊的情況下拿到房卡，完成手續。
 
