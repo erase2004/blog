@@ -440,12 +440,15 @@ describe('layout', () => {
 		expect(linksUnder('標籤')).toHaveLength(57);
 	});
 
-	it.each(PAGES)('%s has the site footer, with the rel="me" link that verifies the Mastodon account', async (path) => {
+	it.each(PAGES)('%s has the site footer, with the hidden rel="me" link that verifies the Mastodon account', async (path) => {
 		const footer = (await html(path)).querySelectorAll('footer').find((element) => !element.closest('main'));
+		const mastodon = footer?.querySelector('a[href="https://g0v.social/@erase2004"]');
 
 		expect(footer?.text).toContain('TsukiStudio');
-		// As on the WordPress site, for Mastodon's profile link verification.
-		expect(footer?.querySelector('a[href="https://g0v.social/@erase2004"]')?.getAttribute('rel')).toContain('me');
+		// As on the WordPress site: in the HTML, for Mastodon's profile link
+		// verification, but not shown, focused or read out.
+		expect(mastodon?.getAttribute('rel')?.split(/\s+/)).toContain('me');
+		expect(mastodon?.hasAttribute('hidden')).toBe(true);
 	});
 
 	describe('a post', () => {
