@@ -811,4 +811,36 @@ describe('feeds', () => {
 		expect(html.querySelector('a[data-footnote-ref]')?.getAttribute('href')).toBe('#post-mdx-user-content-fn-1');
 		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
+
+	it('/feed/atom/ is an Atom feed of the same posts, with the same full text and WordPress’s entry IDs', async () => {
+		const response = await get('/feed/atom/');
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toBe('application/atom+xml; charset=utf-8');
+		const atom = parseXml(await response.text(), ['entry', 'link', 'category']).feed;
+		expect(atom).toMatchObject({
+			'@xmlns': 'http://www.w3.org/2005/Atom',
+			'@xml:lang': 'zh-TW',
+			id: 'https://aniya.moe/feed/atom/',
+			title: { '#text': 'TsukiStudio' },
+			subtitle: { '#text': '生活點滴紀錄' },
+			updated: '2026-01-23T10:01:26Z',
+		});
+		expect(atom.link).toContainEqual(expect.objectContaining({ '@rel': 'self', '@href': 'https://aniya.moe/feed/atom/' }));
+		const alternate = (entry: { link: { '@rel': string; '@href': string }[] }) =>
+			entry.link.find((link) => link['@rel'] === 'alternate')?.['@href'];
+		expect(atom.entry.map(alternate)).toEqual(NEWEST_POSTS);
+		expect(atom.entry[1]).toMatchObject({
+			id: 'https://aniya.moe/?p=1797',
+			author: { name: 'Tsuki' },
+			published: '2025-12-05T10:00:00Z',
+			updated: '2025-12-05T12:02:43Z',
+			category: ['旅遊', '閒聊', 'こえび隊', '小蝦隊', '瀨戶內國際藝術祭'].map((term) => ({ '@term': term })),
+		});
+		const rssItems = (await rss()).channel.item;
+		atom.entry.forEach((entry: { content: { '@type': string; '#text': string } }, index: number) => {
+			expect(entry.content['@type']).toBe('html');
+			expect(entry.content['#text'], alternate(entry as never)).toBe(rssItems[index]['content:encoded']);
+		});
+	});
 });

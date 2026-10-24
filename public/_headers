@@ -4,3 +4,5 @@
 # with its trailing slash, so their Content-Type is set here.
 /feed/
   Content-Type: application/rss+xml; charset=utf-8
+/feed/atom/
+  Content-Type: application/atom+xml; charset=utf-8

@@ -67,6 +67,37 @@ export async function rssFeed(site: URL): Promise<string> {
 	].join('\n');
 }
 
+/** The Atom feed at /feed/atom/. */
+export async function atomFeed(site: URL): Promise<string> {
+	const { entries, updated } = await feed(site);
+	const self = new URL('/feed/atom/', site).href;
+	return [
+		'<?xml version="1.0" encoding="UTF-8"?>',
+		'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh-TW">',
+		`<title type="text">${escapeXml(SITE_TITLE)}</title>`,
+		`<subtitle type="text">${escapeXml(SITE_DESCRIPTION)}</subtitle>`,
+		`<updated>${rfc3339(updated)}</updated>`,
+		`<link rel="alternate" type="text/html" href="${escapeXml(site.href)}" />`,
+		`<id>${escapeXml(self)}</id>`,
+		`<link rel="self" type="application/atom+xml" href="${escapeXml(self)}" />`,
+		...entries.flatMap((entry) => [
+			'<entry>',
+			`<author><name>${escapeXml(AUTHOR)}</name><uri>${escapeXml(new URL('/about/', site).href)}</uri></author>`,
+			`<title type="text">${escapeXml(entry.title)}</title>`,
+			`<link rel="alternate" type="text/html" href="${escapeXml(entry.url)}" />`,
+			`<id>${escapeXml(entry.id)}</id>`,
+			`<updated>${rfc3339(entry.updated)}</updated>`,
+			`<published>${rfc3339(entry.published)}</published>`,
+			...entry.terms.map((term) => `<category scheme="${escapeXml(site.href)}" term="${escapeXml(term)}" />`),
+			`<summary type="text">${escapeXml(entry.summary)}</summary>`,
+			`<content type="html" xml:base="${escapeXml(entry.url)}">${cdata(entry.content)}</content>`,
+			'</entry>',
+		]),
+		'</feed>',
+		'',
+	].join('\n');
+}
+
 /** The newest posts, and when the latest change to any post was made (WordPress's `lastBuildDate`). */
 async function feed(site: URL): Promise<{ entries: FeedEntry[]; updated: Date }> {
 	const posts = await getPosts();
@@ -111,6 +142,11 @@ export async function feedContent(
 /** RSS's date format, as WordPress wrote it: `Fri, 23 Jan 2026 10:00:00 +0000`. */
 function rfc822(date: Date): string {
 	return date.toUTCString().replace(/GMT$/, '+0000');
+}
+
+/** Atom's date format, as WordPress wrote it: `2026-01-23T10:01:26Z`. */
+function rfc3339(date: Date): string {
+	return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
 }
 
 function escapeXml(text: string): string {
