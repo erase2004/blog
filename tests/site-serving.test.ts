@@ -13,15 +13,17 @@ import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 const buildScript = fileURLToPath(new URL('./support/build-site.mjs', import.meta.url));
 const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta.url));
 
-// A test-only page the build script adds next to the site's real pages.
+// Test-only pages the build script adds next to the site's real pages: a
+// plain page, and one with the sidebar widgets.
 const PROBE_PATH = '/probe/';
+const WIDGETS_PATH = '/widgets/';
 
 let outDir: string;
 let server: WranglerDev | undefined;
 
 beforeAll(async () => {
 	outDir = mkdtempSync(join(tmpdir(), 'aniya-moe-site-'));
-	execFileSync(process.execPath, [buildScript, outDir, PROBE_PATH], { stdio: 'inherit' });
+	execFileSync(process.execPath, [buildScript, outDir, PROBE_PATH, WIDGETS_PATH], { stdio: 'inherit' });
 	server = await startWranglerDev({ assetsDir: outDir });
 }, 180_000);
 
@@ -214,6 +216,91 @@ describe('archives', () => {
 			'/2025/05/': '5 月, 2025 - TsukiStudio',
 			'/2025/05/17/': '2025 年 5 月 17 日 - TsukiStudio',
 		});
+	});
+});
+
+// Expected values from the WordPress sidebar (aniya.moe, 2026-10-24).
+describe('sidebar widgets', () => {
+	async function widget(id: string) {
+		const response = await get(WIDGETS_PATH);
+		return parse(await response.text()).querySelector(`#${id}`)!;
+	}
+
+	/** Each list item's link, and the post count after it. */
+	async function countedLinks(id: string) {
+		return (await widget(id)).querySelectorAll('li').map((item) => {
+			const link = item.querySelector('a')!;
+			return {
+				text: link.text.trim(),
+				href: decodeURI(link.getAttribute('href')!),
+				count: Number(item.text.match(/\((\d+)\)/)?.[1]),
+			};
+		});
+	}
+
+	it('the category list links to each category that has posts, with its post count', async () => {
+		expect(await countedLinks('categories')).toEqual([
+			{ text: '技術', href: '/category/技術/', count: 9 },
+			{ text: '旅遊', href: '/category/旅遊/', count: 10 },
+			{ text: '閒聊', href: '/category/閒聊/', count: 4 },
+		]);
+	});
+
+	it('the year list links to each year that has posts, newest first, with its post count', async () => {
+		expect(await countedLinks('years')).toEqual([
+			{ text: '2026', href: '/2026/', count: 1 },
+			{ text: '2025', href: '/2025/', count: 11 },
+			{ text: '2022', href: '/2022/', count: 6 },
+			{ text: '2021', href: '/2021/', count: 4 },
+		]);
+	});
+
+	it('the tag cloud links to every tag that has posts, by name, bigger the more posts it has', async () => {
+		const cloud = (await widget('tags')).querySelectorAll('a').map((link) => ({
+			text: link.text.trim(),
+			href: decodeURI(link.getAttribute('href')!),
+			size: Number(link.getAttribute('style')?.match(/font-size:\s*([\d.]+)pt/)?.[1]),
+		}));
+
+		expect(cloud).toHaveLength(57);
+		expect(cloud).toContainEqual(expect.objectContaining({ text: 'BOOK☆WALKER', href: '/tag/book☆walker/' }));
+		// WordPress showed 30 of the tags (ties picked arbitrarily), 10pt to 16pt.
+		const wordpress: [string, number][] = [
+			['Astro', 10],
+			['Ave Mujica', 10],
+			['SSG', 10],
+			['Summer Pockets', 14.430769230769],
+			['Tailwind CSS', 10],
+			['Vue', 11.661538461538],
+			['Vue Router', 11.661538461538],
+			['Website Optimization', 10],
+			['Windows', 12.769230769231],
+			['からかい上手の高木さん', 10],
+			['こえび隊', 10],
+			['ざつ旅', 11.661538461538],
+			['ゆゆゆ', 11.661538461538],
+			['丸龜', 11.661538461538],
+			['女木島', 10],
+			['小蝦隊', 10],
+			['小豆島', 10],
+			['岡山', 12.769230769231],
+			['德島', 11.661538461538],
+			['推しが武道館いってくれたら死ぬ', 10],
+			['沙彌島', 10],
+			['瀨居島', 10],
+			['瀨戶內國際藝術祭', 15.538461538462],
+			['犬島', 10],
+			['男木島', 11.661538461538],
+			['直島', 10],
+			['聖地巡禮', 16],
+			['香川', 10],
+			['高松', 15.076923076923],
+			['鳴門', 10],
+		];
+		const shown = new Set(wordpress.map(([text]) => text));
+		expect(cloud.filter(({ text }) => shown.has(text)).map(({ text, size }) => [text, size])).toEqual(
+			wordpress.map(([text, size]) => [text, expect.closeTo(size, 2)]),
+		);
 	});
 });
 

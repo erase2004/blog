@@ -1,0 +1,12 @@
+---
+// Sidebar widget: the categories that have posts, with their post counts.
+import { categoryArchives } from '../lib/archives';
+import ArchiveList from './ArchiveList.astro';
+
+const archives = await categoryArchives();
+---
+
+<ArchiveList
+	label="分類"
+	items={archives.map((archive) => ({ name: archive.name, path: archive.path, count: archive.posts.length }))}
+/>
