@@ -1,0 +1,15 @@
+---
+// The home page's later pages, at their WordPress URLs /page/2/, /page/3/, …
+import ArchiveLayout from '../../layouts/ArchiveLayout.astro';
+import { type ArchivePage, archivePages, homeArchive } from '../../lib/archives';
+
+export async function getStaticPaths() {
+	return archivePages(await homeArchive())
+		.slice(1)
+		.map((page) => ({ params: { page: String(page.number) }, props: { page } }));
+}
+
+const { page } = Astro.props as { page: ArchivePage };
+---
+
+<ArchiveLayout page={page} />
