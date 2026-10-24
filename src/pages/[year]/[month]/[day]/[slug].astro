@@ -1,0 +1,27 @@
+---
+// A post, at its WordPress URL /YYYY/MM/DD/<slug>/.
+import { render } from 'astro:content';
+import { SITE_TITLE } from '../../../../consts';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getPosts, type Post, postDescription, siteDate } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+	return (await getPosts()).map((post) => ({
+		params: { ...siteDate(post.data.published), slug: post.data.slug },
+		props: { post },
+	}));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const { title, published } = post.data;
+const { year, month, day } = siteDate(published);
+---
+
+<BaseLayout title={`${title} - ${SITE_TITLE}`} description={postDescription(post)}>
+	<article>
+		<h1>{title}</h1>
+		<p><time datetime={published.toISOString()}>{`${year} 年 ${Number(month)} 月 ${Number(day)} 日`}</time></p>
+		<Content />
+	</article>
+</BaseLayout>

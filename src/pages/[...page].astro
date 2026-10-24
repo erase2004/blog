@@ -1,0 +1,24 @@
+---
+// A page, at its WordPress URL: /about/, /about/contact/, /policy/, …
+import { render } from 'astro:content';
+import { SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPages, type Page, pagePath } from '../lib/content';
+
+export async function getStaticPaths() {
+	return (await getPages()).map((page) => ({
+		params: { page: pagePath(page).slice(1, -1) },
+		props: { page },
+	}));
+}
+
+const { page } = Astro.props as { page: Page };
+const { Content } = await render(page);
+---
+
+<BaseLayout title={`${page.data.title} - ${SITE_TITLE}`} description={page.data.description}>
+	<article>
+		<h1>{page.data.title}</h1>
+		<Content />
+	</article>
+</BaseLayout>

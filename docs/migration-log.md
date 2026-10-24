@@ -248,3 +248,169 @@ npm run check-urls -- build --prune-pending   # 順便把已經通過的網址�
 ### 備份
 
 - WordPress 備份已另存一份到異地（站長確認）。
+
+## 05：轉換器與文章、頁面的文字內容（2026-10-24）
+
+### 重新產生所有轉換結果
+
+```sh
+npm run convert-wordpress                      # 讀 D:/wordpress-backup/wordpress-2026-10-24-23e0c01.sql
+npm run convert-wordpress -- <其他 dump.sql>   # 換一份備份
+```
+
+- 一個指令重新產生所有轉換出來的檔案：`src/content/posts/`、`src/content/pages/`（先整個清空再寫，在 18 號人工檢查之前，這兩個資料夾裡的檔案都來自轉換器）、`src/data/categories.json`、`src/data/tags.json`、`src/data/old-url-map.json`。
+- 同一份備份、同一份程式碼，輸出的每個位元組都一樣（實測兩次輸出的雜湊相同；測試也確認資料表的列換了順序，輸出不變）。所以**平行的 branch 合併時，這些產生出來的檔案衝突了不用手動解，合併完程式碼後重跑這個指令就好**。待完成清單不是產生的，照 03 號的規則處理。
+- 備份檔只讀不寫，路徑在 `scripts/wordpress-converter/settings.ts`。結束時會列出還留著「未轉換標記」的元素各有幾個。
+
+### 架構
+
+程式在 `scripts/convert-wordpress.ts`（指令）與 `scripts/wordpress-converter/`：
+
+| 檔案 | 內容 |
+|---|---|
+| `sql-dump.ts` | 直接解析 mysqldump 的 SQL：從 `CREATE TABLE` 拿欄位名稱，從 `INSERT` 拿資料列，處理 `\'`、`\\`、`\n` 等跳脫字元。不匯入資料庫，也不用 WXR。25 MB 的備份約 0.4 秒。 |
+| `wordpress.ts` | 把資料表整理成文章（各種 post type）、metadata、選項、分類與標籤、使用者、AIOSEO 設定。 |
+| `blocks.ts` | 照 WordPress 的 block parser 解析 `<!-- wp:… -->` 區塊，保留每個區塊的原始寫法（給未轉換標記用）。 |
+| `content.ts` | 轉換引擎：每個區塊、HTML 元素、shortcode 交給登記的規則；沒有規則的一律變成未轉換標記。 |
+| `rules/` | 轉換規則，一個關注點一個模組，在 `rules/index.ts` 登記。 |
+| `convert.ts` | 整個網站：每篇文章與頁面的 frontmatter 和檔名、分類與標籤資料檔、對應表。 |
+| `url-map/` | 對應表裡的舊網址，一類一個模組，在 `url-map/index.ts` 登記。 |
+| `seo.ts` | AIOSEO 的描述與社群圖片，以及 AIOSEO 從內文產生描述的方式。 |
+| `markdown.ts`、`html.ts`、`frontmatter.ts` | Markdown 跳脫、保留的 HTML、frontmatter 的寫法。 |
+
+### 後續 issue 怎麼擴充轉換器
+
+06、08、09、10 號會在各自的 branch 同時擴充轉換器，所以每個關注點都是獨立的模組：
+
+- **已經預留的模組**：`rules/images.ts`（06）、`rules/media.ts`（07：影片與 PDF）、`rules/code.ts`、`rules/footnotes.ts`、`rules/youtube.ts`（08）、`rules/gallery.ts`（09）、`rules/compare.ts`（10）。它們已經登記好、宣告了自己負責的區塊與元素，目前只留下未轉換標記，模組開頭的註解寫了該轉成什麼、資料在哪裡。**這幾張 issue 只要改自己的模組，不用動 `rules/index.ts`**，彼此不會衝突。
+- **新增一個關注點**：寫一個新模組，在 `rules/index.ts` 加一行 `export { 名稱 } from './檔名.ts';`（照字母排序，不同 issue 加的行通常不會相鄰）。
+- 一條規則（`rule.ts` 的 `Rule`）可以宣告：
+  - `blocks`：依區塊名稱（`core/image`、`envira/envira-gallery`）轉換整個區塊，回傳 Markdown。
+  - `elements`：依標籤名稱轉換文字裡的 HTML 元素；`sup[data-fn]` 這種寫法只比對有那個屬性的元素，優先於 `sup`。
+  - `shortcodes`：依名稱轉換 shortcode（`ref` 就是 `[ref]…[/ref]`）。
+  - `finish`：整篇轉完之後執行，例如把腳註定義加在文末。
+  - 同一個區塊、元素或 shortcode 只能有一條規則認領，重複就直接報錯，不會因為登記順序而默默蓋掉。
+- 規則拿到的 `context`：`entry`（正在轉換的文章）、`site`（整份備份的資料）、`parse()`、`inline()`（文字內容轉 Markdown）、`blocks()`（內層區塊）、`rawHtml()`（在 .md 和 .mdx 裡意思都一樣的 HTML）、`url()`（站內絕對網址轉相對路徑）、`unconverted()`。
+- 需要元件時：`context.document.imports.add("import Gallery from '…';")`，有 import 的檔案自動輸出成 `.mdx`，對應表裡的檔名也跟著變。`context.document.footer` 加在文末，`context.document.state` 讓規則存放一篇文章內的狀態（例如腳註編號）。
+- 對應表也一樣：`url-map/` 一類舊網址一個模組，回傳 `urls`（預期）和自己的 section（例如 06 號的 upload 路徑與附件頁）。
+
+### 未轉換的元素：明顯的標記
+
+還不能轉換的元素原封不動留在輸出裡，不會靜默丟失：
+
+- 區塊：變成一個程式碼區塊，標題是 `wp-unconverted: <區塊名稱>`，內容是區塊在 WordPress 裡的原始寫法。頁面上看得到，建置照常通過，在 .md 和 .mdx 都合法（測試會編譯成 MDX 確認）。Gutenberg 腳註區塊的標記另外列出存在 postmeta 裡的腳註內文，在 08 號轉換之前不會遺失。
+- 文字裡的元素：變成行內程式碼 `` `wp-unconverted: <原始寫法>` ``。
+- 用 `grep -r wp-unconverted src/content` 就能找到全部。08 號的驗收條件「05 號留下的對應標記全部處理掉」指的就是這些。
+
+轉換後留下的標記（kind：數量／檔案數）：
+
+| 元素 | 數量 | 負責的 issue |
+|---|---|---|
+| `core/image` | 93／18（另有 5 張在 3 個 gallery 裡） | 06 |
+| `img`（文字裡 48px 的小圖） | 6／4 | 06 |
+| `core/video`、`core/file` | 7／4、1／1 | 07 |
+| `core/code` | 9／3 | 08 |
+| `[ref]`、`sup[data-fn]`、`core/footnotes` | 38／6、37／8、8／8 | 08 |
+| `core/embed`（YouTube） | 2／1 | 08 |
+| `envira/envira-gallery`、`core/gallery` | 83／10、3／3 | 09 |
+| `jetpack/image-compare`、`core/html` | 72／6、8／4 | 10 |
+
+數字跟規劃時統計的完全一致，沒有其他種類的未轉換元素。
+
+### 文字類 block 的轉換規則
+
+| 來源 | 轉成 |
+|---|---|
+| 段落 | Markdown 段落；空段落省略；置中、字級等 class 不保留 |
+| 標題 | 同層級的 `#` 標題；inline style（`line-height:0` 等）不保留 |
+| 清單（舊式 `<ul>` 與 list-item block） | Markdown 清單，保留編號與巢狀 |
+| 表格 | 保留 HTML（唯一的表格沒有表頭列、儲存格裡有換行），去掉 WordPress 的 class 與外層 `<figure>`，一列一行 |
+| 分隔線 | `---`；寬版、點點等樣式不保留 |
+| 按鈕 | 一般連結，一個按鈕一段，外觀交給新版型 |
+| 欄位 | 攤平，裡面的區塊依序排列（唯一一個是 100% 寬的單欄） |
+| `<mark style=… class=…>` | 一律 `<mark>`，由版型決定一種螢光筆樣式 |
+| `<ruby>` | 保留 HTML |
+| 站內的 `https://aniya.moe/…`、`http://aniya.moe/…` | 相對路徑，中文路徑解碼成 UTF-8 方便閱讀 |
+| `[lmt-post-modified-info]`、`<!-- more -->` | 移除 |
+
+- **粗體、斜體與中文標點**：CommonMark 的規則下，`這是**「重要」**的` 裡的 `**` 不會變成粗體（星號內側是標點、外側是文字）。轉換器逐一檢查每組強調符號前後的字元，會失效的就改用 `<strong>`／`<em>`。判斷標準跟 Astro 用的 Markdown 引擎（Sätteri）一致，測試直接用 Sätteri 渲染確認。
+- **跳脫**：`*`、`_`、`[`、`]`、`<`、`{`、`}`、`~`、`` ` `` 等在 Markdown 或 MDX 有意義的字元一律跳脫；行首的 `#`、`>`、`-`、`1.` 也是，不會變成標題或清單。保留的 HTML 裡改用字元參照（`&#42;`），這樣在 .md 的 HTML 區塊和 MDX 的 JSX 裡意思都一樣（09、10 號會把含相簿與對照滑桿的文章改成 MDX）。
+- **連結的 `target="_blank"`、`rel` 不保留**：Markdown 連結表達不了。要外部連結另開分頁，15 號可以在 Markdown 設定統一處理。
+- **`<mark>` 的實際用途**：已發布的內容只有 4 個 `<mark>`（規劃時的 20 個含修訂版本），都是 `background-color:rgba(0, 0, 0, 0)` 加灰色字的 class，也就是 WordPress 的「文字顏色」功能，不是螢光筆。照 spec 統一成 `<mark>`；15、18 號可以決定要不要改回一般文字。
+- **`<ruby>` 只出現在對照滑桿的圖說裡**：規則已經寫好也有測試，等 10 號轉換圖說時才會出現在輸出。
+
+### frontmatter 與內容 schema
+
+- 文章：`src/content/posts/<slug>.md`，頁面依階層放：`src/content/pages/about/contact.md`。
+- 文章 frontmatter：`title`、`slug`（解碼後的 UTF-8）、`published`、`updated`（都寫成 `+08:00` 的時間）、`categories`、`tags`、`excerpt`（手動摘要，11 篇有）、`description`（AIOSEO 自訂描述，11 篇有）、`socialImage`（AIOSEO 社群圖片，11 篇有，暫時是舊的 upload 路徑，06 號改成統一圖片目錄裡的圖）、`draft`、`wordpressId`。
+- 頁面 frontmatter：`title`、`slug`、`parent`（父頁面路徑，例如 `about`）、`updated`、`description`、`wordpressId`。
+- 分類與標籤是兩個 collection（`src/data/categories.json`、`src/data/tags.json`），ID 就是網址裡的 slug，文章用 `reference()` 參照。只列有已發布文章的分類與標籤（3 個與 57 個），「未分類」不列。
+- `src/content.config.ts` 驗證 frontmatter，錯了建置就失敗。踩到的坑：**Astro 對參照到不存在的分類或標籤只印出錯誤，建置照樣成功**（而且之後的建置因為快取連錯誤都不印）。所以 `src/lib/content.ts` 的 `getPosts()` 另外檢查，參照錯誤時建置失敗。手動驗證過：拿掉 `title`、改成不存在的標籤，建置都會失敗。
+- 文章至少要有 `description` 或 `excerpt` 其中一個（schema 檢查），這就是 meta description 的來源：有 AIOSEO 自訂描述用自訂的，否則用摘要。
+- `draft: true` 的文章只在正式建置時排除（`getPosts()`），11、12 號列文章時也要用這個函式。
+
+### 時區與網址
+
+- WordPress 的 `post_date_gmt` 是 UTC，轉換器換算成 Asia/Taipei 寫進 frontmatter；網站用 `published` 在 Asia/Taipei 的日期組出 `/YYYY/MM/DD/<slug>/`（`src/lib/content.ts`）。轉換器也逐篇比對換算結果跟 WordPress 存的當地時間 `post_date` 一致，不一致就停下。
+- 2025-05-17 同一天有 9 篇文章（前言與 Day 1–8），網址都跟 WordPress 一致。
+- 頁面網址由 `parent` 和 `slug` 組成：`/about/`、`/about/contact/`、`/about/autobiography/`、`/policy/`、`/subscribe/`。
+- 路由：`src/pages/[year]/[month]/[day]/[slug].astro`、`src/pages/[...page].astro`。版型目前只有標題、日期、內文，15 號重做。
+
+### AIOSEO 的設定
+
+- 自訂描述在 11 篇文章（2025 年以後的遊記等）。352 號文章的描述欄位是 `#post_excerpt`、標題欄位是 `#post_title #separator_sa #site_title`，都是 AIOSEO 的預設範本，不是自訂值。**所以其實沒有自訂標題**（規劃時記為 1 篇），14 號不用處理。轉換器遇到其他範本寫法或自訂標題會直接停下，不會默默忽略。
+- 社群圖片：10 篇用自訂圖片，前言那篇設定成「精選圖片」（`_thumbnail_id` → `highlight.jpg`），一併帶入，共 11 篇。
+- 頁面沒有自訂描述，AIOSEO 用的是 `#post_content`：從內文產生。看了備份裡 AIOSEO 的原始碼（`getDescriptionFromContent()`）照做：去掉圖片、figure 與嵌入、去掉 shortcode、區塊層級的標籤之間視為空白（wpautop 的效果）、去掉所有標籤、空白合併，取前 55 個字元（zh_TW 以字元計算）。5 個頁面的結果跟線上網站的 meta description 逐字相同（2026-10-24 抓的）。
+- 線上網站的標題有 `遊記 – 岡山…`（en dash），資料庫裡是 `遊記 - 岡山…`：WordPress 的 wptexturize 會把 ` - ` 換成 ` – `。frontmatter 保留資料庫裡的原文；Astro 預設的 smartypants 在內文有類似效果，但不處理 `<title>`，14 號比對標題時要決定怎麼處理。
+
+### 舊網址對應表
+
+`src/data/old-url-map.json`，一行一筆，網址依 code point 排序：
+
+- `content`：每篇文章與頁面的 `wordpressId`、`type`、`title`、`url`、`file`、`oldSlugs`、`oldDates`。
+- `urls`：網址檢查讀的預期，格式沒變（`{ url, expect, location? }`），`fromMappingTable()` 不用改。
+- 之後 06 號加 upload 路徑與附件頁、07 號加影片與 PDF 的路徑，各自一個 `url-map/` 模組和 section。
+
+涵蓋從 WordPress 資料推得出來的每一類舊網址，預期照 spec 的路由與轉址章節：
+
+| 類別 | 數量 | 預期 | 負責 |
+|---|---|---|---|
+| 首頁、文章、頁面 | 1 + 22 + 5 | 200 | 05 |
+| `?p=ID`、`?page_id=ID`（每篇文章與頁面兩種都有） | 54 | 301 到該文章或頁面 | 13 |
+| 沒用過的 ID（備份裡最大的 ID 加 1：`?p=1887`、`?page_id=1887`） | 2 | 404 | 13 |
+| 舊 slug | 1 | 301 到現在的網址 | 13 |
+| 分類、標籤 | 3 + 57 | 200 | 11 |
+| 「未分類」 | 1 | 404 | — |
+| 日期彙整（有文章的年、月、日） | 4 + 9 + 14 | 200 | 11 |
+| 分頁：`/page/2/`、`/page/3/`、`/2025/page/2/` | 3 | 200 | 11 |
+| `/page/4/` | 1 | 404 | 11 |
+| `/feed/`、`/feed/atom/` | 2 | 200 | 12 |
+| `/comments/feed/` | 1 | 301 到 `/feed/` | 13 |
+| 文章、頁面、分類、標籤的 `…/feed/` | 22 + 5 + 3 + 57 | 301 到該頁 | 13 |
+| `/author/erase2004/` | 1 | 301 到 `/about/` | 13 |
+| `/wp-sitemap.xml` | 1 | 301 到 `/sitemap.xml` | 13 |
+| `/wp-admin/`、`/wp-login.php`、`/xmlrpc.php`、`/wp-json/` | 4 | 404 | — |
+
+用線上網站確認過的幾件事（2026-10-24）：
+
+- **舊日期的轉址其實是 0 筆**：備份裡 3 筆 `_wp_old_date` 屬於導覽選單項目（2 筆）和一個 Envira 相簿，不是文章。13 號寫的「3 篇改過日期的文章」不存在；程式仍然會處理文章的 `_wp_old_date`，只是目前沒有資料。
+- **`/2025/page/2/` 存在**（200）：2025 年有 11 篇文章，每頁 10 篇。11 號的 issue 只提到分類與標籤不會有分頁，這一頁也要產生。
+- **頁面也有 feed**：`/about/feed/`、`/about/contact/feed/` 都回 200，所以跟文章的 feed 一樣列入，13 號的動態規則要涵蓋頁面。
+- `?page_id=` 加文章 ID、`?p=` 加頁面 ID 也都會 301（WordPress 找不到時用 ID 找）；不存在的 ID 回 404。
+- `/category/uncategorized/` 在 WordPress 回 200（空的彙整頁），spec 決定不產生，所以預期是 404。
+- `/wp-sitemap.xml` 在 WordPress 是 302，spec 要 301。
+- 沒有涵蓋的：`?cat=`、`?tag=`、`?m=`、`?author=`、`?s=` 等其他 query string，以及 `/feed/rss2/` 之類的 feed 變體。spec 的 Worker 只處理 `?p=` 與 `?page_id=`，要涵蓋得先改 spec。
+
+### 待完成清單
+
+- 22 篇文章與 5 個頁面通過，從清單移除（27 筆）。
+- 對應表帶進來、還沒實作的預期全部加進清單（179 筆），之後由 11、12、13 號照 WordPress 推出來的預期逐步刪掉，而不是照各自的實作結果。帶 query string 的 56 筆在建置輸出模式是略過，在 HTTP 模式會失敗，所以也在清單上。
+- 清單從 855 筆變成 1,007 筆。新增的方式：跑一次網址檢查，把失敗與略過的網址照 03 號的排序與分組規則插進去（先確認過同樣的程式對原本的清單會一字不差地重現）。
+
+### 測試
+
+- `tests/wordpress-converter/sql-dump.test.ts`：SQL 的解析，含跳脫字元與 NULL。
+- `tests/wordpress-converter/content.test.ts`：每條轉換規則至少一個 fixture，片段取自真正的備份；強調、跳脫、連結、表格等用 Sätteri 渲染確認讀者看到的結果，並確認輸出能編譯成 MDX；每一種留給後續 issue 的元素都要留下標記；規則的擴充方式（認領、重複認領報錯、import 讓檔案變成 MDX、文末內容）。
+- `tests/wordpress-converter/convert-wordpress.test.ts`：用一個小型的 WordPress 資料（真實資料列刪減而成）轉換整個網站：frontmatter、時區、AIOSEO、頁面階層與描述（期望值是線上網站的實際描述）、分類與標籤資料檔、對應表的每一類舊網址、資料列順序不影響輸出。
+- `tests/site-serving.test.ts`（03 號）：對真正的建置結果跑網址檢查，22 篇文章與 5 個頁面在建置輸出與 HTTP 兩種模式都通過，待完成清單剛好列出還沒做的網址。
+- 加了 `satteri` 作為 devDependency，版本跟 Astro 用的同一個（0.10.5，npm 只裝一份），讓測試用跟網站一樣的引擎渲染 Markdown。

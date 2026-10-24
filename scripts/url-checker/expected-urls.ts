@@ -1,7 +1,8 @@
 // The expected list: every URL the WordPress site had, and what the new site
 // must answer for it. Two sources:
 //   - the sitemap snapshot taken before the move (fixed, never changes);
-//   - the old-URL mapping table, once ticket 05 has created it.
+//   - the old-URL mapping table, generated from the WordPress backup by the
+//     converter (scripts/wordpress-converter/).
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
@@ -90,8 +91,9 @@ function fromSitemapSnapshot(sitemapDir: string): ExpectedUrl[] {
  *   ] }
  *
  * `url` and `location` are paths, in UTF-8 or percent-encoded; a `location` on
- * another site is a full URL. Other keys of the table are ignored, so ticket 05
- * may shape the rest of it freely (or change this function and its tests).
+ * another site is a full URL. The table's other keys (`content`, and the
+ * sections later tickets add) hold the facts behind these URLs and are
+ * ignored here; see scripts/wordpress-converter/mapping-table.ts.
  */
 function fromMappingTable(file: string): ExpectedUrl[] {
 	const table = JSON.parse(readFileSync(file, 'utf8')) as { urls?: unknown };

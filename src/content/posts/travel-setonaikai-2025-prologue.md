@@ -1,0 +1,76 @@
+---
+title: "遊記 - 岡山 / 香川 / 德島八日遊 - 前言"
+slug: "travel-setonaikai-2025-prologue"
+published: 2025-05-17T09:00:00+08:00
+updated: 2025-05-16T22:37:25+08:00
+categories: ["旅遊"]
+tags: ["summer-pockets", "岡山", "德島", "瀨戶內國際藝術祭", "聖地巡禮", "香川"]
+description: "在三月下旬某日準備下一季要看的動畫新番清單時，看到 Summer Pockets1 的 PV，同時想起今年初設定的目標—再去一次瀨戶內藝術祭（春或夏），在聖地巡禮與參加瀨戶內藝術祭（之後簡稱瀨戶藝）這兩個目的下，就決定了這次旅行。"
+socialImage: "/wp-content/uploads/2025/05/highlight.jpg"
+draft: false
+wordpressId: 442
+---
+
+在三月下旬某日準備下一季要看的動畫新番清單時，看到 [Summer Pockets](https://summerpockets-anime.jp/ "Summer Pockets 動畫官網") 的 PV，同時想起今年初設定的目標—再去一次瀨戶內藝術祭（春或夏），在聖地巡禮與參加瀨戶內藝術祭（之後簡稱瀨戶藝）這兩個目的下，就決定了這次旅行。
+
+```html title="wp-unconverted: core/embed"
+<!-- wp:embed {"url":"https://www.youtube.com/watch?v=x3_Pcru8SS8","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://www.youtube.com/watch?v=x3_Pcru8SS8
+</div></figure>
+<!-- /wp:embed -->
+```
+
+```html title="wp-unconverted: core/embed"
+<!-- wp:embed {"url":"https://www.youtube.com/watch?v=2u-RIQst_N4","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
+<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
+https://www.youtube.com/watch?v=2u-RIQst_N4
+</div></figure>
+<!-- /wp:embed -->
+```
+
+起初，從台灣過去日本，會搭乘桃園國際機場（TPE）到高松機場（TAK）的航班，會選擇 TAK 是因為上次參加瀨戶藝時，在日本國內從成田機場（NRT）飛過去，所以這次從台灣飛過去時，也預設到 TAK，然而，台灣到 TAK 直達只有中華航空，機票價格相對於上次從 NRT 飛過去所搭乘的捷星高出好幾倍，且該航線並非每天都有。在尋找其他航線來減少機票的開銷同時增加計畫安排的彈性時，找到了岡山機場（OKJ）這個選項，TPE 到 OKJ 有台灣虎航的直達，且該航線每天都有。確定藉由 OKJ 進出後，接著就是決定進出的日期，在機票價格的考量下，最後決定了 4/20（日） 前往，4/27（日） 返回的規劃。
+
+旅遊天數來到八天後，扣除一開始設定的犬島、瀨戶大橋區域、直島、男木島、女木島和小豆島，以及抵達和返回的時間，還剩完整的一天可以安排，這時候想到之前想去看的鳴門漩渦，確認了相關交通資訊後，便把鳴門也納入這次的旅遊計畫中，於是，這次的旅遊範圍從岡山、香川，擴大成岡山、香川和德島了。
+
+在進行完整的旅行規劃時，先把日期與地區一一配對，確認每個地區在該日期的可行性，例如：犬島因為週二為休島日，就不能給犬島安排在週二，接著，在接下來的每個晚上，撥出一小段時間，來安排其中一天的行程，經過一週的持續付出後，在出發前幾天完成這次的旅遊計畫。
+
+```html title="wp-unconverted: core/image"
+<!-- wp:image {"id":468,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
+<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-07_22-48-58-1024x592.png" alt="瀨戶藝官方網站上的預計擁堵日曆資訊" class="wp-image-468"/><figcaption class="wp-element-caption">瀨戶藝官方網站上的<a href="https://setouchi-artfest.jp/congestion-calendar/" target="_blank" rel="noopener" title="">預計擁堵日曆資訊</a></figcaption></figure>
+<!-- /wp:image -->
+```
+
+```html title="wp-unconverted: core/file"
+<!-- wp:file {"id":459,"href":"https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf","displayPreview":false} -->
+<div class="wp-block-file"><a id="wp-block-file--media-e5b93318-a9f8-4846-993b-4e16fa60939f" href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" target="_blank" rel="noreferrer noopener">瀨戶內國際藝術祭 2025 旅遊計畫</a><a href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" class="wp-block-file__button wp-element-button" download aria-describedby="wp-block-file--media-e5b93318-a9f8-4846-993b-4e16fa60939f">下載</a></div>
+<!-- /wp:file -->
+```
+
+順道一提，在安排每天行程時，順便統計當天參觀作品所需要的花費，作為是否購買[鑑賞護照](https://setouchi-artfest.jp/buy/passport "作品鑑賞護照")的參考，關於鑑賞護照的更多資訊，可以參考[深海札記](https://deepseanotes.com/2025-setouchi-artfest-eticket/#5-%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a0%85%e8%88%87%e5%bb%ba%e8%ad%b0)的資料彙整。由於這次是購買電子票，針對電子票的部份，可以分享查詢蓋章紀錄的方法。首先，打開[官方的 App](https://setouchi-artfest.jp/access/app/#app-info)，並且切換到「メニュー」的畫面，接著再點選「スタンプラリー」，就會進到蓋章清單的頁面，點選清單中任一座島嶼，便會顯示該島的蓋章紀錄。
+
+```html title="wp-unconverted: core/gallery"
+<!-- wp:gallery {"linkTo":"none","align":"center"} -->
+<figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":474,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003312-519x1024.png" alt="官方 App 的「メニュー」畫面" class="wp-image-474"/><figcaption class="wp-element-caption">官方 App 的「メニュー」畫面</figcaption></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":475,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003355-518x1024.png" alt="蓋章清單的頁面" class="wp-image-475"/><figcaption class="wp-element-caption">蓋章清單的頁面</figcaption></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->
+```
+
+※使用電子票時，需留意在參觀免費的作品時，由於不會有工作人員幫忙掃 QR code（蓋章），需要在觀看付費作品時，請工作人員幫忙補蓋免費作品的章。
+
+順便附上上次參加瀨戶藝的蓋章紀錄。
+
+```html title="wp-unconverted: envira/envira-gallery"
+<!-- wp:envira/envira-gallery {"galleryId":521,"title":"瀨戶藝 2019 秋會期蓋章紀錄","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"isotope":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1274-scaled.jpg","title":"瀨戶藝 2019 秋會期紙本護照封面","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1274-scaled.jpg","alt":"","caption":"","thumb":"","id":488,"height":141.01941747572815,"width":79},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1275-scaled.jpg","title":"直島 / 直島家計畫 / 豐島 / 男木島 / 女木島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1275-scaled.jpg","alt":"","caption":"","thumb":"","id":484,"height":141.01941747572815,"width":251},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1276-scaled.jpg","title":"小豆島 / 大島 / 犬島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1276-scaled.jpg","alt":"","caption":"","thumb":"","id":487,"height":141.01941747572815,"width":251},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1277-scaled.jpg","title":"高松港 / 宇野港 / 本島 / 高見島 / 其他","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1277-scaled.jpg","alt":"","caption":"","thumb":"","id":485,"height":167.69662921348313,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1278-scaled.jpg","title":"粟島 / 伊吹島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1278-scaled.jpg","alt":"","caption":"","thumb":"","id":486,"height":167.69662921348313,"width":298.5}]} -->
+<div class="wp-block-envira-envira-gallery">[envira-gallery id='521']</div>
+<!-- /wp:envira/envira-gallery -->
+```
+
+<sup>*2019 瀨戶藝秋會期的蓋章紀錄*</sup>
+
+最後，針對需要預約且有名額限制的作品（通常是[倍樂生](https://benesse-artsite.jp/general-information.html "倍樂生相關作品的預約網站")相關）提前進行預約，這次就有預約到直島的[家プロジェクト「南寺」](https://benesse-artsite.jp/art/arthouse.html#ieproject3)，但沒有預約到直島的[家プロジェクト「きんざ」](https://benesse-artsite.jp/art/arthouse.html#ieproject4)和[杉本博司ギャラリー 時の回廊](https://benesse-artsite.jp/art/sugimoto-gallery.html)。
