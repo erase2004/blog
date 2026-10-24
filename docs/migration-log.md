@@ -414,3 +414,120 @@ npm run convert-wordpress -- <其他 dump.sql>   # 換一份備份
 - `tests/wordpress-converter/convert-wordpress.test.ts`：用一個小型的 WordPress 資料（真實資料列刪減而成）轉換整個網站：frontmatter、時區、AIOSEO、頁面階層與描述（期望值是線上網站的實際描述）、分類與標籤資料檔、對應表的每一類舊網址、資料列順序不影響輸出。
 - `tests/site-serving.test.ts`（03 號）：對真正的建置結果跑網址檢查，22 篇文章與 5 個頁面在建置輸出與 HTTP 兩種模式都通過，待完成清單剛好列出還沒做的網址。
 - 加了 `satteri` 作為 devDependency，版本跟 Astro 用的同一個（0.10.5，npm 只裝一份），讓測試用跟網站一樣的引擎渲染 Markdown。
+
+## 06：圖片搬遷與舊圖片網址轉址（2026-10-24）
+
+### 重新產生
+
+```sh
+npm run convert-wordpress                                   # 備份與 uploads 資料夾的位置在 settings.ts
+npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備份
+```
+
+- 轉換器現在也會從備份的 `D:/wordpress-backup/wp-content/uploads`（只讀不寫）把圖片複製到 `src/assets/images/`，讓這個資料夾剛好只有內容用到的圖：多的刪掉，缺的或大小、時間不同的才複製。重跑一次是 0 張複製，不會每次重寫 377 MB。
+- 跟 05 號一樣，產生出來的檔案（內容、對應表、圖片）合併衝突時，合併程式碼後重跑這個指令就好。
+
+### 搬了哪些圖：769 張、377 MB
+
+- 被已發布的文章與頁面用到的圖：內文裡的 `<img>`、Envira 相簿與對照滑桿 block 裡的 JSON（含 `i0.wp.com` 的 Photon 網址、`-WxH` 縮圖網址、百分比編碼的檔名），以及 AIOSEO 的社群圖片（含前言那篇的精選圖片）。共 **767 張**，跟規劃時從檔案系統算出來的清單逐一比對完全相同。
+- 再加上全站設定用到的 **2 張**：AIOSEO 的預設社群圖片 `night.png`（og:image 的最後 fallback），和佈景主題的 header 圖 `cropped-akiba07-scaled-3.jpg`。spec 指定它們放 `site/`。
+- **跟 issue 的出入**：issue 寫「共 767 張」、「94 張孤兒圖不搬」，但規劃時這兩張被算在 94 張孤兒圖裡（沒有文章用到）。這裡照 spec 的媒體章節搬了，所以是 769 張。其餘沒搬的：資料庫裡 48 個沒人用的圖片附件；94 張裡另外 44 張根本沒有附件紀錄（Envira 自己產生的 `-320x240_c` 裁切圖與另一張 header 裁切圖）。
+- 網站圖示 `cropped-night.png` 沒搬：spec 說 favicon 放 `public/`，留給 14 或 15 號。
+- 不搬的另外幾類自然排除：只複製 WordPress 實際提供的那個檔案（`_wp_attached_file`），所以 `-WxH` 縮圖、超過 2560px 的相機原圖都不會進來；LiteSpeed 的 webp 與 `.bk` 備份在資料庫裡根本沒有紀錄。用 sharp 檢查過：769 張最長邊都不超過 2560px，沒有縮圖、`.bk`、`-scaled` 檔名。
+- 程式：`scripts/wordpress-converter/media-library.ts` 是整個媒體庫的模型：哪些圖搬、搬到哪、任何形式的舊網址對應到哪張圖。
+
+### 放在哪裡
+
+- `src/assets/images/<第一篇用到它的文章 slug>/<檔名>`，「第一篇」依發布時間。檔名是 WordPress 實際提供的那個檔名，去掉副檔名前的 `-scaled`（`cropped-akiba07-scaled-3.jpg` 的 scaled 在中間，不是 WordPress 縮小時加的，保留）。
+- **共用圖的放法**：有 9 張圖被兩篇以上的文章用到，sitemap 快照多出來的 11 筆就是它們（快照共 772 筆、761 個不同網址；規劃時記的「11 張圖」其實是 11 筆）：8 張同時出現在 Day 4 與 Day 8（Day 8 重用了 Day 4 的圖），1 張 48px 的小圖示出現在 Day 1、2、3、8。規則是**放在最早用到它的那篇**（Day 4、Day 1），其他文章用相對路徑引用同一個檔案，不複製兩份，也不放進 `site/`：`site/` 只放全站設定用的圖。這 9 張剛好也都是當初上傳到那篇文章（附件的 `post_parent`），或沒有掛在任何文章下。
+- 同一個資料夾裡檔名（不分大小寫）撞名時轉換器會直接停下；目前沒有。
+- 有一個檔名含零寬空格（U+200B）：`travel-setonaikai-2025-day5/池田港​-2-Ave-Mujica.jpg`，照原樣保留，建置與轉址都正常。18 號可以決定要不要改名。
+
+### 內文的轉換
+
+| 來源 | 轉成 |
+|---|---|
+| `core/image`（93 個） | Markdown 圖片，指向統一圖片目錄裡的原圖，不是內文用的 `-1024x768` 縮圖 |
+| 有圖說的 | `<figure>` 包住 Markdown 圖片，圖說是 `<figcaption>`（保留連結，用 05 號的 raw HTML，在 .md 與 .mdx 意思都一樣） |
+| 舊式 block 的 `<div id="image-1">` | `<figure id="image-1">`，內文的 `#image-1` 連結仍然有效 |
+| 文字裡的 `<img>`（6 個 48px 小圖示） | 行內的 Markdown 圖片 |
+| frontmatter 的 `socialImage` | 圖片的相對路徑，schema 改成 `image()`，建置時會檢查檔案存在 |
+
+- `<figure>` 與 Markdown 圖片之間要空一行：CommonMark 的 HTML 區塊到空行才結束，中間的圖片才會被當成 Markdown，交給 Astro 最佳化。測試用 Sätteri 渲染並編譯成 MDX 確認。
+- WordPress 手動調過寬度的 13 個 block（例如 768px）沒有保留寬度，現在是「最寬到原圖寬度、不超過欄寬」。15、18 號看版面再決定。
+- alt 文字頭尾的空白去掉。
+- 09、10 號轉相簿與對照滑桿時，用 `rules/images.ts` 的 `imageSource(url, context)` 取得圖片相對於內容檔的路徑；任何形式的舊網址都可以丟進去，不是要搬的圖會直接報錯。
+
+### Astro 的輸出：webp 與響應式尺寸
+
+- `astro.config.mjs` 設 `image: { layout: 'constrained' }`：每張圖輸出 webp，`srcset` 是 Astro 內建的寬度（640、750、828、1080、1280、1668、2048、2560）中不超過原圖寬度的那些，`sizes` 是 `(min-width: 原圖寬px) 原圖寬px, 100vw`。原始的 JPEG／PNG 不會出現在建置結果裡。
+- 實測：用 Chrome 的 DevTools 裝置模擬（390×844，跟 iPhone 差不多寬）打開 Day 2 那篇，逐一捲到每張圖，看瀏覽器實際選的檔案：
+  - DPR 2：每張 2560px 的照片都載入 828w 的 webp。
+  - DPR 3：載入 1280w 的 webp。
+  - 桌機 1920px：載入 1920w／2048w，因為 `sizes` 寫的是 `100vw`，但範本的內文欄只有 640px。**15 號做版型時要把 `sizes` 改成實際欄寬**，桌機才不會下載過大的圖。
+  - 所有請求都是 webp，沒有原圖。
+  - 注意：直接用 `--window-size=390,844` 開 headless Chrome 不準，桌面版視窗有最小寬度，選到的圖會偏大，要用裝置模擬。
+- 第一次建置要做 1,278 張 webp，約 2 分半；之後 Astro 從 `node_modules/.astro` 的快取拿，建置回到幾十秒。**04 號 CI 要快取 `node_modules/.astro`**。`tests/site-serving.test.ts` 的建置時限從 180 秒放寬到 600 秒。
+- 建置結果的 `_astro/` 有 1,279 個檔案、392 MB（webp 對截圖類的 PNG 不一定比較小）。離 Workers 每個版本 20,000 個檔案、單檔 25 MiB 的限制都還很遠。
+
+### 舊網址對應表
+
+`src/data/old-url-map.json` 新增兩個 section：
+
+- `images`：每張搬過去的圖一筆，`{ wordpressId, file, uploads, attachmentPage }`。`file` 是新檔案，`uploads` 與 `attachmentPage` 是 WordPress 上的舊網址。轉換器丟掉之後，建置時就是從這裡產生轉址規則。
+- `unusedImages`：沒搬的 48 張，舊的檔案網址與附件頁都預期回 404（共 101 個網址）。
+- `urls` 新增 1,639 個 `redirect`（不寫 `location`：新網址要建置後才知道，網址檢查確認轉到同站、回 200 的網址）與 101 個 `not-found`。
+
+舊的 upload 路徑（共 1,333 個）：
+
+- WordPress 實際提供的檔案。
+- 被 WordPress 縮小過的 563 張（`-scaled`），還有原本的相機原圖網址。sitemap 快照列的是這個沒有 `-scaled` 的網址（AIOSEO 會把 `-scaled` 拿掉），而且這些網址在 WordPress 上真的回 200（2026-10-24 實測），所以兩個都轉。
+- AIOSEO 的 image sitemap 列的網址：它的 `removeImageDimensions()`（看過備份裡外掛的原始碼）會把檔名任何位置的 `-數字x數字` 與 `-scaled` 拿掉。只有一張因此不同：`puru-1536x864-1.jpg` 在 sitemap 裡變成 `puru-1.jpg`，這個網址在 WordPress 上其實是 404，但 sitemap 列過，就一起轉。
+
+附件頁：照 WordPress 的 `get_attachment_link()`，並在線上網站逐類實測過（2026-10-24）：
+
+| 附件掛在 | 附件頁網址 | 數量 | 處理 |
+|---|---|---|---|
+| 已發布的文章 | `/<文章網址><附件 slug>/` | 292 | 301 到新圖片 |
+| 同上，slug 是數字 | `/<文章網址>attachment/<slug>/` | 6 | 301 到新圖片 |
+| 沒有掛在任何文章下（含 `night.png`、header 圖） | `/<附件 slug>/` | 8 | 301 到新圖片 |
+| Envira 相簿 | 只有 `/?attachment_id=ID` | 463 | 記在 section 裡，**不在 `urls`** |
+
+- 中文的附件 slug 與文章網址都解碼成 UTF-8，跟對應表其他網址的寫法一樣。
+- **Envira 相簿裡的 463 張圖沒有漂亮的附件頁網址**：WordPress 給它們的是 `/?attachment_id=639`（`/<文章網址>/<slug>/` 也會先 301 到這個）。帶 query string 的網址由 Worker 處理，spec 的 Worker 只處理 `?p=` 與 `?page_id=`，所以這裡只把資料記進 `images` section，沒有加進預期清單。要不要讓 Worker 也處理 `?attachment_id=`（其實所有附件都有這個網址）是**留給 13 號或站長決定的問題**；這些網址不在 sitemap 裡，被外部連結的機會很低。
+- 影片與 PDF 的附件頁和路徑是 07 號的，這裡只處理圖片。
+
+### 建置時產生 `_redirects`
+
+- 轉址目標是 Astro 輸出的帶 hash 網址，只有建置時才知道，所以由 integration 產生：`src/integrations/image-redirects.ts` 注入一個只在建置時存在的頁面（`image-redirect-rules.ts`），它讀對應表的 `images`，用 `src/lib/images.ts` 的 `imageUrl()` 取得每張圖的網址，輸出成規則；建置完成時 integration 把規則移進 `_redirects`，再刪掉那個暫存檔。
+- 轉址目標是**原圖寬度的 webp**：也就是文章裡那張圖的 `src`，同時是 `srcset` 裡最大的那個。看過 Astro 的原始碼確認 hash 只跟來源、寬高、格式、品質等有關，跟 layout 無關，所以 `imageUrl()` 跟文章裡 Markdown 圖片得到的是同一個網址；測試也直接比對。12 號的 sitemap 圖片網址也用 `imageUrl()`，就會跟轉址目標一致。
+- 規則的來源路徑用 `encodeURI` 寫成大寫的百分比編碼，跟 Cloudflare 正規化之後一樣，檔名有空白也不會壞。小寫編碼的請求一樣是先 307 到大寫（01、03 號記錄的現象，19 號在預覽網址確認）。
+- **一律附加、不覆蓋**：把 01 號 integration 裡附加 `_redirects` 的那幾行抽成 `src/integrations/redirects-file.ts` 的 `appendRedirects()`，補斜線的規則和圖片規則都用它。之後 07、13 號寫 `_redirects` 也請用它。
+- **規則數量**：圖片 1,639 條（1,333 個 upload 路徑 + 306 個附件頁）加上目前 27 條補斜線，共 **1,666 條靜態規則**。估計網站做完：11 號再多約 89 個頁面的補斜線規則、07 號約 18 條、13 號約 10 條靜態加幾條動態，合計約 1,780 條，還在 2,000 以內，但剩下的空間不多。
+
+### 規則數量的上限：超過就建置失敗
+
+- `src/integrations/redirects-budget.ts`：建置完成時讀最後的 `_redirects`，靜態規則超過 2,000 條或動態規則超過 100 條就讓建置失敗。它放在 integrations 的最後一個，檢查的是所有 integration 寫完之後的結果。
+- 為什麼一定要擋：看了 wrangler 的 `parseRedirects()`，超過上限的規則只會印一行警告然後**被跳過**，部署照樣成功，舊網址就默默變成 404。計數方式照它的寫法：來源有 `*` 或 `:placeholder` 的是動態規則，**第一條動態規則之後的每一條都算動態**（03 號也記錄過這點）。
+
+### 網址檢查與待完成清單
+
+- sitemap 快照的 772 筆圖片網址（761 個不同網址）全部通過，從待完成清單移除。對應表新增的 1,639 個轉址與 101 個 404 也全部通過，建置輸出與 HTTP（`wrangler dev`）兩種模式都是。
+- 待完成清單從 1,007 筆變成 246 筆，刪掉的剛好是 761 個 `/wp-content/` 網址，其他行沒動（`/wp-content/` 那一組原本的位置留下兩個空行，不影響檢查，也避免碰到 11、13 號會改的相鄰行）。
+
+### 測試
+
+- `tests/wordpress-converter/content.test.ts`：圖片 block（圖說含連結、舊式 block 的 id、`-scaled`／Photon／縮圖／百分比編碼的網址都指向同一個檔案、alt 的跳脫）與文字裡的 `<img>`，用 Sätteri 渲染並編譯成 MDX。
+- `tests/wordpress-converter/convert-wordpress.test.ts`：fixture 加了一個小型媒體庫（真實附件刪減而成）：要複製哪些圖、共用圖放第一篇、`site/` 資料夾、社群圖片、各種舊 upload 路徑與附件頁、沒人用的圖回 404、`images` section。
+- `tests/redirects-budget.test.ts`：2,000 條靜態加 100 條動態通過；2,001 條靜態失敗；第一條動態規則之後都算動態。
+- `tests/site-serving.test.ts`：對真正的建置結果，模擬瀏覽器依 `srcset`／`sizes` 選圖：390px 寬的手機（DPR 2）跟桌機選到不同的檔案、都是 webp、手機那張不到一半大；舊的 upload 路徑與附件頁 301 到文章裡那張圖的 `src`。
+
+### 留給其他 issue 的發現
+
+- 07：`appendRedirects()` 寫 `_redirects`；規則數量會被 `redirects-budget` 檢查。影片與 PDF 的 upload 網址目前沒有任何預期（不在 sitemap 裡），由 07 號自己加。
+- 09、10：圖片已經搬好、轉址也做好了；用 `imageSource(url, context)` 取得路徑。轉址目標固定是原圖寬度的 webp，不管相簿用什麼尺寸顯示都不受影響。
+- 12：sitemap 的圖片網址用 `src/lib/images.ts` 的 `imageAt(file)` 與 `imageUrl()`，跟轉址目標是同一個網址。
+- 13：`?attachment_id=ID`（見上面）。
+- 14：`socialImage` 現在是 `image()`；og:image 要決定輸出格式（webp 在社群平台的支援度要查）。`night.png` 在 `src/assets/images/site/night.png`。網站圖示還沒搬。
+- 15：`sizes` 改成實際欄寬；`<figure>`／`<figcaption>` 的樣式；手動調過寬度的圖。
+- 04：CI 快取 `node_modules/.astro`，否則每次部署都要多花 2 分半做 webp。
