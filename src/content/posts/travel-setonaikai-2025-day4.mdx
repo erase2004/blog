@@ -11,25 +11,33 @@ draft: false
 wordpressId: 767
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 旅遊第四天，早上，我在高松港搭船前往女木島，藉由公車和走路在該島上觀光。中午時，我搭船前往男木島，用走路的方式穿梭於該島。傍晚，我搭乘最後的船班回到高松港。
 
 今天一早起來，打開房間的窗戶，往高松港的方向看過去，遠方一片霧茫茫的，令人擔心是否會影響船班，還好最後船班是正常運行的。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":769,"title":"從東橫 INN 高松站前看向高松港的方向","columns":"0","row_height":200,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_053424187-scaled.jpg","title":"遠方的高松港霧茫茫的","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_053424187-scaled.jpg","alt":"","caption":"","thumb":"","id":770,"height":287.0192307692308,"width":381.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_053547997-scaled.jpg","title":"早上的高松站一帶","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_053547997-scaled.jpg","alt":"","caption":"","thumb":"","id":771,"height":287.0192307692308,"width":215.3}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='769']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_053424187.jpg'), caption: '遠方的高松港霧茫茫的' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_053547997.jpg'), caption: '早上的高松站一帶' },
+	]}
+/>
 
 在旅館一樓享用免費的早餐後，回到房間整理一下，7 點多離開旅館開始行程。
 
 首先在高松站的圍牆外，守候[サンライズ瀬戸](https://www.jr-odekake.net/train/sunriseseto_izumo/)的到來，在列車開始進站時，我開始對它拍照，直到列車完全停在月台旁。接著，前往高松港，購買船票並等候船的到來，前往高松港的路上，順便路過[高松築港站](https://maps.app.goo.gl/oEPZzmDdSK86hoDX9)，拍一下照片。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":773,"title":"サンライズ瀬戸","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072653772-scaled.jpg","title":"列車出現","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072653772-scaled.jpg","alt":"","caption":"","thumb":"","id":774,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072707143-scaled.jpg","title":"列車進站中","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072707143-scaled.jpg","alt":"","caption":"","thumb":"","id":775,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072714058-scaled.jpg","title":"列車進站中","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072714058-scaled.jpg","alt":"","caption":"","thumb":"","id":776,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072721151-scaled.jpg","title":"列車進站中","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072721151-scaled.jpg","alt":"","caption":"","thumb":"","id":777,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072729393-scaled.jpg","title":"列車進站中","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072729393-scaled.jpg","alt":"","caption":"","thumb":"","id":778,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072757628-scaled.jpg","title":"列車完全停靠月台","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_072757628-scaled.jpg","alt":"","caption":"","thumb":"","id":779,"height":145.6140350877193,"width":193.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='773']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072653772.jpg'), caption: '列車出現' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072707143.jpg'), caption: '列車進站中' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072714058.jpg'), caption: '列車進站中' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072721151.jpg'), caption: '列車進站中' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072729393.jpg'), caption: '列車進站中' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_072757628.jpg'), caption: '列車完全停靠月台' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":781,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630_2.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":782,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_073355.jpg","alt":"","width":1920,"height":1080},"caption":"ざつ旅第三集中出現的高松築港站"} -->
@@ -37,11 +45,16 @@ wordpressId: 767
 <!-- /wp:jetpack/image-compare -->
 ```
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":783,"title":"高松港 \u0026#8211; 20250423","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_074125511-scaled.jpg","title":"高松港，左邊兩個柱狀體是其標誌，作品名為「Liminal Air -core-」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_074125511-scaled.jpg","alt":"","caption":"","thumb":"","id":784,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_074204142-scaled.jpg","title":"高松港，前面的網子是 2019 年在沙彌島展出的作品，作品名為「そらあみ」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_074204142-scaled.jpg","alt":"","caption":"","thumb":"","id":785,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_075324899-scaled.jpg","title":"從高松港看向瀨戶內海，遠方一片霧茫茫","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_075324899-scaled.jpg","alt":"","caption":"","thumb":"","id":786,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_080314787-scaled.jpg","title":"遠方停靠在碼頭的渡輪上有呆呆獸的圖裝","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_080314787-scaled.jpg","alt":"","caption":"","thumb":"","id":787,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_081448727-scaled.jpg","title":"有呆呆獸圖裝的渡輪正在遠方航行著","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_081448727-scaled.jpg","alt":"","caption":"","thumb":"","id":789,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_080629426-scaled.jpg","title":"一艘有熊貓樣式的渡輪","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_080629426-scaled.jpg","alt":"","caption":"","thumb":"","id":788,"height":145.6140350877193,"width":193.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='783']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_074125511.jpg'), caption: '高松港，左邊兩個柱狀體是其標誌，作品名為「Liminal Air -core-」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_074204142.jpg'), caption: '高松港，前面的網子是 2019 年在沙彌島展出的作品，作品名為「そらあみ」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_075324899.jpg'), caption: '從高松港看向瀨戶內海，遠方一片霧茫茫' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_080314787.jpg'), caption: '遠方停靠在碼頭的渡輪上有呆呆獸的圖裝' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_081448727.jpg'), caption: '有呆呆獸圖裝的渡輪正在遠方航行著' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_080629426.jpg'), caption: '一艘有熊貓樣式的渡輪' },
+	]}
+/>
 
 搭上渡輪，渡輪航行約 20 分鐘後，抵達女木島，下船後，我馬上前往遊客中心購買單程公車票，票買好後，從遊客中心另一側的門走出去，搭上停在遊客中心旁的公車，公車沒多久就發車，前往[大洞窟](https://maps.app.goo.gl/p3QZZCSPpekXbNSs5)。
 
@@ -49,11 +62,15 @@ wordpressId: 767
 
 公車抵達大洞窟外，下車後，往階梯方向走，爬坡一小段路，來到大洞窟的售票處，在售票處前的隊伍排隊等候購票。買好票後，前往大洞窟入口，在進到大洞窟前，發現久島鴎的看板，是意外的驚喜。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":791,"title":"女木島大洞窟入口","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_083859912-scaled.jpg","title":"真。鬼島","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_083859912-scaled.jpg","alt":"","caption":"","thumb":"","id":792,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084056956-scaled.jpg","title":"階梯旁的鬼像","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084056956-scaled.jpg","alt":"","caption":"","thumb":"","id":793,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084219881-scaled.jpg","title":"售票處平台往外看，一片濃霧","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084219881-scaled.jpg","alt":"","caption":"","thumb":"","id":794,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084631114-scaled.jpg","title":"大洞窟入口前，久島鴎的看板","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084631114-scaled.jpg","alt":"","caption":"","thumb":"","id":795,"height":90.44481054365733,"width":67.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084703545-scaled.jpg","title":"大洞窟的看板與久島鴎的看板","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_084703545-scaled.jpg","alt":"","caption":"","thumb":"","id":796,"height":90.44481054365733,"width":120.3}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='791']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_083859912.jpg'), caption: '真。鬼島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_084056956.jpg'), caption: '階梯旁的鬼像' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_084219881.jpg'), caption: '售票處平台往外看，一片濃霧' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_084631114.jpg'), caption: '大洞窟入口前，久島鴎的看板' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_084703545.jpg'), caption: '大洞窟的看板與久島鴎的看板' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":798,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_16.jpg","alt":"","width":512,"height":288},"imageAfter":{"id":799,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_084811.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中出現的洞窟入口，其參考原型為女木島大洞窟入口"} -->
@@ -63,11 +80,14 @@ wordpressId: 767
 
 進到大洞窟，開始探險。雖然被稱作大洞窟，但裡面有些通道的高度很低，即便我努力蹲下並低頭通過，還是有可能摩擦到通道的上緣。大洞窟裡相較於外面，比較溼冷，搭配昏暗的燈光，給人陰冷的感覺。大洞窟裡有岔路與小空間，以及四處充滿了[オニノコ瓦](https://setouchi-artfest.jp/artworks/detail/5e9d78b6-421f-4416-b342-667e93b1606f)，小空間裡有的是存放鬼的寶藏，有的是一群正在分贓的鬼，也有鬼和被監禁的女子，以及鬼大將和其手下等，此外，牆壁上也有瀨戶藝的作品「[生成するウォールドローイング](https://setouchi-artfest.jp/artworks/detail/092583a6-2e70-4aaa-9432-153138691a26)」。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":800,"title":"女木島大洞窟","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_085358970-scaled.jpg","title":"一堆オニノコ瓦","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_085358970-scaled.jpg","alt":"","caption":"","thumb":"","id":801,"height":119.19831223628691,"width":89.4},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_085931065-scaled.jpg","title":"在牆壁上的「生成するウォールドローイング」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_085931065-scaled.jpg","alt":"","caption":"","thumb":"","id":802,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_090124674-scaled.jpg","title":"在牆壁上的「生成するウォールドローイング」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_090124674-scaled.jpg","alt":"","caption":"","thumb":"","id":803,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_090233708-scaled.jpg","title":"一個小空間裡，有鬼大將與其手下","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_090233708-scaled.jpg","alt":"","caption":"","thumb":"","id":804,"height":119.19831223628691,"width":158.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='800']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_085358970.jpg'), caption: '一堆オニノコ瓦' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_085931065.jpg'), caption: '在牆壁上的「生成するウォールドローイング」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_090124674.jpg'), caption: '在牆壁上的「生成するウォールドローイング」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_090233708.jpg'), caption: '一個小空間裡，有鬼大將與其手下' },
+	]}
+/>
 
 出了大洞窟後，往上爬坡一段路，來到[鷲ヶ峰展望台](https://maps.app.goo.gl/ry2N7jC6oVuocmzC9)，在這裡看了四周的景色，拍了照片後，我順著階梯往下走，回到大洞窟的售票處前，稍作休息一下，接著，我繼續往下走，回到公車亭，由於距離下一班公車還有很多時間，我決定自行走下山。
 
@@ -80,11 +100,13 @@ wordpressId: 767
 
 我從公車亭旁的山路往下走，這條山路的階梯高度落差不小，加上昨晚的下雨，使得階梯有些溼滑，又周遭都是樹林和野草，我小心翼翼得踩著階梯往下，一方面避免滑倒，一方面避免踩到蛇之類。走了一陣子後，終於回到柏油道路，心情稍微放鬆，我順著道路，往山下小跑步，途中與往山上前進的公車相遇，我站到路旁讓公車通過，公車通過後，我繼續往山下小跑步，最後，在[住吉神社](https://maps.app.goo.gl/5cLUJk3viHTC7so77)附近，我從一條小路往上走，來到作品「[段々の風](https://setouchi-artfest.jp/artworks/detail/e8ec17bf-3ebe-4306-8754-10d25d6bcfd9)」前，欣賞完該作品後，我在女木島中心部繼續參觀其他作品。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":807,"title":"從女木島大洞窟往女木島中心部的過程","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_092227492-scaled.jpg","title":"從山道往女木港的方向看","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_092227492-scaled.jpg","alt":"","caption":"","thumb":"","id":808,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_092817159-scaled.jpg","title":"路旁有「小心野豬」的告示","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_092817159-scaled.jpg","alt":"","caption":"","thumb":"","id":809,"height":170.38123167155425,"width":127.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_093043475-scaled.jpg","title":"作品「段々の風」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_093043475-scaled.jpg","alt":"","caption":"","thumb":"","id":810,"height":170.38123167155425,"width":226.6}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='807']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_092227492.jpg'), caption: '從山道往女木港的方向看' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_092817159.jpg'), caption: '路旁有「小心野豬」的告示' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_093043475.jpg'), caption: '作品「段々の風」' },
+	]}
+/>
 
 首先是「[女木島人口増加大計画 ～あなぐまち入居者募集中～](https://setouchi-artfest.jp/artworks/detail/2b8facd0-bc1b-4bd5-83e1-baf8695e4cc4)」，這個作品是由許多紙板做的大樓所構成，大樓的部份房間裡有住戶，有些住戶底下會有一本小書，描述關於該住戶的資訊，此外，在這展覽的空間，不時會有小鳥飛進飛出，彷彿真的有住戶遷入遷出的樣子。另外，參觀者可以在隔壁的房間填寫「入住申請表」，在入住申請表上，選擇一個自己最重要的物品，賦予它形象與名字，並且描述其能力，即可完成入住申請。
 
@@ -114,19 +136,24 @@ wordpressId: 767
 
 「いのちの詩・あまのおと」是由一堆一圈圈的紙片所構築而成，忽隱忽現的燈光打在這些紙片上時，看起來彷彿是一片片的水花；「ヨガ教室 －瞑想するブランコ 転がる景色－」的中間有一個鞦韆，參觀者坐在上面擺盪時，會產生電力，觸發其他裝置發出聲音，這些聲音交織在一起形成奇特的樂曲；「SUNSET TAILOR　思い出オーダーメイド」是一間裁縫店，參觀者可以在這裡「購買」畫在紙上裁剪而成的衣物，也可以投稿自己畫的衣物；「休校書店 メコチャン」是一間奇特的書店，有一位巨大的小女孩背著書包坐在書店中央，看向窗戶外。「ガラス漁具店」是在一間暗室中展示許多製作精美的玻璃裝飾，搭配光線照射在這些裝飾上，使得其看起來閃閃發光；「ピンポン・シー NEW！」是一堆造型奇特的乒乓球桌，參觀則可以在附近的商店租用乒乓球和球拍，在這些特殊的球桌上打乒乓球；最後，「カフェ・サムシング サインズ」是一間餐廳，這餐廳使用一塊一塊大面積的色塊所裝潢而成，有點像用 Minecraft 所拼湊出來的空間。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":815,"title":"女木島名店街","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_104634016-scaled.jpg","title":"作品「いのちの詩・あまのおと」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_104634016-scaled.jpg","alt":"","caption":"","thumb":"","id":816,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105841872-scaled.jpg","title":"作品「ガラス漁具店」中展出的玻璃裝飾","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105841872-scaled.jpg","alt":"","caption":"","thumb":"","id":818,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105858760-scaled.jpg","title":"作品「ガラス漁具店」中展出的玻璃裝飾","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105858760-scaled.jpg","alt":"","caption":"","thumb":"","id":819,"height":90.44481054365733,"width":120.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105707160-scaled.jpg","title":"作品「ピンポン・シー NEW！」的其中一張桌子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_105707160-scaled.jpg","alt":"","caption":"","thumb":"","id":817,"height":90.44481054365733,"width":67.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110417163-scaled.jpg","title":"作品「カフェ・サムシング サインズ」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110417163-scaled.jpg","alt":"","caption":"","thumb":"","id":820,"height":90.44481054365733,"width":120.3}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='815']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_104634016.jpg'), caption: '作品「いのちの詩・あまのおと」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_105841872.jpg'), caption: '作品「ガラス漁具店」中展出的玻璃裝飾' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_105858760.jpg'), caption: '作品「ガラス漁具店」中展出的玻璃裝飾' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_105707160.jpg'), caption: '作品「ピンポン・シー NEW！」的其中一張桌子' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_110417163.jpg'), caption: '作品「カフェ・サムシング サインズ」' },
+	]}
+/>
 
 接著，往女木港的方向前進，途中遇到作品「[20世紀の回想](https://setouchi-artfest.jp/artworks/detail/8ac6d670-3f40-4680-ae07-056c75b9fce9)」，該作品是上面有四座帆，看起來有點像船的鋼琴，鋼琴會自動播放音樂，該作品似乎也作為 Summer Pockets 中，登場的海盜船的參考原型。而在鋼琴旁邊的提坊上，有著許多海鷗[^1]的藝術裝置，這些海鷗會隨著風向轉動。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":824,"title":"20世紀の回想 / カモメの駐車場","columns":"0","row_height":200,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110913218-1-scaled.jpg","title":"作品「20世紀の回想」與後方的「カモメの駐車場」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110913218-1-scaled.jpg","alt":"","caption":"","thumb":"","id":825,"height":287.0192307692308,"width":215.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111005154-1-scaled.jpg","title":"作品「カモメの駐車場」的特寫","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111005154-1-scaled.jpg","alt":"","caption":"","thumb":"","id":826,"height":287.0192307692308,"width":381.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='824']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_110913218-1.jpg'), caption: '作品「20世紀の回想」與後方的「カモメの駐車場」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_111005154-1.jpg'), caption: '作品「カモメの駐車場」的特寫' },
+	]}
+/>
 
 回到女木港時，由於距離前往男木島的船班還有一大段時間，又差不多接近中午時刻，我想起先前經過的餐廳—[鬼の台所 福](https://maps.app.goo.gl/dWJpGAFMg9Po7T6E9)，於是我前往該店解決午餐，午餐我點了ホルモン焼うどん和炸章魚來吃，ホルモン焼うどん的味道十分濃郁。
 
@@ -139,21 +166,29 @@ wordpressId: 767
 
 午餐後，我回到遊客服務中心，在裡面的用餐區點了哈密瓜刨冰來吃。接著，在遊客中心附近拍照、打發時間，等待船班的到來。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":829,"title":"女木港附近","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_114953095-scaled.jpg","title":"哈密瓜刨冰","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_114953095-scaled.jpg","alt":"","caption":"","thumb":"","id":833,"height":80.65522620904837,"width":60.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111047672-scaled.jpg","title":"該地藏菩薩像為安撫紫雲丸事件的受難者所設立，紫雲丸事件亦為促成瀨戶大橋建設的重要轉捩點","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111047672-scaled.jpg","alt":"","caption":"","thumb":"","id":830,"height":80.65522620904837,"width":107.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111617749-scaled.jpg","title":"摩艾石像","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111617749-scaled.jpg","alt":"","caption":"","thumb":"","id":831,"height":80.65522620904837,"width":60.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111638497-scaled.jpg","title":"鬼島洞窟的路標","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111638497-scaled.jpg","alt":"","caption":"","thumb":"","id":832,"height":80.65522620904837,"width":60.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_120517023-scaled.jpg","title":"鬼ヶ島 おにの館，也是旅客服務中心","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_120517023-scaled.jpg","alt":"","caption":"","thumb":"","id":834,"height":80.65522620904837,"width":107.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_120916444-scaled.jpg","title":"女木港的閃光塔，上面坐著許多的鬼","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_120916444-scaled.jpg","alt":"","caption":"","thumb":"","id":835,"height":80.65522620904837,"width":60.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_121835328-scaled.jpg","title":"往返高松、女木島和男木島的渡輪「シマシマめおん」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_121835328-scaled.jpg","alt":"","caption":"","thumb":"","id":836,"height":80.65522620904837,"width":60.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='829']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_114953095.jpg'), caption: '哈密瓜刨冰' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_111047672.jpg'), caption: '該地藏菩薩像為安撫紫雲丸事件的受難者所設立，紫雲丸事件亦為促成瀨戶大橋建設的重要轉捩點' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_111617749.jpg'), caption: '摩艾石像' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_111638497.jpg'), caption: '鬼島洞窟的路標' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_120517023.jpg'), caption: '鬼ヶ島 おにの館，也是旅客服務中心' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_120916444.jpg'), caption: '女木港的閃光塔，上面坐著許多的鬼' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_121835328.jpg'), caption: '往返高松、女木島和男木島的渡輪「シマシマめおん」' },
+	]}
+/>
 
 ---
 
 搭上渡輪，船航行約 20 分鐘後，抵達目的地—男木島。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":839,"title":"從渡輪上拍男木島聚落","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_123903768-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_123903768-scaled.jpg","alt":"","caption":"","thumb":"","id":840,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_124008763-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_124008763-scaled.jpg","alt":"","caption":"","thumb":"","id":841,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_124245583-scaled.jpg","title":"作為男木交流館的作品「男木島の魂 」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_124245583-scaled.jpg","alt":"","caption":"","thumb":"","id":842,"height":145.6140350877193,"width":193.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='839']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_123903768.jpg'), caption: '男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_124008763.jpg'), caption: '男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_124245583.jpg'), caption: '作為男木交流館的作品「男木島の魂 」' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1242,"url":"https://aniya.moe/wp-content/uploads/2025/05/torisirojima01-1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":845,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250423_123206.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"さしずめ俺は……"} -->
@@ -222,11 +257,13 @@ wordpressId: 767
 
 穿過豐玉姬神社，往[男木漁港](https://maps.app.goo.gl/xMth4njvUmwzdina6)的方向前進，途中皆是下坡，到達男木漁港後左轉，沿著海邊的道路往前走，會看到島上著名的作品「[歩く方舟](https://setouchi-artfest.jp/artworks/detail/2d93cbaa-56b0-4b5a-9f89-5fed706ce66f)」，在這裡，會有不少人到作品旁，跟在作品後面，擺著相同的姿勢，試圖以與作品融為一體的方式合照。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":875,"title":"前往歩く方舟","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_140120312-scaled.jpg","title":"在山路上，拍攝遠方的男木港","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_140120312-scaled.jpg","alt":"","caption":"","thumb":"","id":876,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_140638626-scaled.jpg","title":"在前往作品「歩く方舟」路上所拍攝的貓","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_140638626-scaled.jpg","alt":"","caption":"","thumb":"","id":877,"height":170.38123167155425,"width":127.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_141939954-scaled.jpg","title":"作品「歩く方舟」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_141939954-scaled.jpg","alt":"","caption":"","thumb":"","id":878,"height":170.38123167155425,"width":226.6}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='875']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_140120312.jpg'), caption: '在山路上，拍攝遠方的男木港' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_140638626.jpg'), caption: '在前往作品「歩く方舟」路上所拍攝的貓' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_141939954.jpg'), caption: '作品「歩く方舟」' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":880,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_28.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":881,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_140503.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景"} -->
@@ -269,11 +306,13 @@ wordpressId: 767
 
 往前走一小段路，會看到一戶人家門口擺著各種貓與 Summer Pockets 相關的週邊，兩旁的牆壁上貼滿各種圖畫與照片，這裡是同好間有名的[ねこポケハウス](https://maps.app.goo.gl/eXVKg6mNcGdbMrQSA)，裡面住著[豊爺](https://x.com/nekopoketoyoji)，可以從旁邊的小門進去拜訪他，門口是自助商店，週邊可以自行購買並結帳。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":892,"title":"ねこポケハウス","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144112737-scaled.jpg","title":"ねこポケハウス附近的圍牆","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144112737-scaled.jpg","alt":"","caption":"","thumb":"","id":893,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144120332-scaled.jpg","title":"ねこポケハウス附近的圍牆","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144120332-scaled.jpg","alt":"","caption":"","thumb":"","id":894,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144139140-scaled.jpg","title":"ねこポケハウス外的自助商店","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_144139140-scaled.jpg","alt":"","caption":"","thumb":"","id":895,"height":145.6140350877193,"width":193.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='892']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_144112737.jpg'), caption: 'ねこポケハウス附近的圍牆' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_144120332.jpg'), caption: 'ねこポケハウス附近的圍牆' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_144139140.jpg'), caption: 'ねこポケハウス外的自助商店' },
+	]}
+/>
 
 我在自助商店購買聖地巡禮導覽手冊「[とりしろっぷ ～Summer Pockets 舞台案内～](https://www.melonbooks.co.jp/detail/detail.php?product_id=2697465)」，稍作停留一會，接著往剩下的作品繼續前進。
 
@@ -294,19 +333,31 @@ wordpressId: 767
 <!-- /wp:jetpack/image-compare -->
 ```
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":913,"title":"男木港一帶","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_145321125-scaled.jpg","title":"貼在紀念品上店門窗上的合作活動海報","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_145321125-scaled.jpg","alt":"","caption":"","thumb":"","id":899,"height":135.81730769230768,"width":101.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_145341078-scaled.jpg","title":"在合作商店裡，有紬ヴェンダース和野村美希的立牌","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_145341078-scaled.jpg","alt":"","caption":"","thumb":"","id":900,"height":135.81730769230768,"width":101.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_150144172-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_150144172-scaled.jpg","alt":"","caption":"","thumb":"","id":901,"height":135.81730769230768,"width":180.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152243324-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152243324-scaled.jpg","alt":"","caption":"","thumb":"","id":902,"height":135.81730769230768,"width":180.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152422032-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152422032-scaled.jpg","alt":"","caption":"","thumb":"","id":904,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152326842-scaled.jpg","title":"在岸邊停靠的「めおん2」渡輪，外觀與 Summer Pockets 中，男主角所搭乘的船相似","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_152326842-scaled.jpg","alt":"","caption":"","thumb":"","id":903,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_161033586-scaled.jpg","title":"停留於男木島の魂周圍池塘裡鴨子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_161033586-scaled.jpg","alt":"","caption":"","thumb":"","id":907,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_155848559-scaled.jpg","title":"附近的貓","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_155848559-scaled.jpg","alt":"","caption":"","thumb":"","id":906,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_161622037-scaled.jpg","title":"從男木港防波堤上拍攝整個男木港與聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_161622037-scaled.jpg","alt":"","caption":"","thumb":"","id":908,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_153959950-scaled.jpg","title":"男木島燈塔 1/25 比例的模型","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_153959950-scaled.jpg","alt":"","caption":"","thumb":"","id":905,"height":170.38123167155425,"width":127.8}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='913']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_145321125.jpg'), caption: '貼在紀念品上店門窗上的合作活動海報' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_145341078.jpg'), caption: '在合作商店裡，有紬ヴェンダース和野村美希的立牌' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_150144172.jpg'), caption: '男木島の魂' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_152243324.jpg'), caption: '男木島の魂' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_152422032.jpg'), caption: '男木島の魂' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_152326842.jpg'), caption: '在岸邊停靠的「めおん2」渡輪，外觀與 Summer Pockets 中，男主角所搭乘的船相似' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_161033586.jpg'), caption: '停留於男木島の魂周圍池塘裡鴨子' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_155848559.jpg'), caption: '附近的貓' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_161622037.jpg'), caption: '從男木港防波堤上拍攝整個男木港與聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_153959950.jpg'), caption: '男木島燈塔 1/25 比例的模型' },
+	]}
+/>
 
 搭上回程的渡輪，船開始離港時，我站在船側走道上，看向男木島，注意到島民聚集至作品「[タコツボル](https://setouchi-artfest.jp/artworks/detail/7a828576-d432-455a-9a17-cb53793de53f)」，拿起插在上面的旗幟，並走到渡輪前，組成隊伍，舉起旗幟，向船上的遊客道謝並送行，船上不少遊客也用喊叫的方式，向島民們表達感謝與祝福之意，我也跟著一起喊。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":917,"title":"男木島島民熱情的再見","columns":"0","row_height":200,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_165922686-scaled.jpg","title":"島民熱情的再見","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_165922686-scaled.jpg","alt":"","caption":"","thumb":"","id":918,"height":224.4360902255639,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_165933248-scaled.jpg","title":"島民熱情的再見","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_165933248-scaled.jpg","alt":"","caption":"","thumb":"","id":919,"height":224.4360902255639,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_170001956-scaled.jpg","title":"島民熱情的再見","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_170001956-scaled.jpg","alt":"","caption":"","thumb":"","id":920,"height":224.4360902255639,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_170014987-scaled.jpg","title":"島民熱情的再見","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_170014987-scaled.jpg","alt":"","caption":"","thumb":"","id":921,"height":224.4360902255639,"width":298.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='917']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_165922686.jpg'), caption: '島民熱情的再見' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_165933248.jpg'), caption: '島民熱情的再見' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_170001956.jpg'), caption: '島民熱情的再見' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day4/20250423_170014987.jpg'), caption: '島民熱情的再見' },
+	]}
+/>
 
 ---
 

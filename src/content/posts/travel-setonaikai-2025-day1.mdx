@@ -11,6 +11,8 @@ draft: false
 wordpressId: 493
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 旅遊第一天，我從台灣搭乘飛機飛往岡山機場，接著在 JR 岡山站搭乘電車前往丸龜，最後入住東橫 INN 丸龜站。
 
 在旅途開始的前一天，瀨戶內海區域出現的濃霧情況[^1]，導致上午有部份的船班取消[^2]，因為有裝[官方的 App](https://setouchi-artfest.jp/access/app/#app-info)，所以知道這情況，有初步構想了遇到濃霧，導致船班取消的行程調整備案，不過還好整趟旅程都很幸運，都沒遇到這狀況，備案也就沒有被執行。
@@ -52,13 +54,13 @@ wordpressId: 493
 <figcaption>らぁ～めん京的鶏しおらぁ～めん</figcaption>
 </figure>
 
-```html title="wp-unconverted: core/gallery"
-<!-- wp:gallery {"linkTo":"none","align":"center"} -->
-<figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":500,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/岡山駅前桃太郎像-神推-1024x576.jpg" alt="推しが武道館いってくれたら死ぬ中出現的桃太郎像" class="wp-image-500"/></figure>
-<!-- /wp:image --><figcaption class="blocks-gallery-caption wp-element-caption">原本要在岡山站東出口拍的桃太郎像，出自<a href="https://oshibudo.com/" target="_blank" rel="noopener" title="">推しが武道館いってくれたら死ぬ</a>第三集</figcaption></figure>
-<!-- /wp:gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day1/岡山駅前桃太郎像-神推.jpg'), alt: '推しが武道館いってくれたら死ぬ中出現的桃太郎像' },
+	]}
+>
+原本要在岡山站東出口拍的桃太郎像，出自[推しが武道館いってくれたら死ぬ](https://oshibudo.com/)第三集
+</Gallery>
 
 <figure>
 

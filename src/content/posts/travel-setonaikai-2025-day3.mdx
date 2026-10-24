@@ -11,17 +11,21 @@ draft: false
 wordpressId: 701
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 旅遊第三天，早上，我從丸龜搭電車坂出站，接下來，藉由公車和走路，穿梭於瀨戶藝春會期限定的沙彌島和瀨居島的景點。下午，搭乘公車回到坂出站，接著，搭乘電車到高松，最後入住東橫 INN 高松站前。
 
 今天早上只要在坂出站搭上 8:35 的公車，又丸龜到坂出僅隔兩站，列車通勤時間約 10 分鐘，相較於昨天到高松站有較多的餘裕，因此，起床時間可以設定為 6:30 之後。起床後簡單梳洗，然後到旅館一樓大廳享用免費的早餐，用餐結束後回到房間整理一下行李，接著拖著行李到旅館大廳，在自動化櫃台辦理退房手續，最後前往丸龜站準備搭車。
 
 搭車時間為 8 點多，這時間有不少的學生和上班族，列車上略顯擁擠。抵達坂出站，出站後，將行李寄放在投幣式寄物櫃，接著就去等待公車。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":706,"title":"坂出站","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082158716-scaled.jpg","title":"在公車站旁的鴿子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082158716-scaled.jpg","alt":"","caption":"","thumb":"","id":707,"height":205.30035335689044,"width":154},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082207472-scaled.jpg","title":"在公車站旁的鴿子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082207472-scaled.jpg","alt":"","caption":"","thumb":"","id":708,"height":205.30035335689044,"width":154},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082631005-scaled.jpg","title":"坂出站","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_082631005-scaled.jpg","alt":"","caption":"","thumb":"","id":709,"height":205.30035335689044,"width":273}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='706']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_082158716.jpg'), caption: '在公車站旁的鴿子' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_082207472.jpg'), caption: '在公車站旁的鴿子' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_082631005.jpg'), caption: '坂出站' },
+	]}
+/>
 
 上了公車，找個靠窗的位置坐下。公車前往沙彌島的路上，在行駛於瀨戶大橋橋下的道路時，由於經過[番の州臨海工業団地](https://yuchi-100plan.pref.kagawa.lg.jp/useful/useful2/)，在右側出現不少川崎重工之類的大型廠房。
 
@@ -48,11 +52,16 @@ wordpressId: 701
 
 紀念館記錄著瀨戶大橋的歷史，從一開始本州和四國間要建立橋樑的構想開始，到後來確定三個方案後，卻遇上石油危機，計畫被凍結，後來解凍，建設才正式開始；而設計時，除了設計給汽車通行之外，也要給列車通行，更要讓貨輪能夠從橋下通過；在建設過程中，所遇到的諸多挑戰與創舉等等。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":717,"title":"瀨戶大橋紀念公園","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_103630594-scaled.jpg","title":"從塔上往岡山的方向看過去","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_103630594-scaled.jpg","alt":"","caption":"","thumb":"","id":718,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_103933892-scaled.jpg","title":"從塔上往香川的方向看過去","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_103933892-scaled.jpg","alt":"","caption":"","thumb":"","id":719,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_104424571-scaled.jpg","title":"從塔上往旁邊紀念館的方向看過去","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_104424571-scaled.jpg","alt":"","caption":"","thumb":"","id":720,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_104838239-scaled.jpg","title":"在紀念塔館的展望台上拍攝マリンドーム","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_104838239-scaled.jpg","alt":"","caption":"","thumb":"","id":721,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_105322549-scaled.jpg","title":"マリンドーム內部的樣子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_105322549-scaled.jpg","alt":"","caption":"","thumb":"","id":722,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_112159785-scaled.jpg","title":"紀念館有賣結城友奈は勇者である的週邊（笑","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_112159785-scaled.jpg","alt":"","caption":"","thumb":"","id":723,"height":170.38123167155425,"width":127.8}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='717']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_103630594.jpg'), caption: '從塔上往岡山的方向看過去' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_103933892.jpg'), caption: '從塔上往香川的方向看過去' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_104424571.jpg'), caption: '從塔上往旁邊紀念館的方向看過去' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_104838239.jpg'), caption: '在紀念塔館的展望台上拍攝マリンドーム' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_105322549.jpg'), caption: 'マリンドーム內部的樣子' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_112159785.jpg'), caption: '紀念館有賣結城友奈は勇者である的週邊（笑' },
+	]}
+/>
 
 ```html title="wp-unconverted: core/html"
 <!-- wp:html -->
@@ -74,11 +83,13 @@ wordpressId: 701
 
 走出幼稚園，到隔壁中學校，這裡相對熱鬧，有服務中心、飲食店，也有 *[HELLO CYCLING](https://www.hellocycling.jp/)* 可以租用，同時，學校的教室裡展示著許多各式各樣作者的作品，我印象比較深刻的作品是「[一日の終わりに願うこと](https://setouchi-artfest.jp/artworks/detail/a4e9b77c-6782-417e-a8dc-85390d0c78b6)」和「[いるもの](https://setouchi-artfest.jp/artworks/detail/da78f63b-8179-4944-b619-4dca2c3a87dc)」。前者是用 AI 生成的文字冒險遊戲，他的控制器是一塊大石頭，控制季的按鈕是由小道具或漂流物所組成，觀賞者可以用該控制來選擇選項，操控故事的走向。當我在玩這作品時，留意到來自背後的照相聲，似乎被別人當作作品的一部分給拍照進去了。後者則是一堆各種形狀的白色物體，散落在學校的屋頂上，這些物體的散落方式與樣子，彷彿是活著的生物一般。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":729,"title":"舊瀨居中學校","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_140113809-scaled.jpg","title":"「一日の終わりに願うこと」的控制器，看起來十分硬派","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_140113809-scaled.jpg","alt":"","caption":"","thumb":"","id":730,"height":170.38123167155425,"width":226.6},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_141805674-scaled.jpg","title":"一般的兌幣機與長椅，兌幣機放在磅秤上，當 1000 元鈔票換成 10 個 100 元硬幣時，旁邊的數字會產生變化","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_141805674-scaled.jpg","alt":"","caption":"","thumb":"","id":731,"height":170.38123167155425,"width":127.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_143659390-scaled.jpg","title":"屋頂上的「いるもの」，除了一團一團的樣態，也有一長條的樣子","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_143659390-scaled.jpg","alt":"","caption":"","thumb":"","id":732,"height":170.38123167155425,"width":226.6}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='729']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_140113809.jpg'), caption: '「一日の終わりに願うこと」的控制器，看起來十分硬派' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_141805674.jpg'), caption: '一般的兌幣機與長椅，兌幣機放在磅秤上，當 1000 元鈔票換成 10 個 100 元硬幣時，旁邊的數字會產生變化' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_143659390.jpg'), caption: '屋頂上的「いるもの」，除了一團一團的樣態，也有一長條的樣子' },
+	]}
+/>
 
 在離開中學校前，我遇到一團穿著西裝的台灣人準備看展，從他們的談話中，得知這團當中有處長級的人物![](../../assets/images/travel-setonaikai-2025-day1/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg)，接著，遇到服務台的工作人員邀請填寫問券，由於剩餘時間充裕，我便坐下來好好完成問券，問卷填寫完後，我獲得作為謝禮的官方濕紙巾。
 
@@ -120,11 +131,13 @@ wordpressId: 701
 
 回到坂出站，天空開始飄起毛毛細雨，我從寄物櫃拿回行李後，接著就進站搭乘列車前往高松。抵達高松後，我拖著行李前往今晚要入住的東橫 INN，走進旅館，在自動櫃台辦理入住手續時，怎樣操作都搜尋不到我的預約紀錄，經服務人員協助查詢後，告知我是在另一間分館，我才恍然大悟，原來我跑到兵庫町分館，而非站前分館，於是，我再度拖著行李，前往正確的分館。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":748,"title":"高松站 \u0026#8211; 20250422","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173557754-scaled.jpg","title":"予讚線8000系麵包超人列車","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173557754-scaled.jpg","alt":"","caption":"","thumb":"","id":749,"height":205.30035335689044,"width":154},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173655965-scaled.jpg","title":"予讚線8000系麵包超人列車","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173655965-scaled.jpg","alt":"","caption":"","thumb":"","id":751,"height":205.30035335689044,"width":273},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173629523-scaled.jpg","title":"ざつ旅第三集，主角來高松所搭乘的列車—マリンライナー","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_173629523-scaled.jpg","alt":"","caption":"","thumb":"","id":750,"height":205.30035335689044,"width":154}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='748']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_173557754.jpg'), caption: '予讚線8000系麵包超人列車' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_173655965.jpg'), caption: '予讚線8000系麵包超人列車' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_173629523.jpg'), caption: 'ざつ旅第三集，主角來高松所搭乘的列車—マリンライナー' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":760,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":761,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_180724.jpg","alt":"","width":1920,"height":1080},"caption":"ざつ旅第三集出現的高松站"} -->
@@ -142,10 +155,11 @@ wordpressId: 701
 
 進到旅館房間，稍微整理一下行李後，用 Google Map 查詢一下附近有什麼超市，找到了[マルナカ](https://maps.app.goo.gl/FFfgZmcb1KkGVFEb8)，接著我就前往超市採買晚餐、飲用水和零食，結帳完才發現超市沒有提供免洗餐具，於是今天晚餐無法享用剛剛購買的泡麵，只能依靠零食和在瀨居島購買的柿茶。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":755,"title":"在瀨居島購買的柿茶","columns":"0","row_height":200,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_191401241-scaled.jpg","title":"在瀨居島購買的柿茶","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_191401241-scaled.jpg","alt":"","caption":"","thumb":"","id":756,"height":398,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250422_191418054-scaled.jpg","title":"在瀨居島購買的柿茶","link":"https://aniya.moe/wp-content/uploads/2025/05/20250422_191418054-scaled.jpg","alt":"","caption":"","thumb":"","id":757,"height":398,"width":298.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='755']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_191401241.jpg'), caption: '在瀨居島購買的柿茶' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day3/20250422_191418054.jpg'), caption: '在瀨居島購買的柿茶' },
+	]}
+/>
 
 晚餐帶回旅館房間解決，晚餐結束後稍作休息，接著是洗澡，洗澡完後看一會 YouTube 影片，時間差不多來到晚上11 點時熄燈就寢。

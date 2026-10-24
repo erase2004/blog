@@ -11,6 +11,8 @@ draft: false
 wordpressId: 1590
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 旅遊最後一天，早上，我在高松搭乘渡輪前往男木島，在島上進行最後的聖地巡禮。中午回到高松，搭乘電車與轉乘公車到達岡山機場，搭飛機飛回台灣，結束旅行。
 
 今天早上，在旅館完成退房手續，將行李寄放在旅館後，走到高松港搭乘渡輪前往男木島，前往高松港的途中，在超商購買早餐。
@@ -22,11 +24,18 @@ wordpressId: 1590
 <figcaption>搭乘渡輪前往男木島</figcaption>
 </figure>
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1595,"title":"男木港 \u0026#8211; 20250427","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084030303-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084030303-scaled.jpg","alt":"","caption":"","thumb":"","id":1597,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084021441-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084021441-scaled.jpg","alt":"","caption":"","thumb":"","id":1596,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084044656-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084044656-scaled.jpg","alt":"","caption":"","thumb":"","id":1598,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084108932-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084108932-scaled.jpg","alt":"","caption":"","thumb":"","id":1599,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084138775-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084138775-scaled.jpg","alt":"","caption":"","thumb":"","id":1600,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084145909-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084145909-scaled.jpg","alt":"","caption":"","thumb":"","id":1601,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084155145-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084155145-scaled.jpg","alt":"","caption":"","thumb":"","id":1602,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084335425-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084335425-scaled.jpg","alt":"","caption":"","thumb":"","id":1603,"height":106.20300751879698,"width":141.3}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1595']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084030303.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084021441.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084044656.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084108932.jpg'), caption: '男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084138775.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084145909.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084155145.jpg'), caption: '男木港與男木島聚落' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084335425.jpg'), caption: '男木島聚落' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":844,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_18.jpg?ssl=1","alt":"","width":512,"height":288},"imageAfter":{"id":1605,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250427_083326.jpg","alt":"","width":1920,"height":1080},"caption":"(重拍) さしずめ俺は……"} -->
@@ -36,11 +45,14 @@ wordpressId: 1590
 
 到達男木島，下船後，前往今天的主要目標—[男木島灯台](https://maps.app.goo.gl/Nm8KojhZVyBYzeC3A)。路途上，看到紬ヴェンダース的痛車，遇到一隻逃出雞舍的雞，以及經過[「細川和俊君の足跡」碑](https://maps.app.goo.gl/HNp94uyBT3Eg3JQeA)，行走約半小時後，抵達燈塔。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1609,"title":"前往男木島燈塔的途中","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084820299-scaled.jpg","title":"紬ヴェンダース的痛車","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084820299-scaled.jpg","alt":"","caption":"","thumb":"","id":1610,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090609979-scaled.jpg","title":"細川和俊君の足跡」石碑","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090609979-scaled.jpg","alt":"","caption":"","thumb":"","id":1611,"height":119.19831223628691,"width":89.4},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090624244-scaled.jpg","title":"遠方就是男木島燈塔","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090624244-scaled.jpg","alt":"","caption":"","thumb":"","id":1612,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090916077-scaled.jpg","title":"抵達男木島燈塔","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_090916077-scaled.jpg","alt":"","caption":"","thumb":"","id":1613,"height":119.19831223628691,"width":158.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1609']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_084820299.jpg'), caption: '紬ヴェンダース的痛車' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_090609979.jpg'), caption: '細川和俊君の足跡」石碑' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_090624244.jpg'), caption: '遠方就是男木島燈塔' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_090916077.jpg'), caption: '抵達男木島燈塔' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1630,"url":"https://aniya.moe/wp-content/uploads/2025/05/蒼と出会った小道-Summer-Pocket.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1631,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250427_085441.jpg","alt":"","width":1920,"height":1080},"caption":"在 Summer Pockets 中，與蒼相遇的小路"} -->
@@ -56,11 +68,17 @@ wordpressId: 1590
 
 參觀完燈塔與旁邊的資料館[^1]，以及附近的露營場後，返回男木島聚落。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1615,"title":"男木島燈塔","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091625109-scaled.jpg","title":"男木島燈塔","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091625109-scaled.jpg","alt":"","caption":"","thumb":"","id":1616,"height":88.67924528301887,"width":66.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091731321-scaled.jpg","title":"男木島燈塔資料館","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091731321-scaled.jpg","alt":"","caption":"","thumb":"","id":1617,"height":88.67924528301887,"width":117.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091852208-scaled.jpg","title":"資料館門旁的「男木島灯台サマポケ祭り」的海報","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_091852208-scaled.jpg","alt":"","caption":"","thumb":"","id":1618,"height":88.67924528301887,"width":66.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_093047619-scaled.jpg","title":"資料館門旁的海報","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_093047619-scaled.jpg","alt":"","caption":"","thumb":"","id":1624,"height":88.67924528301887,"width":66.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092420958-scaled.jpg","title":"紬ヴェンダース的透明立牌","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092420958-scaled.jpg","alt":"","caption":"","thumb":"","id":1619,"height":88.67924528301887,"width":66.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092656381-scaled.jpg","title":"紬ヴェンダース與野村美希的立牌","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092656381-scaled.jpg","alt":"","caption":"","thumb":"","id":1622,"height":88.67924528301887,"width":66.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092944694-scaled.jpg","title":"男木島觀光景點資訊","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_092944694-scaled.jpg","alt":"","caption":"","thumb":"","id":1623,"height":88.67924528301887,"width":66.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1615']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_091625109.jpg'), caption: '男木島燈塔' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_091731321.jpg'), caption: '男木島燈塔資料館' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_091852208.jpg'), caption: '資料館門旁的「男木島灯台サマポケ祭り」的海報' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_093047619.jpg'), caption: '資料館門旁的海報' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_092420958.jpg'), caption: '紬ヴェンダース的透明立牌' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_092656381.jpg'), caption: '紬ヴェンダース與野村美希的立牌' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_092944694.jpg'), caption: '男木島觀光景點資訊' },
+	]}
+/>
 
 <figure>
 <video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day8/20250427_092603501.mp4"></video>
@@ -108,17 +126,28 @@ wordpressId: 1590
 <figcaption>從豐玉姬神社鳥瞰整個男木島聚落</figcaption>
 </figure>
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1645,"title":"歩く方舟 \u0026#8211; 20250427","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101450950-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101450950-scaled.jpg","alt":"","caption":"","thumb":"","id":1646,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101453654-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101453654-scaled.jpg","alt":"","caption":"","thumb":"","id":1647,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101838046-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101838046-scaled.jpg","alt":"","caption":"","thumb":"","id":1648,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101841087-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101841087-scaled.jpg","alt":"","caption":"","thumb":"","id":1649,"height":106.20300751879698,"width":141.3}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1645']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_101450950.jpg'), caption: '歩く方舟' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_101453654.jpg'), caption: '歩く方舟' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_101838046.jpg'), caption: '歩く方舟' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_101841087.jpg'), caption: '歩く方舟' },
+	]}
+/>
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1652,"title":"男木島 \u0026#8211; 20250427","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_100415268-scaled.jpg","title":"路上遇到的貓","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_100415268-scaled.jpg","alt":"","caption":"","thumb":"","id":1653,"height":111.81262729124236,"width":83.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_100446817-scaled.jpg","title":"路上遇到的貓","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_100446817-scaled.jpg","alt":"","caption":"","thumb":"","id":1654,"height":111.81262729124236,"width":83.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_102727829-scaled.jpg","title":"熊造型的木像","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_102727829-scaled.jpg","alt":"","caption":"","thumb":"","id":1655,"height":111.81262729124236,"width":83.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_102921964-scaled.jpg","title":"ねこポケホウス準備中","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_102921964-scaled.jpg","alt":"","caption":"","thumb":"","id":1656,"height":111.81262729124236,"width":148.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_103001513-scaled.jpg","title":"ねこポケホウス附近的圍牆","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_103001513-scaled.jpg","alt":"","caption":"","thumb":"","id":1657,"height":111.81262729124236,"width":148.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_103053644-scaled.jpg","title":"頭上注意","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_103053644-scaled.jpg","alt":"","caption":"","thumb":"","id":1658,"height":119.19831223628691,"width":89.4},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104252203-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104252203-scaled.jpg","alt":"","caption":"","thumb":"","id":1659,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104415814-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104415814-scaled.jpg","alt":"","caption":"","thumb":"","id":1660,"height":119.19831223628691,"width":158.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104501117-scaled.jpg","title":"男木島の魂","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_104501117-scaled.jpg","alt":"","caption":"","thumb":"","id":1661,"height":119.19831223628691,"width":158.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1652']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_100415268.jpg'), caption: '路上遇到的貓' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_100446817.jpg'), caption: '路上遇到的貓' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_102727829.jpg'), caption: '熊造型的木像' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_102921964.jpg'), caption: 'ねこポケホウス準備中' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_103001513.jpg'), caption: 'ねこポケホウス附近的圍牆' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_103053644.jpg'), caption: '頭上注意' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_104252203.jpg'), caption: '男木島の魂' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_104415814.jpg'), caption: '男木島の魂' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_104501117.jpg'), caption: '男木島の魂' },
+	]}
+/>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":873,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_25.jpg?ssl=1","alt":"","width":1270,"height":1920},"imageAfter":{"id":1663,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250427_095941.jpg","alt":"","width":1080,"height":1634},"caption":"(重拍) Summer Pockets 動畫主視覺圖"} -->
@@ -198,21 +227,31 @@ wordpressId: 1590
 <!-- /wp:jetpack/image-compare -->
 ```
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1683,"title":"從男木島返回高松港的途中 \u0026#8211; 20250427","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_111938841-scaled.jpg","title":"從船上拍攝鬼ヶ島おにの館","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_111938841-scaled.jpg","alt":"","caption":"","thumb":"","id":1684,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_111950790-scaled.jpg","title":"從船上拍攝「20世紀の回想」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_111950790-scaled.jpg","alt":"","caption":"","thumb":"","id":1685,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_112427497-scaled.jpg","title":"從船上拍攝女木港","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_112427497-scaled.jpg","alt":"","caption":"","thumb":"","id":1686,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113311956-scaled.jpg","title":"在高松港裡行駛的水上摩拖車","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113311956-scaled.jpg","alt":"","caption":"","thumb":"","id":1687,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113731574-scaled.jpg","title":"前往小豆島的渡輪","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113731574-scaled.jpg","alt":"","caption":"","thumb":"","id":1688,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113738189-scaled.jpg","title":"前往小豆島的渡輪","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113738189-scaled.jpg","alt":"","caption":"","thumb":"","id":1689,"height":55.53168635875402,"width":73.9},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113842908-scaled.jpg","title":"高松港","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_113842908-scaled.jpg","alt":"","caption":"","thumb":"","id":1690,"height":55.53168635875402,"width":73.9}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1683']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_111938841.jpg'), caption: '從船上拍攝鬼ヶ島おにの館' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_111950790.jpg'), caption: '從船上拍攝「20世紀の回想」' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_112427497.jpg'), caption: '從船上拍攝女木港' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_113311956.jpg'), caption: '在高松港裡行駛的水上摩拖車' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_113731574.jpg'), caption: '前往小豆島的渡輪' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_113738189.jpg'), caption: '前往小豆島的渡輪' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_113842908.jpg'), caption: '高松港' },
+	]}
+/>
 
 ---
 
 回到高松後，我在車站附近找了一間同時提供咖喱飯和燒肉的店[^2]，點了燒肉套餐當作午餐。店老闆自己一個人經營這間店，可以同時應付我這邊的上菜，以及其他客戶的出餐，挺厲害的。整體味道上不錯，份量上就吃粗飽。用餐途中，店老闆看到我右手的傷勢，關心我一下，然後從店裡消失一陣子，回來時，手上拿著 OK 繃要給我。順道一提，從店老闆和其他熟客的談話中，我得知今天有自衛隊相關的活動[^3]。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1692,"title":"MEGのスパイス食堂","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_120535423-scaled.jpg","title":"燒肉","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_120535423-scaled.jpg","alt":"","caption":"","thumb":"","id":1693,"height":82.5563909774436,"width":109.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_121144938-scaled.jpg","title":"燒肉","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_121144938-scaled.jpg","alt":"","caption":"","thumb":"","id":1694,"height":82.5563909774436,"width":109.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_121455707-scaled.jpg","title":"燒肉","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_121455707-scaled.jpg","alt":"","caption":"","thumb":"","id":1695,"height":82.5563909774436,"width":109.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_123717040-scaled.jpg","title":"店家自製的香腸","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_123717040-scaled.jpg","alt":"","caption":"","thumb":"","id":1696,"height":82.5563909774436,"width":109.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_130154312-scaled.jpg","title":"雞肉","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_130154312-scaled.jpg","alt":"","caption":"","thumb":"","id":1697,"height":82.5563909774436,"width":109.8}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1692']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_120535423.jpg'), caption: '燒肉' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_121144938.jpg'), caption: '燒肉' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_121455707.jpg'), caption: '燒肉' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_123717040.jpg'), caption: '店家自製的香腸' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/20250427_130154312.jpg'), caption: '雞肉' },
+	]}
+/>
 
 用餐結束後，回旅館領回寄放的行李，接著前往高松站，簡短逛了[ハレノヒヤ高松オルネ店](https://maps.app.goo.gl/DED5iYt1UziGbzxD6)後，進站搭乘電車前往岡山站。
 
@@ -260,11 +299,16 @@ wordpressId: 1590
 
 <sup>*各個島嶼的蓋章紀錄*</sup>
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":517,"title":"瀨戶藝 2025 蓋章紀錄","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"isotope":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003403.png","title":"犬島","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003403.png","alt":"","caption":"","thumb":"","id":476,"height":174.18300653594773,"width":88.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004654.png","title":"直島","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004654.png","alt":"","caption":"","thumb":"","id":478,"height":174.18300653594773,"width":88.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004701.png","title":"女木島","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004701.png","alt":"","caption":"","thumb":"","id":481,"height":174.18300653594773,"width":88.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004708.png","title":"男木島","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004708.png","alt":"","caption":"","thumb":"","id":477,"height":174.18300653594773,"width":88.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004721.png","title":"小豆島","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004721.png","alt":"","caption":"","thumb":"","id":479,"height":174.18300653594773,"width":88.8},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004729.png","title":"瀨戶大橋區域","link":"https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-004729.png","alt":"","caption":"","thumb":"","id":482,"height":174.18300653594773,"width":88.8}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='517']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-003403.png'), caption: '犬島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-004654.png'), caption: '直島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-004701.png'), caption: '女木島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-004708.png'), caption: '男木島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-004721.png'), caption: '小豆島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day8/Screenshot_20250508-004729.png'), caption: '瀨戶大橋區域' },
+	]}
+/>
 
 ---
 
