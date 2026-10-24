@@ -6,6 +6,7 @@ import {
 	LOWERCASE_PERCENT_ENCODED_PATHS,
 	type LowercasePercentEncodedPaths,
 	SITE_ORIGIN,
+	TITLE_FORMAT,
 } from './settings.ts';
 import type { Reply, Target } from './targets.ts';
 
@@ -170,7 +171,7 @@ async function checkUrl(
 	const reply = await target.get(requestPath);
 	const problems = await replyProblems(entry, reply, target);
 	if (problems.length === 0 && entry.expect === 'page') {
-		problems.push(...headProblems(entry, reply));
+		problems.push(...(await headProblems(entry, reply, target)));
 	}
 
 	// Non-ASCII paths as WordPress wrote them in canonicals and links.
@@ -253,7 +254,7 @@ function redirectProblems(reply: Reply, location: string): string[] {
 }
 
 /** Spot checks of a page's HTML head. */
-function headProblems(entry: ExpectedUrl, reply: Reply): string[] {
+async function headProblems(entry: ExpectedUrl, reply: Reply, target: Target): Promise<string[]> {
 	const problems: string[] = [];
 	const head = parse(reply.body ?? '').querySelector('head');
 	const canonical = head?.querySelector('link[rel="canonical"]')?.getAttribute('href');
@@ -261,13 +262,31 @@ function headProblems(entry: ExpectedUrl, reply: Reply): string[] {
 	if (!canonical || !URL.canParse(canonical) || !sameUrl(new URL(canonical), ownUrl)) {
 		problems.push(`canonical URL is ${canonical || 'missing'}, expected ${ownUrl.href}`);
 	}
-	if (!head?.querySelector('title')?.text.trim()) {
+	const title = head?.querySelector('title')?.text.trim();
+	if (!title) {
 		problems.push('no <title>');
+	} else if (!TITLE_FORMAT.pattern.test(title)) {
+		problems.push(`title "${title}" is not ${TITLE_FORMAT.description}`);
 	}
 	if (!head?.querySelector('meta[name="description"]')?.getAttribute('content')?.trim()) {
 		problems.push('no meta description');
 	}
+	const ogImage = head?.querySelector('meta[property="og:image"]')?.getAttribute('content')?.trim();
+	problems.push(...(await socialImageProblems(ogImage, target)));
 	return problems;
+}
+
+/**
+ * The og:image must be a full URL on the site, of a JPEG or PNG (the formats
+ * every social platform takes), that answers 200.
+ */
+async function socialImageProblems(ogImage: string | undefined, target: Target): Promise<string[]> {
+	if (!ogImage) return ['no og:image'];
+	const url = URL.canParse(ogImage) ? new URL(ogImage) : null;
+	if (url?.origin !== SITE_ORIGIN) return [`og:image ${ogImage} is not a URL on ${SITE_ORIGIN}`];
+	if (!/\.(?:jpe?g|png)$/i.test(url.pathname)) return [`og:image ${ogImage} is not a JPEG or PNG`];
+	const { status } = await target.get(url.pathname);
+	return status === 200 ? [] : [`og:image ${ogImage} answers HTTP ${status}`];
 }
 
 /** Equal, treating different percent-encodings of the same character as equal. */
