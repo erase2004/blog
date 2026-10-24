@@ -38,6 +38,34 @@ describe('build output', () => {
 	});
 });
 
+describe('trailing slash', () => {
+	it('page URLs without the trailing slash are 301-redirected to the slashed URL', async () => {
+		const response = await get(PROBE_PATH.slice(0, -1));
+
+		expect(response.status).toBe(301);
+		expect(new URL(response.headers.get('location')!, server!.url).pathname).toBe(PROBE_PATH);
+	});
+
+	it('page URLs with the trailing slash are served directly', async () => {
+		const response = await get(PROBE_PATH);
+
+		expect(response.status).toBe(200);
+	});
+
+	it('_redirects only adds the trailing slash for URLs that are pages', () => {
+		const addsSlash = readFileSync(join(outDir, '_redirects'), 'utf8')
+			.split('\n')
+			.map((line) => line.trim().split(/\s+/))
+			.filter(([from, to]) => from !== undefined && to === `${from}/`);
+
+		const targetsWithoutPage = addsSlash
+			.map(([, to]) => to!)
+			.filter((to) => !existsSync(join(outDir, decodeURI(to), 'index.html')));
+		expect(addsSlash.length).toBeGreaterThan(0);
+		expect(targetsWithoutPage).toEqual([]);
+	});
+});
+
 describe('unknown URLs', () => {
 	it('answer with HTTP 404 and the 404 page', async () => {
 		const response = await get('/no-such-page/');
