@@ -1,0 +1,17 @@
+---
+// A date archive, at its WordPress URL /YYYY/, /YYYY/MM/ or /YYYY/MM/DD/
+// (/page/N/ after the first page).
+import ArchiveLayout from '../../layouts/ArchiveLayout.astro';
+import { type ArchivePage, archivePages, dateArchives } from '../../lib/archives';
+
+export async function getStaticPaths() {
+	return (await dateArchives()).flatMap(archivePages).map((page) => {
+		const [year, ...rest] = page.path.slice(1, -1).split('/');
+		return { params: { year, archive: rest.join('/') || undefined }, props: { page } };
+	});
+}
+
+const { page } = Astro.props as { page: ArchivePage };
+---
+
+<ArchiveLayout page={page} />

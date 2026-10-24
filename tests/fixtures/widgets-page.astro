@@ -1,0 +1,20 @@
+---
+// A page that exists only in test builds (injected by tests/support/build-site.mjs):
+// the sidebar widgets, before ticket 15 places them in the layout.
+import CategoryList from '../../src/components/CategoryList.astro';
+import TagCloud from '../../src/components/TagCloud.astro';
+import YearList from '../../src/components/YearList.astro';
+---
+
+<!doctype html>
+<html lang="zh-TW">
+	<head>
+		<meta charset="utf-8" />
+		<title>widgets</title>
+	</head>
+	<body>
+		<section id="categories"><CategoryList /></section>
+		<section id="years"><YearList /></section>
+		<section id="tags"><TagCloud /></section>
+	</body>
+</html>

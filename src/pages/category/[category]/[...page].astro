@@ -1,0 +1,18 @@
+---
+// A category archive, at its WordPress URL /category/<slug>/ (/page/N/ after the first page).
+import ArchiveLayout from '../../../layouts/ArchiveLayout.astro';
+import { type ArchivePage, archivePages, categoryArchives, pageParam } from '../../../lib/archives';
+
+export async function getStaticPaths() {
+	return (await categoryArchives()).flatMap((archive) =>
+		archivePages(archive).map((page) => ({
+			params: { category: archive.path.slice('/category/'.length, -1), page: pageParam(page) },
+			props: { page },
+		})),
+	);
+}
+
+const { page } = Astro.props as { page: ArchivePage };
+---
+
+<ArchiveLayout page={page} />

@@ -46,6 +46,12 @@ export function siteDate(date: Date): { year: string; month: string; day: string
 	return { year: part('year'), month: part('month'), day: part('day') };
 }
 
+/** A date as WordPress showed it (its `date_format`, `Y 年 n 月 j 日`): `2021 年 9 月 30 日`. */
+export function formatSiteDate(date: Date): string {
+	const { year, month, day } = siteDate(date);
+	return `${year} 年 ${Number(month)} 月 ${Number(day)} 日`;
+}
+
 /** `/YYYY/MM/DD/<slug>/`, the date being the publish date in Asia/Taipei, as WordPress permalinks were. */
 export function postPath(post: Post): string {
 	const { year, month, day } = siteDate(post.data.published);
