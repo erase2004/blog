@@ -1,0 +1,49 @@
+---
+// One page of an archive (src/lib/archives.ts): its posts, newest first, and
+// links to the pages with newer and older posts.
+import type { ArchivePage } from '../lib/archives';
+import { formatSiteDate, postPath } from '../lib/content';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+	page: ArchivePage;
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title={page.title} description={page.description}>
+	<Fragment slot="head">
+		{/* WordPress (AIOSEO) kept the pages after the first out of search results. */}
+		{page.number > 1 && <meta name="robots" content="noindex, nofollow" />}
+		{page.newer && <link rel="prev" href={page.newer} />}
+		{page.older && <link rel="next" href={page.older} />}
+	</Fragment>
+	<h1>{page.archive.heading}</h1>
+	{
+		page.posts.map((post) => (
+			<article>
+				<h2>
+					<a href={postPath(post)} rel="bookmark">
+						{post.data.title}
+					</a>
+				</h2>
+				<p>
+					<time datetime={post.data.published.toISOString()}>{formatSiteDate(post.data.published)}</time>
+				</p>
+				<p>{post.data.excerpt ?? post.data.description}</p>
+			</article>
+		))
+	}
+	{
+		page.count > 1 && (
+			<nav aria-label="文章分頁">
+				{page.newer && <a href={page.newer}>較新的文章</a>}
+				<span>
+					第 {page.number} 頁，共 {page.count} 頁
+				</span>
+				{page.older && <a href={page.older}>較舊的文章</a>}
+			</nav>
+		)
+	}
+</BaseLayout>

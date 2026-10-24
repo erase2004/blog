@@ -4,6 +4,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
 import { defineConfig, fontProviders } from 'astro/config';
+import mediaRedirects from './src/integrations/media-redirects';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
 
 // Expressive Code has no Chinese texts of its own.
@@ -31,7 +32,7 @@ export default defineConfig({
 		}),
 	},
 	// Expressive Code highlights code blocks (and must come before MDX).
-	integrations: [expressiveCode({ defaultLocale: 'zh-TW' }), mdx(), trailingSlashRedirects()],
+	integrations: [expressiveCode({ defaultLocale: 'zh-TW' }), mdx(), mediaRedirects(), trailingSlashRedirects()],
 	fonts: [
 		{
 			provider: fontProviders.local(),

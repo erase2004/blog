@@ -1,0 +1,41 @@
+---
+// Sidebar widget: every tag that has posts, by name, bigger the more posts it
+// has. Sizes as WordPress's tag cloud had them (wp_generate_tag_cloud(), the
+// widget set to 10pt–16pt): linear in round(log10(count + 1) * 100).
+import { tagArchives } from '../lib/archives';
+
+const SMALLEST_PT = 10;
+const LARGEST_PT = 16;
+
+const archives = await tagArchives();
+const weight = (count: number) => Math.round(Math.log10(count + 1) * 100);
+const weights = archives.map((archive) => weight(archive.posts.length));
+const lightest = Math.min(...weights);
+const step = (LARGEST_PT - SMALLEST_PT) / Math.max(1, Math.max(...weights) - lightest);
+const size = (count: number) => Number((SMALLEST_PT + (weight(count) - lightest) * step).toFixed(2));
+---
+
+<nav aria-label="標籤">
+	<ul>
+		{
+			archives.map((archive) => (
+				<li>
+					<a href={archive.path} style={`font-size: ${size(archive.posts.length)}pt`}>
+						{archive.name}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<style>
+	ul {
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		display: inline;
+		margin-inline-end: 0.5em;
+	}
+</style>

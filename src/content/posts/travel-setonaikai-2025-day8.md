@@ -61,11 +61,10 @@ wordpressId: 1590
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1628,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250427_092603501.mp4"></video><figcaption class="wp-element-caption">影片：自動化燈器</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day8/20250427_092603501.mp4"></video>
+<figcaption>影片：自動化燈器</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1633,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_30.jpg","alt":"","width":2293,"height":1290},"imageAfter":{"id":1634,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250427_093931.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，坐在燈塔上的紬ヴェンダース"} -->

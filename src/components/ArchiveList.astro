@@ -1,0 +1,22 @@
+---
+// A list of links to archives, each with its post count: `技術 (9)`.
+interface Props {
+	/** What the archives are, for screen readers: `分類`, `年份`. */
+	label: string;
+	items: { name: string; path: string; count: number }[];
+}
+
+const { label, items } = Astro.props;
+---
+
+<nav aria-label={label}>
+	<ul>
+		{
+			items.map(({ name, path, count }) => (
+				<li>
+					<a href={path}>{name}</a> ({count})
+				</li>
+			))
+		}
+	</ul>
+</nav>
