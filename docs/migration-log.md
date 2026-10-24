@@ -1334,3 +1334,65 @@ import Gallery from '../../components/Gallery.astro';
 - 13：Worker 對找不到的 `?p=ID`／`?page_id=ID` 要回 404 頁的內容與 HTTP 404，網址檢查現在會比對標題與 `noindex`（例如向 `env.ASSETS` 要一個不存在的路徑，拿到的應該就是 404 頁和 404；要實測）。新增的 dynamic `_redirects` 規則照舊放在所有 static 規則之後，包括 `/404/` 這一條。
 - 19：在預覽網址確認 `/404/` 回 404（網址檢查 HTTP 模式）、404 頁的兩個搜尋框都能用。預覽網址上 GA4 不會送資料，GA 的即時報表看不到預覽網址的造訪，這是預期的。
 - 20／21：切換後在 aniya.moe 開一個不存在的網址，在 GA4 的 Realtime 或 DebugView 確認 `page_not_found` 有進來；之後每週照上面的 Explore 設定看 404 網址。
+
+## 13：其餘舊網址轉址與查詢字串 Worker（2026-10-24）
+
+### 轉址一覽
+
+| 舊網址 | 新網站的回應 | 由誰回答 |
+|---|---|---|
+| `/?p=ID`、`/?page_id=ID`（27 篇文章與頁面） | 301 到該文章或頁面 | Worker |
+| `/?attachment_id=ID`（826 個附件） | 搬過的圖片 301 到原尺寸的新圖片；影片與 PDF 301 到 R2；沒搬的孤兒圖回 404 頁 | Worker |
+| WordPress 沒發過的 ID（`/?p=1887` 等三種） | 404 頁、HTTP 404 | Worker |
+| `/author/erase2004/` | 301 到 `/about/` | 靜態規則 |
+| `/wp-sitemap.xml` 與 AIOSEO 的 5 個子 sitemap | 301 到 `/sitemap.xml` | 靜態規則 |
+| `/comments/feed/` | 301 到 `/feed/` | 靜態規則 |
+| 舊 slug `/2026/01/23/從-ssr-到-ssg：acgn-股市歷史博物館-7-萬頁靜態化的實戰轉型/` | 301 到 `/2026/01/23/acgn-museum-ssg/` | 靜態規則 |
+| 文章、頁面、分類、標籤的 `…/feed/`（87 個） | 301 到該頁本身 | 1 條動態規則 |
+| `/wp-admin/`、`/wp-login.php`、`/xmlrpc.php`、`/wp-json/` | 404 頁 | 原本就是（沒有檔案） |
+
+### Worker
+
+- `src/worker.ts`，`wrangler.jsonc` 加上 `main`、`assets.binding: "ASSETS"` 與 `assets.run_worker_first: ["/"]`。
+- **只在首頁網址執行**：`run_worker_first` 用陣列（static routing）指定 `/`，比對的是路徑，所以 `/` 帶任何查詢字串都會進 Worker，其他路徑一律是免費的靜態檔案請求。看過 router worker 與 asset worker 的原始碼（miniflare 內建的 `router.worker.js`、`assets.worker.js`）才知道陣列形式是必要的：有 Worker 但沒有 static routing 時，asset worker 判斷「能不能回答」會把 `not_found_handling` 當成 `none`，**所有找不到檔案、也沒有 `_redirects` 規則的網址（錯字網址、`/wp-admin/` 等）都會進 Worker**、算進每天 10 萬次的免費額度；用了 static routing 才保留 `404-page`，由 asset worker 自己回 404 頁。測試實際驗證過（見下面「測試」）。
+- **`?p=`／`?page_id=`**：用對應表 `content` 段的 WordPress ID 查網址。`Location` 是完整網址、用請求本身的網域（在預覽網址上也會轉到預覽網址；WordPress 送的是 `https://aniya.moe/…`），中文路徑是大寫百分比編碼。
+- **`?attachment_id=`**：新圖片的網址帶 hash，建置之後才知道，Worker 程式裡沒有。所以 Worker 用對應表（`images`、`unusedImages`、`media` 段）查出附件在 WordPress 上的檔案網址（`/wp-content/uploads/…`），向 `env.ASSETS` 要那個網址（`redirect: 'manual'`），原樣回傳：`_redirects` 已經有舊檔案網址 → 新圖片／R2 的規則，所以是一次 301 直接到原尺寸的新圖片（相簿連結的那張）或 R2；孤兒圖的舊檔案網址沒有規則，就是 404 頁。Worker 不需要建置時產生的資料，跟 `_redirects` 也不會對不上。Envira 相簿的 463 張照片只有這種附件頁網址，現在也都有轉址。
+- **找不到的 ID**：向 `env.ASSETS` 要 `/404/`（17 號的 proxy 規則讓它本身就回 404），再把狀態碼設成 404 回傳，內容就是 `dist/404.html`，跟其他不存在的網址一樣（17 號的網址檢查會比對標題與 `noindex`）。`?p=` 有值但查不到、或不是數字，都算找不到。
+- 首頁沒有這三個參數時（包括 `?utm_source=…` 之類），照舊交給靜態檔案。WordPress 的搜尋網址 `/?s=…` 現在也是首頁（不在 spec 範圍）。
+- 對應表用 named import（`import { content, images, media, unusedImages } from './data/old-url-map.json'`），esbuild 會把用不到的 `urls` 段丟掉：`wrangler deploy --dry-run` 的 Worker 是 223 KiB（gzip 20 KiB）。
+
+### 對應表
+
+- 每個附件都加上 `/?attachment_id=ID`（WordPress 會把它轉到附件頁，附件頁再轉到檔案）：搬過的 769 張是 `redirect`（不寫 `location`，跟附件頁一樣，轉到回 200 的站內網址就算通過）、影片與 PDF 9 個是 `redirect` 到 R2、沒搬的 48 張是 `not-found`，再加一個沒發過的 `/?attachment_id=1887`，共 827 筆。寫在 `url-map/images.ts`、`url-map/media.ts`、`url-map/query-ids.ts`。
+- `url-map/sitemaps.ts` 加上 AIOSEO 的子 sitemap（`addl`、`post`、`page`、`category`、`post_tag`，取自 sitemap 快照的索引）與 `/sitemap.xml` 本身。以前只在快照的預期清單裡；spec 說轉址規則只從對應表產生，所以寫進對應表。
+- 對應表共 2,865 個網址（原本 2,032）。
+
+### `_redirects`
+
+- `src/integrations/old-url-redirects.ts`：對應表裡所有「`redirect` 到站內固定網址、沒有查詢字串」的網址，各寫一條靜態規則（作者頁、comments feed、`/wp-sitemap.xml` 與 5 個子 sitemap、舊 slug，共 9 條）；`<網址>feed/` → `<網址>` 的 87 個 feed 不寫靜態規則，改用一條動態規則 `/*/feed/ /:splat/ 301`，寫在最後。`/feed/` 本身不符合（`*` 前後要有兩個 `/`），`/feed/atom/` 也不符合。之後對應表多了轉到站內網址的舊網址，規則會自動產生。
+- 放在 astro.config.mjs 裡所有寫靜態規則的 integration（包括 17 號的 `notFoundPage()`）之後、`redirectsBudget()` 之前：Cloudflare 把第一條動態規則之後的規則都當成動態規則算，順序錯了建置會因為超過 100 條動態規則而失敗。
+- 動態規則的副作用：任何 `<路徑>/feed/` 都會 301 到 `<路徑>/`，那頁不存在的話接著是 404（WordPress 是直接 404）。日期彙整的 feed（`/2025/05/feed/`）、作者頁的 feed 也因此轉到有意義的頁面。
+- 目前 `_redirects`：**1,786 條靜態規則、1 條動態規則**（上限 2,000／100），靜態規則剩 214 條空間。
+
+### 改過日期的文章
+
+ticket 寫「1 個舊 slug 與 3 篇改過日期的文章」，但備份裡的 3 筆 `_wp_old_date` 都不是已發布的文章：2 筆是 post 48（選單項目），1 筆是 post 655（Envira 相簿「在高松市區亂逛」）。05 號就發現了。所以只有 1 條舊 slug 規則，沒有舊日期規則；`url-map/old-slugs.ts` 照樣會處理舊日期，只是這份備份沒有。
+
+### 網址檢查與待完成清單
+
+- 待完成清單 152 筆 → **0 筆**（56 個 `?p=`／`?page_id=`、9 個靜態規則、87 個 feed），只剩檔頭的註解。沒有只能在正式網域檢查的項目（`www` 轉址不在預期清單裡，20 號在正式網域另外確認）。
+- 建置模式：1,985 個通過，883 個帶查詢字串的網址跳過。HTTP 模式（`wrangler dev`）：連同 883 個查詢字串網址全部通過。
+
+### 測試
+
+- `tests/site-serving.test.ts`：
+  - `WordPress query-string URLs`：`?p=`／`?page_id=` 轉到的網址（期望值取自 WordPress 的 ID，例如 30 是〈第一篇文章〉、86 是 `/about/`），而且在測試伺服器的網域上；沒發過的 ID 回 404 與 `dist/404.html`；`?attachment_id=639`（Day 2 相簿的照片）轉到 Day 2 頁面上相簿連結的那張原尺寸圖片、影片轉到 R2、孤兒圖與沒發過的 ID 回 404 頁；`/` 與 `/?utm_source=…` 是首頁。
+  - `the Worker`：用 `tests/fixtures/marking-worker.ts`（自己回答所有請求、加一個 header）取代網站的 Worker，搭配真正的 `wrangler.jsonc` 跑第二個 `wrangler dev`（`tests/support/wrangler-dev.ts` 多了 `script` 參數，對應 `wrangler dev <script>`）：`/` 加各種查詢字串會進 Worker；頁面、無斜線網址、`/index.html`、feed、sitemap、favicon、`_redirects` 的靜態與動態規則、不存在的網址、`/404/`、子路徑帶 `?p=` 都不會。拿掉 `run_worker_first` 試過，有 10 個測試失敗（`/` 不進 Worker，不存在的網址反而進 Worker；當時 feed 與作者頁還沒有規則，也是不存在的網址），確認測試抓得到。
+  - `the URL checker`：建置與 HTTP 兩種模式，待完成清單是空的。
+- `tests/wordpress-converter/convert-wordpress.test.ts`、`media.test.ts`：`?attachment_id=` 的預期（搬過、孤兒、沒發過的 ID、影片與 PDF 到 R2），AIOSEO 的子 sitemap。
+
+### 留給其他 issue 的發現
+
+- 04：`wrangler deploy` 現在會打包 `src/worker.ts`（它讀的是 repo 裡的對應表，不是 `dist`）；部署後的 HTTP 網址檢查會一起檢查 Worker。
+- 19：在預覽網址跑 HTTP 模式的網址檢查（883 個查詢字串網址），並確認正式環境的 `run_worker_first` 一樣只讓 `/` 進 Worker（Workers 的指標裡請求數應該只跟首頁的請求數相當）；動態規則對百分比編碼中文路徑（大寫與小寫）的比對也一起看。
+- 21：Worker 的請求數只來自首頁網址；如果接近每天 10 萬次的免費額度，要看是不是被大量打首頁。GA4 的 404 事件會記到 `/?p=…` 這類找不到的 ID。
