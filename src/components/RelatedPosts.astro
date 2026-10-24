@@ -1,6 +1,6 @@
 ---
 // The related posts after a post (src/lib/related-posts.ts): title and date.
-import { formatSiteDate, type Post, postPath } from '../lib/content';
+import { displayTitle, formatSiteDate, type Post, postPath } from '../lib/content';
 
 interface Props {
 	posts: Post[];
@@ -15,7 +15,7 @@ const { posts } = Astro.props;
 		{
 			posts.map((post) => (
 				<li>
-					<a href={postPath(post)}>{post.data.title}</a>
+					<a href={postPath(post)}>{displayTitle(post.data.title)}</a>
 					<time datetime={post.data.published.toISOString()}>{formatSiteDate(post.data.published)}</time>
 				</li>
 			))

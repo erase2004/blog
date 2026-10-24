@@ -19,12 +19,18 @@ import { startWranglerDev, type WranglerDev } from '../support/wrangler-dev';
 /** An HTML page whose head is right for `path`, unless `head` says otherwise. */
 function page(
 	path: string,
-	head: { canonical?: string | null; title?: string | null; description?: string | null } = {},
+	head: {
+		canonical?: string | null;
+		title?: string | null;
+		description?: string | null;
+		ogImage?: string | null;
+	} = {},
 ): string {
 	const {
 		canonical = `https://aniya.moe${encodeURI(path)}`,
 		title = `${path} - TsukiStudio`,
 		description = `About ${path}`,
+		ogImage = 'https://aniya.moe/img/new.png',
 	} = head;
 	return `<!doctype html>
 <html lang="zh-TW">
@@ -33,6 +39,7 @@ function page(
 		${canonical === null ? '' : `<link rel="canonical" href="${canonical}" />`}
 		${title === null ? '' : `<title>${title}</title>`}
 		${description === null ? '' : `<meta name="description" content="${description}" />`}
+		${ogImage === null ? '' : `<meta property="og:image" content="${ogImage}" />`}
 	</head>
 	<body><p>${path}</p></body>
 </html>
@@ -45,10 +52,18 @@ const fixtureSite: Record<string, string> = {
 	'wrong-canonical/index.html': page('/wrong-canonical/', { canonical: 'https://aniya.moe/ok/' }),
 	'no-title/index.html': page('/no-title/', { title: null }),
 	'no-description/index.html': page('/no-description/', { description: null }),
+	'home-title/index.html': page('/home-title/', { title: 'TsukiStudio - 生活點滴紀錄' }),
+	'later-page-title/index.html': page('/later-page-title/', { title: 'TsukiStudio - 生活點滴紀錄 - Page 2' }),
+	'bad-title/index.html': page('/bad-title/', { title: 'About bad-title' }),
+	'no-og-image/index.html': page('/no-og-image/', { ogImage: null }),
+	'missing-og-image/index.html': page('/missing-og-image/', { ogImage: 'https://aniya.moe/img/missing.png' }),
+	'webp-og-image/index.html': page('/webp-og-image/', { ogImage: 'https://aniya.moe/img/new.webp' }),
+	'relative-og-image/index.html': page('/relative-og-image/', { ogImage: '/img/new.png' }),
 	'no-slash-rule/index.html': page('/no-slash-rule/'),
 	'中文/index.html': page('/中文/'),
 	'混/index.html': page('/混/'),
 	'img/new.png': 'not really a PNG',
+	'img/new.webp': 'not really a webp',
 	'robots.txt': 'User-agent: *\n',
 	'404.html': '<!doctype html><title>404</title>',
 	_redirects: [
@@ -56,6 +71,13 @@ const fixtureSite: Record<string, string> = {
 		'/wrong-canonical /wrong-canonical/ 301',
 		'/no-title /no-title/ 301',
 		'/no-description /no-description/ 301',
+		'/home-title /home-title/ 301',
+		'/later-page-title /later-page-title/ 301',
+		'/bad-title /bad-title/ 301',
+		'/no-og-image /no-og-image/ 301',
+		'/missing-og-image /missing-og-image/ 301',
+		'/webp-og-image /webp-og-image/ 301',
+		'/relative-og-image /relative-og-image/ 301',
 		'/中文 /中文/ 301',
 		'/混 /混/ 301',
 		'/%e6%b7%b7/ /ok/ 301',
@@ -139,6 +161,56 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 				url: '/no-description/',
 				outcome: 'fail',
 				problems: [expect.stringContaining('description')],
+			},
+		]);
+	});
+
+	it('passes the titles of the site: `<name> - TsukiStudio`, the home page, and later pages of a list', async () => {
+		const report = await check([
+			{ url: '/ok/', expect: 'page' },
+			{ url: '/home-title/', expect: 'page' },
+			{ url: '/later-page-title/', expect: 'page' },
+		]);
+
+		expect(outcomes(report)).toEqual({ '/ok/': 'pass', '/home-title/': 'pass', '/later-page-title/': 'pass' });
+	});
+
+	it('fails a page whose title is not in the format of the site', async () => {
+		const report = await check([{ url: '/bad-title/', expect: 'page' }]);
+
+		expect(report.results).toEqual([
+			{
+				url: '/bad-title/',
+				outcome: 'fail',
+				problems: ['title "About bad-title" is not "<name> - TsukiStudio" or "TsukiStudio - 生活點滴紀錄"'],
+			},
+		]);
+	});
+
+	it('fails a page without an og:image, or whose og:image is not a JPEG or PNG on the site that answers 200', async () => {
+		const report = await check([
+			{ url: '/no-og-image/', expect: 'page' },
+			{ url: '/missing-og-image/', expect: 'page' },
+			{ url: '/webp-og-image/', expect: 'page' },
+			{ url: '/relative-og-image/', expect: 'page' },
+		]);
+
+		expect(report.results).toEqual([
+			{ url: '/no-og-image/', outcome: 'fail', problems: ['no og:image'] },
+			{
+				url: '/missing-og-image/',
+				outcome: 'fail',
+				problems: ['og:image https://aniya.moe/img/missing.png answers HTTP 404'],
+			},
+			{
+				url: '/webp-og-image/',
+				outcome: 'fail',
+				problems: ['og:image https://aniya.moe/img/new.webp is not a JPEG or PNG'],
+			},
+			{
+				url: '/relative-og-image/',
+				outcome: 'fail',
+				problems: ['og:image /img/new.png is not a URL on https://aniya.moe'],
 			},
 		]);
 	});

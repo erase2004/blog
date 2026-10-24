@@ -3,6 +3,16 @@
 /** The production origin; every page's canonical URL must be on it. */
 export const SITE_ORIGIN = 'https://aniya.moe';
 
+/**
+ * Every page's `<title>`, as on WordPress: `<name> - TsukiStudio`, or the
+ * home page's `TsukiStudio - 生活點滴紀錄`; the pages after the first of a
+ * list add ` - Page N`.
+ */
+export const TITLE_FORMAT = {
+	pattern: /^(?:.+ - TsukiStudio|TsukiStudio - 生活點滴紀錄)(?: - Page \d+)?$/,
+	description: '"<name> - TsukiStudio" or "TsukiStudio - 生活點滴紀錄"',
+};
+
 /** Sitemap snapshot taken from WordPress before the move. Never changes. */
 export const SITEMAP_SNAPSHOT_DIR = 'tests/fixtures/wordpress-sitemap-2026-10-24';
 
