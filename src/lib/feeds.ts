@@ -7,7 +7,7 @@ import { loadRenderers } from 'astro:container';
 import { getEntries, render } from 'astro:content';
 import MarkdownImage from '../components/MarkdownImage.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { getPosts, type Post, postDescription, postPath, postUpdated } from './content';
+import { displayTitle, getPosts, type Post, postDescription, postPath, postUpdated } from './content';
 import { feedHtml } from './feed-html';
 import { cdata, escapeXml } from './xml';
 
@@ -112,7 +112,7 @@ async function feedEntry(post: Post, site: URL): Promise<FeedEntry> {
 	const terms = [...(await getEntries(post.data.categories)), ...(await getEntries(post.data.tags))];
 	const { Content } = await render(post);
 	return {
-		title: post.data.title,
+		title: displayTitle(post.data.title),
 		url: url.href,
 		id: post.data.wordpressId === undefined ? url.href : new URL(`/?p=${post.data.wordpressId}`, site).href,
 		published: post.data.published,

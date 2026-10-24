@@ -4,7 +4,7 @@
 import type { APIRoute } from 'astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { categoryArchives, tagArchives } from '../lib/archives';
-import { getPages, getPosts, pagePath, postDescription, postPath } from '../lib/content';
+import { displayTitle, getPages, getPosts, pagePath, postDescription, postPath } from '../lib/content';
 
 export const GET: APIRoute = async ({ site }) => {
 	const link = (text: string, path: string, notes?: string) =>
@@ -18,11 +18,11 @@ export const GET: APIRoute = async ({ site }) => {
 		...section('Sitemaps', [link('XML Sitemap', '/sitemap.xml', '網站上所有公開、可索引的網址')]),
 		...section(
 			'文章',
-			(await getPosts()).map((post) => link(post.data.title, postPath(post), postDescription(post))),
+			(await getPosts()).map((post) => link(displayTitle(post.data.title), postPath(post), postDescription(post))),
 		),
 		...section(
 			'頁面',
-			(await getPages()).map((page) => link(page.data.title, pagePath(page), page.data.description)),
+			(await getPages()).map((page) => link(displayTitle(page.data.title), pagePath(page), page.data.description)),
 		),
 		...section('分類', (await categoryArchives()).map(({ name, path }) => link(name, path))),
 		...section('標籤', (await tagArchives()).map(({ name, path }) => link(name, path))),

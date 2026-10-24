@@ -1455,6 +1455,8 @@ describe('feeds', () => {
 			'dc:creator': 'Tsuki',
 			category: ['技術', 'Astro', 'SSG', 'Website Optimization'],
 		});
+		// WordPress's titles turn " - " into an en dash (wptexturize).
+		expect(feed.channel.item[2].title).toBe('遊記 – 岡山 / 香川 / 德島八日遊 – Day 8');
 		expect(feed.channel.lastBuildDate).toBe('Fri, 23 Jan 2026 10:01:26 +0000');
 		expect(feed.channel.language).toBe('zh-TW');
 		expect(feed.channel['atom:link']).toMatchObject({ '@href': 'https://aniya.moe/feed/', '@rel': 'self' });
