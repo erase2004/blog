@@ -140,15 +140,15 @@ Status: ready-for-agent
 
 - 建置時根據舊網址對應表與 Astro 輸出的圖片網址，產生 `_redirects`。
 - 靜態規則（共約 1,600 條，在 2,000 條上限內）：
-  - 附件頁 → 新的圖片網址
+  - 附件頁 → 新的圖片網址（孤兒圖沒有搬，它們的附件頁不轉址，回 404）
   - `/wp-content/uploads/YYYY/MM/<檔名>` → 新的圖片網址（包含原本帶 `-scaled` 的檔名）
-  - 影片舊路徑 → R2 上的新網址
+  - 影片與 PDF 的舊路徑 → R2 上的新網址
   - 改過的舊 slug 與舊日期 → 現在的網址
   - 作者頁 `/author/erase2004/` → `/about/`
   - `/wp-sitemap.xml` 與 `post-sitemap.xml` 等子 sitemap → `/sitemap.xml`
   - `/comments/feed/` → `/feed/`
 - 動態規則：單篇、分類、標籤的 `…/feed/` → 該頁本身。
-- Worker 程式：只在首頁 `/` 執行。若帶有 `?p=ID` 或 `?page_id=ID`，依對應表 301 到該文章或頁面；否則交回靜態檔案處理。
+- Worker 程式：只在首頁 `/` 執行。若帶有 `?p=ID` 或 `?page_id=ID`，依對應表 301 到該文章或頁面，ID 不存在就回 404（與 WordPress 的行為一致）；沒有這些參數的請求交回靜態檔案處理。
 - `www.aniya.moe` 用 Cloudflare 的 zone 層級 Redirect Rule 301 到 `aniya.moe`，不依賴舊主機。
 - `/wp-admin/`、`/wp-login.php`、`/xmlrpc.php`、`/wp-json/` 回 404。
 
@@ -157,7 +157,7 @@ Status: ready-for-agent
 - 統一圖片目錄放在 `src/assets/images/<文章 slug>/<檔名>`，網站共用圖（`night.png`、header 圖）放 `site/` 子資料夾，favicon 放在 `public/`。檔名去掉 WordPress 加的 `-scaled`。
 - 圖片交給 Astro 最佳化，輸出 webp 和多種響應式尺寸。轉址的目標是 Astro 輸出的帶 hash 網址，所以轉址規則必須在建置時產生，不能手寫。
 - 不搬：舊縮圖（`-WxH`）、LiteSpeed 產生的 webp 副本與 `.bk` 備份、超過 2560px 的相機原圖、94 張沒被引用的孤兒圖。
-- 8 支影片（179 MB，其中 2 支超過 25 MiB 的單檔上限）放在 R2，以 `media.aniya.moe/videos/<文章 slug>/` 提供。R2 支援 range request，影片可以正常拖曳進度條。
+- 8 支影片（179 MB，其中 2 支超過 25 MiB 的單檔上限）放在 R2，以 `media.aniya.moe/videos/<文章 slug>/` 提供。R2 支援 range request，影片可以正常拖曳進度條。唯一的 PDF 也放在 R2，同樣依文章 slug 分資料夾。
 
 ### 元件與版型
 
@@ -167,7 +167,7 @@ Status: ready-for-agent
 - 輕量 YouTube 嵌入：先顯示縮圖，點了才載入 iframe。
 - 程式碼高亮用 Expressive Code。
 - 側欄與頁尾：Pagefind 搜尋（中文）、分類（含文章數）、年份彙整（含文章數）、標籤雲。
-- 文章頁：發布日期、最後更新時間、腳註、分享按鈕（純連結，不載入第三方 JS）、依標籤重疊度計算的相關文章、giscus 留言。
+- 文章頁：發布日期、最後更新時間、腳註、分享按鈕（純連結，不載入第三方 JS）、依標籤重疊度計算的 3 篇相關文章（與 Jetpack 現在的數量相同）、giscus 留言。
 - giscus 使用同一個 repo 的 Discussions，分類名稱為 `Comments`。
 - 404 頁：導覽列、Pagefind 搜尋框、最新 5 篇文章、回首頁連結，加 `noindex`，HTTP 狀態碼必須是 404。
 
