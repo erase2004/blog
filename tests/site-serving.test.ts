@@ -1,11 +1,12 @@
 // Builds the site and serves it with `wrangler dev`, the same way Cloudflare
 // Workers static assets will serve it, then checks what readers and crawlers
-// get back over HTTP.
+// get back over HTTP, and what HTML readers get for converted content.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse } from 'node-html-parser';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
@@ -14,13 +15,18 @@ const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta
 
 // A test-only page the build script adds next to the site's real pages.
 const PROBE_PATH = '/probe/';
+// Test-only pages with what the WordPress converter writes, in an .md and an
+// .mdx file (tests/fixtures/converted-content.*).
+const CONVERTED = { md: '/converted/md/', mdx: '/converted/mdx/' };
 
 let outDir: string;
 let server: WranglerDev | undefined;
 
 beforeAll(async () => {
 	outDir = mkdtempSync(join(tmpdir(), 'aniya-moe-site-'));
-	execFileSync(process.execPath, [buildScript, outDir, PROBE_PATH], { stdio: 'inherit' });
+	execFileSync(process.execPath, [buildScript, outDir, PROBE_PATH, '/converted/[format]/=converted-content.astro'], {
+		stdio: 'inherit',
+	});
 	server = await startWranglerDev({ assetsDir: outDir });
 }, 180_000);
 
@@ -93,4 +99,58 @@ describe('the URL checker', () => {
 	it('passes over HTTP', () => {
 		expect(runUrlChecker('http', server!.url)).toMatchObject({ status: 0 });
 	}, 120_000);
+});
+
+describe('converted content', () => {
+	/** A built page; <pre> is parsed as elements too (Expressive Code puts its lines in it). */
+	const page = (path: string) =>
+		parse(readFileSync(join(outDir, path, 'index.html'), 'utf8'), { blockTextElements: { script: true, style: true } });
+
+	describe('code blocks', () => {
+		it.each(Object.entries(CONVERTED))('in %s are highlighted by Expressive Code, titled with their file name', (_, path) => {
+			const block = page(path).querySelector('.expressive-code');
+
+			expect(block?.querySelector('figcaption .title')?.text).toBe('src/router/index.js');
+			expect(block?.querySelector('pre')?.getAttribute('data-language')).toBe('javascript');
+			expect(block?.querySelectorAll('pre code span[style]').length).toBeGreaterThan(0);
+		});
+
+		it('have a copy button that speaks Chinese', () => {
+			const button = page(CONVERTED.md).querySelector('.expressive-code .copy button');
+
+			expect(button?.getAttribute('title')).toBe('複製到剪貼簿');
+			expect(button?.getAttribute('data-copied')).toBe('已複製！');
+		});
+	});
+
+	describe('footnotes', () => {
+		it.each(Object.entries(CONVERTED))('in %s link to their texts, which link back', (_, path) => {
+			const html = page(path);
+			const reference = html.querySelector('a[data-footnote-ref]');
+
+			expect(reference?.text).toBe('1');
+			expect(reference?.getAttribute('href')).toBe('#user-content-fn-1');
+			const backReference = html.getElementById('user-content-fn-1')?.querySelector('a[data-footnote-backref]');
+			expect(backReference?.getAttribute('href')).toBe(`#${reference?.id}`);
+			expect(backReference?.getAttribute('aria-label')).toBe('回到內文的註腳 1');
+		});
+
+		it('are listed under a heading in Chinese, for screen readers', () => {
+			const heading = page(CONVERTED.md).getElementById('footnote-label');
+
+			expect(heading?.text).toBe('註腳');
+			expect(heading?.classList.contains('sr-only')).toBe(true);
+		});
+	});
+
+	describe('YouTube embeds', () => {
+		it('show the thumbnail, linked to the video, and no player until clicked', () => {
+			const html = page(CONVERTED.mdx);
+			const link = html.querySelector('a[href="https://www.youtube.com/watch?v=x3_Pcru8SS8"]');
+
+			expect(link?.querySelector('img')?.getAttribute('src')).toBe('https://i.ytimg.com/vi/x3_Pcru8SS8/hqdefault.jpg');
+			expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
+			expect(html.querySelectorAll('iframe')).toHaveLength(0);
+		});
+	});
 });
