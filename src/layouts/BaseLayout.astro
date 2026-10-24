@@ -1,7 +1,10 @@
 ---
+// Every page: the site header with the menu, the main column, the sidebar
+// and the site footer.
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
 
 interface Props {
 	title: string;
@@ -18,10 +21,14 @@ const { title, description } = Astro.props;
 		<slot name="head" />
 	</head>
 	<body>
+		<a class="skip-link" href="#main">跳到主要內容</a>
 		<Header />
-		<main>
-			<slot />
-		</main>
+		<div class="sheet">
+			<main id="main">
+				<slot />
+			</main>
+			<Sidebar />
+		</div>
 		<Footer />
 	</body>
 </html>

@@ -19,6 +19,17 @@ const { Content } = await render(page);
 <BaseLayout title={`${page.data.title} - ${SITE_TITLE}`} description={page.data.description}>
 	<article>
 		<h1>{page.data.title}</h1>
-		<Content />
+		<div class="prose">
+			<Content />
+		</div>
 	</article>
 </BaseLayout>
+
+<style>
+	h1 {
+		margin-bottom: 2rem;
+		padding-bottom: 1rem;
+		border-bottom: 3px solid var(--color-frame);
+		font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
+	}
+</style>

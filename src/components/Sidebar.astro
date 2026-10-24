@@ -1,0 +1,63 @@
+---
+// The sidebar, in the WordPress sidebar's order: search, categories, years,
+// tag cloud. Each widget is a `.widget` section with an h2.
+import CategoryList from './CategoryList.astro';
+import TagCloud from './TagCloud.astro';
+import YearList from './YearList.astro';
+---
+
+<aside class="sidebar" aria-label="側欄">
+	{
+		/*
+		 * SEARCH SLOT (ticket 16): the Pagefind search box goes here, first in
+		 * the sidebar, as <section class="widget" id="search"> with an
+		 * <h2>搜尋</h2> (or <h2 class="sr-only">搜尋</h2> to show only the box).
+		 * It takes the full sidebar width, like the tag cloud.
+		 */
+	}
+	<section class="widget" id="categories">
+		<h2>分類</h2>
+		<CategoryList />
+	</section>
+	<section class="widget" id="years">
+		<h2>年份</h2>
+		<YearList />
+	</section>
+	<section class="widget" id="tags">
+		<h2>標籤</h2>
+		<TagCloud />
+	</section>
+</aside>
+
+<style>
+	.sidebar {
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		font-size: 0.9375rem;
+		line-height: 1.6;
+	}
+
+	/* A heavy rule over each widget, as Twenty Sixteen had. */
+	.sidebar :global(.widget) {
+		padding-top: 0.875rem;
+		border-top: 3px solid var(--color-frame);
+	}
+	.sidebar :global(.widget > h2) {
+		margin: 0 0 0.875rem;
+		font-size: 1rem;
+		letter-spacing: 0.06em;
+	}
+
+	/* Below the main column: categories and years side by side, the rest full width. */
+	@media (max-width: 64rem) {
+		.sidebar {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 2.5rem 2rem;
+		}
+		.sidebar :global(.widget:not(#categories, #years)) {
+			grid-column: 1 / -1;
+		}
+	}
+</style>

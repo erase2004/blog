@@ -2,11 +2,12 @@
 // Workers static assets will serve it, then checks what readers and crawlers
 // get back over HTTP, and what HTML readers get for converted content.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
+import { type Browser, chromium } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
@@ -308,6 +309,201 @@ describe('sidebar widgets', () => {
 		expect(cloud.filter(({ text }) => shown.has(text)).map(({ text, size }) => [text, size])).toEqual(
 			wordpress.map(([text, size]) => [text, expect.closeTo(size, 2)]),
 		);
+	});
+});
+
+describe('layout', () => {
+	// One page of each kind the layout wraps: home, home page 2, post, page,
+	// category, tag and date archives, and the 404 page.
+	const PAGES = [
+		'/',
+		'/page/2/',
+		'/2021/11/30/電子紙閱讀器使用心得/',
+		'/about/contact/',
+		'/category/技術/',
+		'/tag/vue/',
+		'/2025/05/',
+		'/no-such-page/',
+	];
+
+	async function html(path: string) {
+		return parse(await (await get(path)).text());
+	}
+
+	/** The site header: the page's `header` outside `main`. */
+	function siteHeader(page: ReturnType<typeof parse>) {
+		return page.querySelectorAll('header').find((header) => !header.closest('main'));
+	}
+
+	it.each(PAGES)('%s has the site name, linking to the home page, and the tagline in the site header', async (path) => {
+		const header = siteHeader(await html(path));
+
+		const home = header?.querySelector('a[href="/"]');
+		expect(home?.text.trim()).toBe('TsukiStudio');
+		expect(header?.text).toContain('生活點滴紀錄');
+	});
+
+	// The WordPress menu (aniya.moe, 2026-10-24): 首頁, 關於我 (with 我的故事 and
+	// 聯絡方式 under it), 訂閱, 隱私權政策.
+	it.each(PAGES)('%s has the six links of the WordPress menu, in its order, in the site header', async (path) => {
+		const links = siteHeader(await html(path))
+			?.querySelectorAll('nav a')
+			.map((link) => [link.text.trim(), decodeURI(link.getAttribute('href')!)]);
+
+		expect(links).toEqual([
+			['首頁', '/'],
+			['關於我', '/about/'],
+			['我的故事', '/about/autobiography/'],
+			['聯絡方式', '/about/contact/'],
+			['訂閱', '/subscribe/'],
+			['隱私權政策', '/policy/'],
+		]);
+	});
+
+	it('the menu marks the link to the page being read', async () => {
+		const current = async (path: string) =>
+			siteHeader(await html(path))
+				?.querySelectorAll('nav a[aria-current="page"]')
+				.map((link) => link.text.trim());
+
+		expect(await current('/')).toEqual(['首頁']);
+		expect(await current('/about/contact/')).toEqual(['聯絡方式']);
+		expect(await current('/page/2/')).toEqual([]);
+		expect(await current('/2021/11/30/電子紙閱讀器使用心得/')).toEqual([]);
+	});
+
+	// As in the WordPress sidebar: categories, then years, then the tag cloud.
+	it.each(PAGES)('%s has the sidebar, beside the main column, with the categories, years and tag cloud', async (path) => {
+		const page = await html(path);
+		const sidebar = page.querySelector('aside');
+		const linksUnder = (heading: string) =>
+			sidebar
+				?.querySelectorAll('section')
+				.find((section) => section.querySelector('h2')?.text.trim() === heading)
+				?.querySelectorAll('a')
+				.map((link) => decodeURI(link.getAttribute('href')!));
+
+		expect(page.querySelector('main')).not.toBeNull();
+		expect(sidebar?.closest('main')).toBeFalsy();
+		const headings = sidebar?.querySelectorAll('h2').map((heading) => heading.text.trim());
+		expect(headings?.filter((heading) => ['分類', '年份', '標籤'].includes(heading))).toEqual(['分類', '年份', '標籤']);
+		expect(linksUnder('分類')).toEqual(['/category/技術/', '/category/旅遊/', '/category/閒聊/']);
+		expect(linksUnder('年份')).toEqual(['/2026/', '/2025/', '/2022/', '/2021/']);
+		expect(linksUnder('標籤')).toHaveLength(57);
+	});
+
+	it.each(PAGES)('%s has the site footer, with the rel="me" link that verifies the Mastodon account', async (path) => {
+		const footer = (await html(path)).querySelectorAll('footer').find((element) => !element.closest('main'));
+
+		expect(footer?.text).toContain('TsukiStudio');
+		// As on the WordPress site, for Mastodon's profile link verification.
+		expect(footer?.querySelector('a[href="https://g0v.social/@erase2004"]')?.getAttribute('rel')).toContain('me');
+	});
+
+	describe('a post', () => {
+		/** Each date the post shows, by its label: the text and the instant of its `<time>`. */
+		async function postDates(path: string) {
+			const article = (await html(path)).querySelector('main article');
+			return Object.fromEntries(
+				article!.querySelectorAll('dt').map((term) => {
+					const time = term.nextElementSibling?.querySelector('time');
+					return [
+						term.text.trim(),
+						{ text: time?.text.trim(), instant: new Date(time?.getAttribute('datetime') ?? NaN).toISOString() },
+					];
+				}),
+			);
+		}
+
+		// Expected values: post_date and post_modified in the WordPress database
+		// (Asia/Taipei), in its date_format `Y 年 n 月 j 日`.
+		it('shows when it was published and last updated', async () => {
+			expect(await postDates('/2021/11/30/電子紙閱讀器使用心得/')).toEqual({
+				發布日期: { text: '2021 年 11 月 30 日', instant: '2021-11-30T08:46:07.000Z' },
+				最後更新: { text: '2022 年 4 月 6 日', instant: '2022-04-06T05:46:11.000Z' },
+			});
+		});
+
+		it('shows dates in Taipei time', async () => {
+			// Updated 2025-03-26 00:42 in Taipei: still the 25th in UTC.
+			expect(await postDates('/2025/03/25/next-js-app-route-and-cloud-cdn-cache/')).toMatchObject({
+				最後更新: { text: '2025 年 3 月 26 日', instant: '2025-03-25T16:42:18.000Z' },
+			});
+		});
+
+		it('scheduled, and last edited before it went out, shows its publish date as the last update', async () => {
+			// Edited 2025-05-16 20:19, published 2025-05-17 09:30.
+			expect(await postDates('/2025/05/17/travel-setonaikai-2025-day1/')).toEqual({
+				發布日期: { text: '2025 年 5 月 17 日', instant: '2025-05-17T01:30:00.000Z' },
+				最後更新: { text: '2025 年 5 月 17 日', instant: '2025-05-17T01:30:00.000Z' },
+			});
+		});
+	});
+
+	describe('on a phone', () => {
+		// WCAG's reflow width: content fits 320 CSS pixels without scrolling sideways.
+		const PHONE = { width: 320, height: 640 };
+
+		let browser: Browser | undefined;
+
+		beforeAll(async () => {
+			browser = await chromium.launch();
+		}, 60_000);
+
+		afterAll(async () => {
+			await browser?.close();
+		});
+
+		/** Every post, as UTF-8 paths, from the build output. */
+		function postPaths(): string[] {
+			return readdirSync(outDir, { recursive: true, encoding: 'utf8' })
+				.map((file) => file.replaceAll('\\', '/'))
+				.filter((file) => /^\d{4}\/\d{2}\/\d{2}\/[^/]+\/index\.html$/.test(file))
+				.map((file) => `/${file.slice(0, -'index.html'.length)}`);
+		}
+
+		it('no page scrolls sideways: every post and page, and each kind of listing', async () => {
+			const posts = postPaths();
+			expect(posts).toHaveLength(22);
+			const paths = [
+				...['/', '/page/2/', '/category/旅遊/', '/tag/vue/', '/2025/', '/2025/05/17/', '/no-such-page/'],
+				...['/about/', '/about/autobiography/', '/about/contact/', '/subscribe/', '/policy/'],
+				...posts,
+			];
+			const context = await browser!.newContext({ viewport: PHONE });
+			// Only the site itself: no YouTube thumbnails or videos from R2.
+			await context.route((url) => url.origin !== server!.url, (route) => route.abort());
+			const page = await context.newPage();
+
+			const overflowing: Record<string, unknown> = {};
+			for (const path of paths) {
+				await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
+				const overflow = await page.evaluate(() => {
+					const width = document.documentElement.clientWidth;
+					if (document.documentElement.scrollWidth <= width) return null;
+					// The innermost elements that reach past the right edge, to say what to
+					// fix; not those inside something that scrolls or clips them.
+					const clipped = (element: Element) => {
+						for (let parent = element.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+							if (getComputedStyle(parent).overflowX !== 'visible') return true;
+						}
+						return false;
+					};
+					const wide = [...document.body.querySelectorAll('*')].filter(
+						(element) => element.getBoundingClientRect().right > width + 1 && !clipped(element),
+					);
+					const innermost = wide.filter((element) => !wide.some((other) => other !== element && element.contains(other)));
+					return {
+						scrollWidth: document.documentElement.scrollWidth,
+						elements: innermost.slice(0, 5).map((element) => element.outerHTML.slice(0, 120)),
+					};
+				});
+				if (overflow) overflowing[path] = overflow;
+			}
+			await context.close();
+
+			expect(overflowing).toEqual({});
+		}, 120_000);
 	});
 });
 

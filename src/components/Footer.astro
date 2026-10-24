@@ -1,17 +1,49 @@
 ---
 import { SITE_TITLE } from '../consts';
 
-const today = new Date();
+const year = new Date().getFullYear();
 ---
 
-<footer>
-	&copy; {today.getFullYear()} {SITE_TITLE}
+<footer class="site-footer">
+	<div class="inner">
+		<p>&copy; {year} {SITE_TITLE}</p>
+		{/* rel="me" verifies the site on the Mastodon profile, as the WordPress site's hidden link did. */}
+		<p><a href="https://g0v.social/@erase2004" rel="me">Mastodon</a></p>
+	</div>
 </footer>
+
 <style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
+	.site-footer {
+		color: var(--color-on-frame-muted);
+		font-size: 0.875rem;
+	}
+	.inner {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.5rem 2rem;
+		max-width: var(--page-width);
+		margin: 0 auto;
+		padding: 2rem 3rem 3rem;
+	}
+	p {
+		margin: 0;
+	}
+	a {
+		color: var(--color-on-frame);
+	}
+	a:hover {
+		color: var(--color-link-on-frame);
+	}
+
+	@media (max-width: 64rem) {
+		.inner {
+			padding-inline: 1.25rem;
+		}
+	}
+	@media (max-width: 40rem) {
+		.inner {
+			padding: 1.5rem var(--gutter) 2rem;
+		}
 	}
 </style>
