@@ -2,7 +2,7 @@
 // description and social image, and the description AIOSEO makes from the
 // content when none is set.
 import { decodeEntities } from './html.ts';
-import { siteRelative } from './content.ts';
+import { siteRelative } from './site-urls.ts';
 import type { Post, WordPressSite } from './wordpress.ts';
 
 /** AIOSEO's templates for these post types, as the site was set up; written out, they are no custom setting. */

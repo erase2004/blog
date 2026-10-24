@@ -31,18 +31,24 @@ wordpressId: 30
 `);
 	});
 
-	it('carry the AIOSEO description and social image, where they are set', () => {
-		const output = files();
+	it('carry the AIOSEO description and social image (moved with the post’s images), where they are set', () => {
+		const { files: output, images } = convertWordPress(wordpressTables());
 
 		expect(frontmatterOf(output['src/content/posts/travel-setonaikai-2025-prologue.md'])).toMatchObject({
 			description: '"在三月下旬某日準備下一季要看的動畫新番清單時，就決定了這次旅行。"',
 			// AIOSEO uses the featured image here.
-			socialImage: '"/wp-content/uploads/2025/05/highlight.jpg"',
+			socialImage: '"../../assets/images/travel-setonaikai-2025-prologue/highlight.jpg"',
 		});
 		expect(frontmatterOf(output['src/content/posts/acgn-museum-ssg.md'])).toMatchObject({
 			description: '"記錄一個大型網站從 SSR 轉為 SSG 的完整過程。"',
-			socialImage: '"/wp-content/uploads/2026/01/heroimage.png"',
+			socialImage: '"../../assets/images/acgn-museum-ssg/heroimage.png"',
 		});
+		expect(images).toEqual(
+			expect.arrayContaining([
+				{ upload: '2025/05/highlight.jpg', file: 'src/assets/images/travel-setonaikai-2025-prologue/highlight.jpg' },
+				{ upload: '2026/01/heroimage.png', file: 'src/assets/images/acgn-museum-ssg/heroimage.png' },
+			]),
+		);
 		// AIOSEO's default title and description templates, written out, are not custom settings.
 		const namedViews = frontmatterOf(output['src/content/posts/vue-router-named-views.md']);
 		expect(namedViews).not.toHaveProperty('description');
@@ -309,6 +315,73 @@ describe('the old-URL mapping table', () => {
 		);
 	});
 
+	it('redirects the old upload paths of moved images: the file served, the original of a scaled one, the sitemap’s name', () => {
+		const urls = urlsOf();
+
+		expect(urls).toEqual(
+			expect.arrayContaining(
+				[
+					'/wp-content/uploads/2022/03/preview-1.png',
+					// WordPress served the scaled file; the camera original was at its own URL.
+					'/wp-content/uploads/2025/05/si_20250418_220750_23-scaled.jpg',
+					'/wp-content/uploads/2025/05/si_20250418_220750_23.jpg',
+					'/wp-content/uploads/2025/05/岡山駅前桃太郎像-神推.jpg',
+					'/wp-content/uploads/2025/05/puru-1536x864-1.jpg',
+					// The name AIOSEO's image sitemap listed (removeImageDimensions() drops -WxH).
+					'/wp-content/uploads/2025/05/puru-1.jpg',
+					'/wp-content/uploads/2021/09/night.png',
+				].map((url) => ({ url, expect: 'redirect' })),
+			),
+		);
+		// Sizes (-WxH) are not redirected (spec: out of scope).
+		expect(urls.map(({ url }) => url)).not.toContain('/wp-content/uploads/2022/03/preview-1-1024x768.png');
+	});
+
+	it('redirects the attachment pages of moved images to the new image (live site, 2026-10-24)', () => {
+		const urls = urlsOf();
+
+		expect(urls).toEqual(
+			expect.arrayContaining(
+				[
+					// Under the post the image was uploaded to.
+					'/2022/03/25/vue-router-named-views/preview-1/',
+					'/2025/05/17/travel-setonaikai-2025-prologue/岡山駅前桃太郎像-神推/',
+					// A numeric slug gets attachment/ (get_attachment_link()).
+					'/2021/09/30/第一篇文章/attachment/32/',
+					// Not uploaded to a post: at the top level.
+					'/night/',
+				].map((url) => ({ url, expect: 'redirect' })),
+			),
+		);
+		// Videos and the PDF are ticket 07's.
+		expect(urls.map(({ url }) => url)).not.toContain('/2026/01/23/acgn-museum-ssg/fcp-01/');
+	});
+
+	it('answers the attachment pages and files of images nothing uses with 404: they do not move', () => {
+		expect(urlsOf()).toEqual(
+			expect.arrayContaining(
+				[
+					'/2021/09/30/第一篇文章/snipaste_2021-10-21_16-04-26/',
+					'/wp-content/uploads/2021/10/Snipaste_2021-10-21_16-04-26.png',
+					// The site icon.
+					'/cropped-night-png/',
+					'/wp-content/uploads/2021/09/cropped-night.png',
+				].map((url) => ({ url, expect: 'not-found' })),
+			),
+		);
+	});
+
+	it('lists each moved image with its old URLs, from which the build makes the redirects', () => {
+		expect(tableOf().images).toContainEqual({
+			wordpressId: 639,
+			file: 'src/assets/images/travel-setonaikai-2025-prologue/20250421_133752943.jpg',
+			uploads: ['/wp-content/uploads/2025/05/20250421_133752943-scaled.jpg', '/wp-content/uploads/2025/05/20250421_133752943.jpg'],
+			// Uploaded to an Envira gallery, it only had a query-string URL (left to the Worker, ticket 13).
+			attachmentPage: '/?attachment_id=639',
+		});
+		expect(urlsOf().map(({ url }) => url)).not.toContain('/?attachment_id=639');
+	});
+
 	it('answers the WordPress system paths with 404', () => {
 		expect(urlsOf()).toEqual(
 			expect.arrayContaining(
@@ -324,6 +397,50 @@ describe('the old-URL mapping table', () => {
 		expect(urlLines.every((line) => /^\t\t\{"url":".*\}(,)?$/.test(line))).toBe(true);
 		const urls = urlLines.map((line) => JSON.parse(line.replace(/,$/, '')).url as string);
 		expect(urls).toEqual([...urls].sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b))));
+	});
+});
+
+describe('images', () => {
+	it('are copied into a folder of the first post using them, named without -scaled; unused ones are not', () => {
+		const { images } = convertWordPress(wordpressTables());
+
+		expect(images).toContainEqual({
+			upload: '2022/03/preview-1.png',
+			file: 'src/assets/images/vue-router-named-views/preview-1.png',
+		});
+		// Used by posts 442 (published 2025-05-17) and 1854 (2026-01-23).
+		expect(images).toContainEqual({
+			upload: '2025/05/si_20250418_220750_23-scaled.jpg',
+			file: 'src/assets/images/travel-setonaikai-2025-prologue/si_20250418_220750_23.jpg',
+		});
+		const uploads = images.map(({ upload }) => upload);
+		expect(uploads).not.toContain('2021/10/Snipaste_2021-10-21_16-04-26.png');
+		// Videos move to R2 (ticket 07).
+		expect(uploads).not.toContain('2026/01/fcp-01.mp4');
+	});
+
+	it('that the whole site uses go to the site folder: the default social image and the header image', () => {
+		const { images } = convertWordPress(wordpressTables());
+
+		expect(images).toEqual(
+			expect.arrayContaining([
+				{ upload: '2021/09/night.png', file: 'src/assets/images/site/night.png' },
+				{ upload: '2021/09/cropped-akiba07-scaled-3.jpg', file: 'src/assets/images/site/cropped-akiba07-scaled-3.jpg' },
+			]),
+		);
+		// The site icon is not an image of the uniform image directory.
+		expect(images.map(({ upload }) => upload)).not.toContain('2021/09/cropped-night.png');
+	});
+
+	it('are referenced from the posts using them', () => {
+		const output = files();
+
+		expect(output['src/content/posts/acgn-museum-ssg.md']).toContain(
+			'![](../../assets/images/travel-setonaikai-2025-prologue/si_20250418_220750_23.jpg)',
+		);
+		expect(output['src/content/posts/vue-router-named-views.md']).toContain(
+			'![](../../assets/images/vue-router-named-views/preview-1.png)',
+		);
 	});
 });
 
