@@ -2,6 +2,8 @@
 
 import mdx from '@astrojs/mdx';
 import { defineConfig, fontProviders } from 'astro/config';
+import imageRedirects from './src/integrations/image-redirects';
+import redirectsBudget from './src/integrations/redirects-budget';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
 
 // https://astro.build/config
@@ -11,7 +13,11 @@ export default defineConfig({
 	// as <path>/index.html.
 	trailingSlash: 'always',
 	build: { format: 'directory' },
-	integrations: [mdx(), trailingSlashRedirects()],
+	// Images become webp in several widths (srcset), up to their own width;
+	// the browser picks the one that fits the screen.
+	image: { layout: 'constrained' },
+	// redirectsBudget() checks the _redirects the others wrote: keep it last.
+	integrations: [mdx(), trailingSlashRedirects(), imageRedirects(), redirectsBudget()],
 	fonts: [
 		{
 			provider: fontProviders.local(),

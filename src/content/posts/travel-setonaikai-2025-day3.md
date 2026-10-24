@@ -6,7 +6,7 @@ updated: 2025-05-20T21:10:01+08:00
 categories: ["旅遊"]
 tags: ["ざつ旅", "ゆゆゆ", "沙彌島", "瀨居島", "瀨戶內國際藝術祭", "聖地巡禮", "高松"]
 description: "今天的內容主要記錄旅遊第三天，從坂出站開始，搭公車到瀨戶藝春會期限定的沙彌島和瀨居島，最後到高松，在這些地方跑瀨戶藝景點、觀光，以及聖地巡禮的收穫。"
-socialImage: "/wp-content/uploads/2025/05/pi_20250422_154141.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day3/pi_20250422_154141.jpg"
 draft: false
 wordpressId: 701
 ---
@@ -37,11 +37,12 @@ wordpressId: 701
 
 接著，前往戶外展出的「[階層・地層・層](https://setouchi-artfest.jp/artworks/detail/43ee948e-08d0-4ea5-920b-04ac921417a4)」，然後再往前走，來到[香川県立東山魁夷せとうち美術館](https://setouchi-artfest.jp/artworks/detail/a3e4cc20-9511-4cc1-8e6f-7776947a17b0)，該美術館這次的展覽主題是「気配の力ー拡大する日本画」，展出岡村桂三郎和新恵美佐子這兩位畫家的畫作。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":715,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250422_095218641-1024x768.jpg" alt="香川県立東山魁夷せとうち美術館" class="wp-image-715"/><figcaption class="wp-element-caption">香川県立東山魁夷せとうち美術館</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![香川県立東山魁夷せとうち美術館](../../assets/images/travel-setonaikai-2025-day3/20250422_095218641.jpg)
+
+<figcaption>香川県立東山魁夷せとうち美術館</figcaption>
+</figure>
 
 看完畫展後，我往[瀨戶大橋紀念館](https://maps.app.goo.gl/aFfXpJxLvyu8mGpg9)的方向前進，途中搭上[瀬戸大橋タワー](https://maps.app.goo.gl/8R99mAXEsnLrEUiC7)，在塔上俯瞰瀨戶大橋和紀念公園。接著，爬上紀念館的展望台拍照，走下展望台後，繞去旁邊的[マリンドーム](https://maps.app.goo.gl/1FqvQDDcTeYivqAt9)，最後再進到紀念館裡參觀。
 
@@ -79,7 +80,7 @@ wordpressId: 701
 <!-- /wp:envira/envira-gallery -->
 ```
 
-在離開中學校前，我遇到一團穿著西裝的台灣人準備看展，從他們的談話中，得知這團當中有處長級的人物`wp-unconverted: <img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">`，接著，遇到服務台的工作人員邀請填寫問券，由於剩餘時間充裕，我便坐下來好好完成問券，問卷填寫完後，我獲得作為謝禮的官方濕紙巾。
+在離開中學校前，我遇到一團穿著西裝的台灣人準備看展，從他們的談話中，得知這團當中有處長級的人物![](../../assets/images/travel-setonaikai-2025-day1/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg)，接著，遇到服務台的工作人員邀請填寫問券，由於剩餘時間充裕，我便坐下來好好完成問券，問卷填寫完後，我獲得作為謝禮的官方濕紙巾。
 
 由於實在好奇剛剛那團台灣人是來自什麼單位的，在公車到來前，我先繞到他們所搭乘的遊覽車，試圖獲得答案，結果遊覽車上沒有貼任何資訊。
 

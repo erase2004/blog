@@ -6,7 +6,7 @@ updated: 2025-05-20T21:14:44+08:00
 categories: ["旅遊"]
 tags: ["ave-mujica", "からかい上手の高木さん", "小豆島", "瀨戶內國際藝術祭", "聖地巡禮", "高松"]
 description: "旅遊第五天，早上，我在高松港搭乘特別的渡輪前往小豆島，在小豆島上，藉由走路、單車、計程車和登山纜車完成預定的行程。傍晚，搭船返回高松港。"
-socialImage: "/wp-content/uploads/2025/05/MixCollage-13-May-2025-05-09-PM-2247-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day5/MixCollage-13-May-2025-05-09-PM-2247.jpg"
 draft: false
 wordpressId: 947
 ---
@@ -113,35 +113,39 @@ wordpressId: 947
 <!-- /wp:html -->
 ```
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1039,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250424_105420323-1024x768.jpg" alt="作品「猪鹿垣の島」" class="wp-image-1039"/><figcaption class="wp-element-caption">作品「猪鹿垣の島」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「猪鹿垣の島」](../../assets/images/travel-setonaikai-2025-day5/20250424_105420323.jpg)
+
+<figcaption>作品「猪鹿垣の島」</figcaption>
+</figure>
 
 繼續往[肥土山站](https://maps.app.goo.gl/DnXDwPjsZs7EkKAEA)騎，會來到作品「[黄金の海に消えた船](https://setouchi-artfest.jp/artworks/detail/915d13f1-94ff-444a-922e-bb0047ff1ce9)」。參觀作品時，工作人員拿雨衣給我套上，進去後，會看到房間裡有一座池塘，池塘中間有一塊凹陷下去沒有水的地方，池塘水面上浮著一艘小船，在工作人員的協助下，我搭乘小船，用雙手控制小船的前進與方向，繞行池塘一圈。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1040,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250424_110745486-1024x768.jpg" alt="作品「黄金の海に消えた船」" class="wp-image-1040"/><figcaption class="wp-element-caption">作品「黄金の海に消えた船」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「黄金の海に消えた船」](../../assets/images/travel-setonaikai-2025-day5/20250424_110745486.jpg)
+
+<figcaption>作品「黄金の海に消えた船」</figcaption>
+</figure>
 
 結束後，原本想從另一邊的道路，沿著河邊前往下一個作品，結果騎到一堆田間的道路時，因為不確定接下來的道路是否會通往目的地，所以採取比較保守的方法，決定先切到縣道 252 號上，縣道 252 號在此處已經是爬坡路段了，我使勁全力騎著沒有變速的單車往上爬，接著將單車停放在[西中山站](https://maps.app.goo.gl/BSKKdAE7mqrQABDR9)前的岔路旁，緩緩得走下岔路旁的山路，抵達作品「[Reverberations 残響 ～ 岡八水車](https://setouchi-artfest.jp/artworks/detail/bc9ed0af-e84a-4815-ab48-06fde5ac276e)」，這個作品使用風車、農具和日常用品組成樂器，並讓這些樂器自動發出聲音，演奏音樂。
 
 騎著單車沿著縣道 252 號繼續往上爬，來到中山千枚田，我在這附近的公車站稍作休息，接著往[オリーブ園](https://maps.app.goo.gl/PWgZAHV1sBMdWktYA)前進。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1045,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250424_113634220-1024x768.jpg" alt="中山千枚田與在遠方的作品「抱擁・小豆島」" class="wp-image-1045"/><figcaption class="wp-element-caption">中山千枚田與在遠方的作品「<a href="https://setouchi-artfest.jp/artworks/detail/9f333df3-8c61-4294-b84f-4563880398b3" target="_blank" rel="noopener" title="">抱擁・小豆島</a>」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1046,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250424_113607553-1024x768.jpg" alt="春日神社前公車站裡貼著高木同學劇場版的海報" class="wp-image-1046"/><figcaption class="wp-element-caption">春日神社前公車站裡貼著高木同學劇場版的海報</figcaption></figure>
-<!-- /wp:image -->
-```
+![中山千枚田與在遠方的作品「抱擁・小豆島」](../../assets/images/travel-setonaikai-2025-day5/20250424_113634220.jpg)
+
+<figcaption>中山千枚田與在遠方的作品「<a href="https://setouchi-artfest.jp/artworks/detail/9f333df3-8c61-4294-b84f-4563880398b3">抱擁・小豆島</a>」</figcaption>
+</figure>
+
+<figure>
+
+![春日神社前公車站裡貼著高木同學劇場版的海報](../../assets/images/travel-setonaikai-2025-day5/20250424_113607553.jpg)
+
+<figcaption>春日神社前公車站裡貼著高木同學劇場版的海報</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1047,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220749_18.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1048,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250424_113813.jpg","alt":"","width":1920,"height":1080},"caption":"Ave Mujica 中，\u003cruby\u003e豊川\u003cbr\u003e\u003crp\u003e（\u003csmall\u003eとがわ\u003c/small\u003e）\u003c/rp\u003e\u003c/ruby\u003e祥子所停留的公車站，拍攝地點為公車站春日神社前"} -->
@@ -165,11 +169,12 @@ wordpressId: 947
 
 休息差不多後，我繼續騎著單車，沿著海邊的縣道 436 號往東前進，來到[草壁港](https://maps.app.goo.gl/gUA3xuJUcsbxhsBFA)，將單車停放在公車站旁後，參觀了在港邊的作品「[Inner Light -Floating Houseboat of Setouchi-](https://setouchi-artfest.jp/artworks/detail/4e95679d-1169-44ac-a0f6-fe6a01e72eed)」，接著再回到公車站，看了一下公車時刻表，決定搭乘計程車前往[紅雲亭](https://maps.app.goo.gl/6QNK8GV141w2WSeY8)，於是我查詢[官方導覽手冊](https://www.amazon.co.jp/%E7%80%AC%E6%88%B8%E5%86%85%E5%9B%BD%E9%9A%9B%E8%8A%B8%E8%A1%93%E7%A5%AD2025%E5%85%AC%E5%BC%8F%E3%82%AC%E3%82%A4%E3%83%89%E3%83%96%E3%83%83%E3%82%AF-%E7%80%AC%E6%88%B8%E5%86%85%E5%9B%BD%E9%9A%9B%E8%8A%B8%E8%A1%93%E7%A5%AD%E5%AE%9F%E8%A1%8C%E5%A7%94%E5%93%A1%E4%BC%9A/dp/4568432219)上的交通資訊，用 [Viber](https://account.viber.com/ja/) 聯繫當地的計程車業者，半小時後，計程車出現，我搭上計程車，前往目的地，這一趟車資約￥2,500。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1056,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250424_130306821-1024x768.jpg" alt="作品「Inner Light -Floating Houseboat of Setouchi-」" class="wp-image-1056"/><figcaption class="wp-element-caption">作品「Inner Light -Floating Houseboat of Setouchi-」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「Inner Light -Floating Houseboat of Setouchi-」](../../assets/images/travel-setonaikai-2025-day5/20250424_130306821.jpg)
+
+<figcaption>作品「Inner Light -Floating Houseboat of Setouchi-」</figcaption>
+</figure>
 
 抵達紅雲亭後，我看到停車場裡有一台遊覽車，看了車上貼的團體資訊並作查詢，得知是台灣某科技公司的旅遊團。接著，我搭乘登山纜車，前往[寒霞渓](https://maps.app.goo.gl/fm7ZridsbvcMSjGg9)。
 

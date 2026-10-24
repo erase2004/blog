@@ -12,17 +12,19 @@ wordpressId: 255
 
 參考範例：[https://github.com/erase2004/vue-router-demo](https://github.com/erase2004/vue-router-demo)
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":257,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2022/03/preview-1-1024x768.png" alt="頁面預覽" class="wp-image-257"/><figcaption>頁面預覽</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":258,"sizeSlug":"full","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2022/03/Untitled-Diagram.drawio-1.png" alt="頁面結構" class="wp-image-258"/><figcaption>頁面結構</figcaption></figure></div>
-<!-- /wp:image -->
-```
+![頁面預覽](../../assets/images/vue-router-named-views/preview-1.png)
+
+<figcaption>頁面預覽</figcaption>
+</figure>
+
+<figure>
+
+![頁面結構](../../assets/images/vue-router-named-views/Untitled-Diagram.drawio-1.png)
+
+<figcaption>頁面結構</figcaption>
+</figure>
 
 在一個顯示元件下，可以同時存在不只一個 router-view 元件，為了能夠讓目標顯示內容，顯示在指定的 router-view 上，這時候可以給個別的 router-view 設定不同的 name 屬性值，並且在元件要顯示時，指定要顯示的 router-view。因為該元件有多個 router-view，又 router-view 可以被指定要顯示的內容，可以把該元件當作一個可重複使用的模板元件，讓類似顯示結構的頁面都使用該元件，並設定好要顯示的內容。
 

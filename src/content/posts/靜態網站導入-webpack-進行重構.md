@@ -12,11 +12,12 @@ wordpressId: 265
 
 這次將 ACGN股市歷史博物館`wp-unconverted: [ref]<a href="https://museum.acgn-stock.com/" data-type="URL" data-id="https://museum.acgn-stock.com/" target="_blank" rel="noreferrer noopener">ACGN股市歷史博物館</a>[/ref]` 的頁面，從原先只有單純的 HTML、CSS和JavaScript，逐一導入 webpack 和 loader 套件，鋪設基礎建設後，使其更利於未來的開發與維護。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":266,"width":768,"height":217,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_15-20-47-1024x289.png" alt="導入前的專案目錄截圖" class="wp-image-266" width="768" height="217"/><figcaption>導入前的專案目錄截圖，<a href="https://github.com/erase2004/museum-landmark/tree/ef6284d0e6e99def41456fcc0b87a53a28f9a3b2" data-type="URL" data-id="https://github.com/erase2004/museum-landmark/tree/ef6284d0e6e99def41456fcc0b87a53a28f9a3b2" target="_blank" rel="noreferrer noopener">commit 連結</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![導入前的專案目錄截圖](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_15-20-47.png)
+
+<figcaption>導入前的專案目錄截圖，<a href="https://github.com/erase2004/museum-landmark/tree/ef6284d0e6e99def41456fcc0b87a53a28f9a3b2">commit 連結</a></figcaption>
+</figure>
 
 這次執行過程，主要是受到這篇文章`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://www.sitepoint.com/bundle-static-site-webpack/" data-type="URL" data-id="https://www.sitepoint.com/bundle-static-site-webpack/" target="_blank">How to Bundle a Simple Static Site Using Webpack</a>[/ref]`的啟發，同時，也參考該篇文章的操作流程，進行專案導入 webpack 的處理，也藉由操作的過程，更加熟悉 webpack 生態系。以下，將依序介紹這次導入的相關工具，以及他們的使用場景。
 
@@ -80,39 +81,44 @@ wordpressId: 265
 
 針對 CSS 的原始碼程式語法與風格檢查工具。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":278,"width":768,"height":497,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_17-28-07-1024x662.png" alt="導入後的專案目錄截圖" class="wp-image-278" width="768" height="497"/><figcaption>導入後的專案目錄截圖，<a href="https://github.com/erase2004/museum-landmark/tree/00c2315699819402ec33edc0d68ff3c5955f3c9f" data-type="URL" data-id="https://github.com/erase2004/museum-landmark/tree/00c2315699819402ec33edc0d68ff3c5955f3c9f" target="_blank" rel="noreferrer noopener">commit 連結</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![導入後的專案目錄截圖](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_17-28-07.png)
+
+<figcaption>導入後的專案目錄截圖，<a href="https://github.com/erase2004/museum-landmark/tree/00c2315699819402ec33edc0d68ff3c5955f3c9f">commit 連結</a></figcaption>
+</figure>
 
 原先根目錄底下的 index.html 搬移到 src 目錄底下管理，同時，assets 目錄底下的 JavaScript 和 CSS 的程式碼，以及 favicon 檔案都也搬移到 src 目錄底下管理。又 images 底下的圖片檔也搬移到 src 目錄底下管理。專案根目錄多了 public 和 dist 目錄，前者用作開發時 devServer 使用，後者用作部屬版本的輸出目錄使用。
 
 新版本的專案要部屬前，先在正式環境上，參考教學`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://www.freecodecamp.org/news/a-b-testing-with-nginx-in-40-lines-of-code-d4f94397130a/" data-type="URL" data-id="https://www.freecodecamp.org/news/a-b-testing-with-nginx-in-40-lines-of-code-d4f94397130a/" target="_blank">A/B testing with NGINX in under 40 lines of code | freeCodeCamp</a>[/ref]``wp-unconverted: [ref]<a href="https://www.nginx.com/blog/performing-a-b-testing-nginx-plus/" data-type="URL" data-id="https://www.nginx.com/blog/performing-a-b-testing-nginx-plus/" target="_blank" rel="noreferrer noopener">Performing A/B Testing with NGINX and NGINX Plus</a>[/ref]`來修改 NGINX 設定，使其能夠同時服務新舊兩個版本，以利做 A/B 測試做對照。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":281,"width":768,"height":115,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_17-41-44-1024x153.png" alt="舊版本的測試結果 (WebPageTest)" class="wp-image-281" width="768" height="115"/><figcaption>舊版本的測試結果，<a href="https://www.webpagetest.org/result/220328_AiDc9T_CXP/" data-type="URL" data-id="https://www.webpagetest.org/result/220328_AiDc9T_CXP/" target="_blank" rel="noreferrer noopener">詳細資訊</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":280,"width":768,"height":114,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_17-41-40-1024x152.png" alt="新版本的測試結果 (WebPageTest)" class="wp-image-280" width="768" height="114"/><figcaption>新版本的測試結果，<a href="https://www.webpagetest.org/result/220328_AiDcPF_CMY/" data-type="URL" data-id="https://www.webpagetest.org/result/220328_AiDcPF_CMY/" target="_blank" rel="noreferrer noopener">詳細資訊</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+![舊版本的測試結果 (WebPageTest)](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_17-41-44.png)
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":283,"width":768,"height":101,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_17-45-43-1024x135.png" alt="舊版本的測試結果 (GTmetrix)" class="wp-image-283" width="768" height="101"/><figcaption>舊版本的測試結果，<a href="https://gtmetrix.com/reports/museum.acgn-stock.com/UBovCjwE/" data-type="URL" data-id="https://gtmetrix.com/reports/museum.acgn-stock.com/UBovCjwE/" target="_blank" rel="noreferrer noopener">詳細資訊</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figcaption>舊版本的測試結果，<a href="https://www.webpagetest.org/result/220328_AiDc9T_CXP/">詳細資訊</a></figcaption>
+</figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":282,"width":768,"height":99,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_17-45-34-1024x132.png" alt="新版本的測試結果 (GTmetrix)" class="wp-image-282" width="768" height="99"/><figcaption>新版本的測試結果，<a href="https://gtmetrix.com/reports/museum.acgn-stock.com/PqmQATlN/" data-type="URL" data-id="https://gtmetrix.com/reports/museum.acgn-stock.com/PqmQATlN/" target="_blank" rel="noreferrer noopener">詳細資訊</a></figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![新版本的測試結果 (WebPageTest)](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_17-41-40.png)
+
+<figcaption>新版本的測試結果，<a href="https://www.webpagetest.org/result/220328_AiDcPF_CMY/">詳細資訊</a></figcaption>
+</figure>
+
+<figure>
+
+![舊版本的測試結果 (GTmetrix)](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_17-45-43.png)
+
+<figcaption>舊版本的測試結果，<a href="https://gtmetrix.com/reports/museum.acgn-stock.com/UBovCjwE/">詳細資訊</a></figcaption>
+</figure>
+
+<figure>
+
+![新版本的測試結果 (GTmetrix)](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_17-45-34.png)
+
+<figcaption>新版本的測試結果，<a href="https://gtmetrix.com/reports/museum.acgn-stock.com/PqmQATlN/">詳細資訊</a></figcaption>
+</figure>
 
 基本上網頁在載入的表現上差異不大，符合預期。
 
@@ -132,11 +138,12 @@ wordpressId: 265
 - 圖片顯示區塊有要載入圖片的**主要顏色**`wp-unconverted: [ref]<a href="https://onlinejpgtools.com/find-dominant-jpg-colors" data-type="URL" data-id="https://onlinejpgtools.com/find-dominant-jpg-colors" target="_blank" rel="noreferrer noopener">主要顏色的分析工具</a>[/ref]`作墊底顯示。
 - 圖片顯示區塊有載入動畫，能讓使用者更清楚圖片正在載入狀態。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":267,"width":768,"height":526,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_15-21-06-1024x701.png" alt="最終的專案目錄截圖" class="wp-image-267" width="768" height="526"/><figcaption>最終的專案目錄截圖</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![最終的專案目錄截圖](../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_15-21-06.png)
+
+<figcaption>最終的專案目錄截圖</figcaption>
+</figure>
 
 ```html title="wp-unconverted: core/gallery"
 <!-- wp:gallery {"linkTo":"none"} -->

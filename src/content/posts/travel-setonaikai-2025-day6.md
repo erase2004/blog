@@ -6,7 +6,7 @@ updated: 2025-05-20T13:05:20+08:00
 categories: ["旅遊"]
 tags: ["summer-pockets", "瀨戶內國際藝術祭", "直島", "聖地巡禮"]
 description: "旅遊第六天，早上，我在高松港搭船前往直島，在直島上，藉由單車和走路進行旅行。傍晚，搭船返回高松港。"
-socialImage: "/wp-content/uploads/2025/05/MixCollage-16-May-2025-05-09-PM-2884-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day6/MixCollage-16-May-2025-05-09-PM-2884.jpg"
 draft: false
 wordpressId: 1158
 ---
@@ -15,27 +15,30 @@ wordpressId: 1158
 
 早上，在旅館用餐完後，前往高松港，搭乘渡輪前往直島，不知道是直島本來就很熱門，還是黃金週連假開始發威，排隊等待上船隊伍的人數很多。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1160,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_080802497-1024x768.jpg" alt="停靠在高松港岸邊的青雲丸" class="wp-image-1160"/><figcaption class="wp-element-caption">停靠在高松港岸邊的青雲丸</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![停靠在高松港岸邊的青雲丸](../../assets/images/travel-setonaikai-2025-day6/20250425_080802497.jpg)
+
+<figcaption>停靠在高松港岸邊的青雲丸</figcaption>
+</figure>
 
 渡輪抵達直島家浦港，我下船後，馬上前往[ふうちゃんレンタサイクル](https://maps.app.goo.gl/zhMdkw8LXLdgr86s9)租借單車，開始今天的直島旅行。
 
 首先往[本村](https://maps.app.goo.gl/ss8oi3qmdiC1jjuZ6)的方向騎，到達後，將單車停妥，開始在這一帶探索。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1161,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_092505686-1024x768.jpg" alt="直島町役場" class="wp-image-1161"/><figcaption class="wp-element-caption">直島町役場</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1162,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_092832774-1024x768.jpg" alt="石井商店，已於 2024 年 12 月停業，旁邊的民宿繼續營業。為 Summer Pockets 中登場的食堂的參考原型" class="wp-image-1162"/><figcaption class="wp-element-caption">石井商店，已於 2024 年 12 月停業，旁邊的民宿繼續營業。為 Summer Pockets 中登場的食堂的參考原型</figcaption></figure>
-<!-- /wp:image -->
-```
+![直島町役場](../../assets/images/travel-setonaikai-2025-day6/20250425_092505686.jpg)
+
+<figcaption>直島町役場</figcaption>
+</figure>
+
+<figure>
+
+![石井商店，已於 2024 年 12 月停業，旁邊的民宿繼續營業。為 Summer Pockets 中登場的食堂的參考原型](../../assets/images/travel-setonaikai-2025-day6/20250425_092832774.jpg)
+
+<figcaption>石井商店，已於 2024 年 12 月停業，旁邊的民宿繼續營業。為 Summer Pockets 中登場的食堂的參考原型</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1248,"url":"https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-14_10-30-25.png","alt":"","width":1192,"height":671},"imageAfter":{"id":1164,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250425_091836.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，主角從食堂回家的途中"} -->
@@ -103,11 +106,12 @@ wordpressId: 1158
 
 結束後，我回到南寺前，騎上單車前往[弁財天附近的海邊](https://www.google.com/maps/search/34.454789,+133.999283?entry=tts&g_ep=EgoyMDI1MDUwNy4wIPu8ASoASAFQAw%3D%3D&skid=efa50f34-2c44-4384-9a2e-5d07bced668a)。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1194,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_114148716-1024x768.jpg" alt="南寺附近的直島ルカコ/naoshima695" class="wp-image-1194"/><figcaption class="wp-element-caption">南寺附近的直島ルカコ/naoshima695</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![南寺附近的直島ルカコ/naoshima695](../../assets/images/travel-setonaikai-2025-day6/20250425_114148716.jpg)
+
+<figcaption>南寺附近的直島ルカコ/naoshima695</figcaption>
+</figure>
 
 到海邊後，我把單車停在路旁。由於事先已確認潮汐的時間，現在是退潮時間，沙灘上看起來有足夠的空間，可以讓人走到[弁財天](https://maps.app.goo.gl/sAszTHEL5ffJ6LJDA)的位置。我走到沙灘上，往弁財天的方向前進，途中小心翻過帶有青苔的岩石，避免發生意外，前進的過程中，也不時往停車的位置察看，確認有沒有疑似同好的人出現，只可惜到回到岸上後，都沒有出現。
 
@@ -143,11 +147,12 @@ wordpressId: 1158
 <!-- /wp:jetpack/image-compare -->
 ```
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1257,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_123829292-1024x768.jpg" alt="琴弾地海水浴場前的恵美須神社鳥居" class="wp-image-1257"/><figcaption class="wp-element-caption">琴弾地海水浴場前的恵美須神社鳥居</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![琴弾地海水浴場前的恵美須神社鳥居](../../assets/images/travel-setonaikai-2025-day6/20250425_123829292.jpg)
+
+<figcaption>琴弾地海水浴場前的恵美須神社鳥居</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1258,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_5.jpg","alt":"","width":1920,"height":1758},"imageAfter":{"id":1259,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_123758.jpg","alt":"","width":1180,"height":1080},"caption":"Summer Pockets 中，水織静久與後面的鳥居"} -->
@@ -161,11 +166,12 @@ wordpressId: 1158
 <!-- /wp:jetpack/image-compare -->
 ```
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1262,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_124800164-1024x768.jpg" alt="直島食堂的海鮮丼" class="wp-image-1262"/><figcaption class="wp-element-caption">直島食堂的海鮮丼</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![直島食堂的海鮮丼](../../assets/images/travel-setonaikai-2025-day6/20250425_124800164.jpg)
+
+<figcaption>直島食堂的海鮮丼</figcaption>
+</figure>
 
 午餐享用完畢後，我前往倍樂生區域散步，從東門進入，先遇到知名的[黃南瓜](https://maps.app.goo.gl/BFS11Eo3garxgzF67)`wp-unconverted: <sup data-fn="5be0dd09-8929-42dd-96b7-ca23629b10d4" class="fn"><a id="5be0dd09-8929-42dd-96b7-ca23629b10d4-link" href="#5be0dd09-8929-42dd-96b7-ca23629b10d4">1</a></sup>`，加入黃南瓜前的拍照隊伍。接著，進到紀念商店購買週邊。離開店家後，往西走，經過[ウッドデッキ](https://maps.app.goo.gl/sJLD7uyhg1kjn3zV9)到達道路，沿著路往回走，經過[ベネッセハウス パーク](https://maps.app.goo.gl/xw4SWecuo8XAUe3a7)前，最後回到東門。
 
@@ -177,11 +183,12 @@ wordpressId: 1158
 
 接著要前往[ヴァレーギャラリー](https://setouchi-artfest.jp/artworks/detail/308f396a-1cf2-4f59-a133-50495bf2d572)，由於從つつじ荘走縣道 256 號到[李禹煥美術館](https://setouchi-artfest.jp/artworks/detail/3e0e0711-1ccf-4d7b-8be3-e5717d98bc0a)前的路段坡度過大，又倍樂生區域的道路是禁止外部車輛通行的，因此我騎著單車繞道至本村，經過[直島ダム公園](https://maps.app.goo.gl/ciQZnAgigbyjXCW46)，抵達李禹煥美術館前的入口，將單車停在附近的停車場，再度走進倍樂生區域。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1280,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_140150585-1024x768.jpg" alt="直島ダム" class="wp-image-1280"/><figcaption class="wp-element-caption">直島ダム</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![直島ダム](../../assets/images/travel-setonaikai-2025-day6/20250425_140150585.jpg)
+
+<figcaption>直島ダム</figcaption>
+</figure>
 
 ヴァレーギャラリー裡展示著兩位作者的作品，分別是[草間彌生](https://setouchi-artfest.jp/artists/detail/ceead043-ce9a-4ece-89d6-89f2673d080e)的「ナルシスの庭」和[小沢剛](https://setouchi-artfest.jp/artists/detail/3d70b141-ea81-495d-bd73-16305e48ec59)的「スラグブッダ88」。「スラグブッダ88」該作品以直島在江戶時代設立的「直島八十八箇所」的佛像為參考，使用豊島產廢事件`wp-unconverted: <sup data-fn="b978e7b7-1aff-49f1-ae00-fe1aa27313fb" class="fn"><a id="b978e7b7-1aff-49f1-ae00-fe1aa27313fb-link" href="#b978e7b7-1aff-49f1-ae00-fe1aa27313fb">2</a></sup>`中的廢棄爐渣來製作，以瀨戶內的歷史，提醒人們重視自然環境。
 
@@ -211,27 +218,30 @@ wordpressId: 1158
 
 最後，回到宮浦港，歸還單車，購買返回高松港的船票，加入排隊等著上船的隊伍中，排隊人數十分多，多到從宇野港調派一艘渡輪來應付剩下的遊客。我搭上第一艘渡輪，渡輪航行時，我看著遠處有加派的第二艘渡輪跟隨著。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1307,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_163110785-1024x768.jpg" alt="在宮浦港，等待搭乘渡輪的隊伍" class="wp-image-1307"/><figcaption class="wp-element-caption">在宮浦港，等待搭乘渡輪的隊伍</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1308,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_175712440-1024x768.jpg" alt="從渡輪上拍攝，傍晚時的高松港" class="wp-image-1308"/><figcaption class="wp-element-caption">從渡輪上拍攝，傍晚時的高松港</figcaption></figure>
-<!-- /wp:image -->
-```
+![在宮浦港，等待搭乘渡輪的隊伍](../../assets/images/travel-setonaikai-2025-day6/20250425_163110785.jpg)
+
+<figcaption>在宮浦港，等待搭乘渡輪的隊伍</figcaption>
+</figure>
+
+<figure>
+
+![從渡輪上拍攝，傍晚時的高松港](../../assets/images/travel-setonaikai-2025-day6/20250425_175712440.jpg)
+
+<figcaption>從渡輪上拍攝，傍晚時的高松港</figcaption>
+</figure>
 
 ---
 
 回到高松後，我前往兵庫町商店街解決晚餐，原本是想要找[瀬戸の祭寿し 兵庫町店](https://maps.app.goo.gl/TVjNrp7BdryAaZiFA)，前幾天路過時，看裡面還有不少空位，但今天去時，裡面沒有空位，且有不少人在候位，於是放棄它。最後是去附近的[香川の食堂 まいしょく家 兵庫町店](https://maps.app.goo.gl/BtfMuRtfzkE5UgWa9)，點了使用豐島鹽的唐揚雞與使用仏升山吉的酢的南蠻雞的套餐。用餐結束後，返回旅館，結束今天的行程。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1311,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_191911005-1024x768.jpg" alt="使用豐島鹽的唐揚雞與使用仏升山吉的酢的南蠻雞的套餐" class="wp-image-1311"/><figcaption class="wp-element-caption">使用豐島鹽的唐揚雞與使用仏升山吉的酢的南蠻雞的套餐</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![使用豐島鹽的唐揚雞與使用仏升山吉的酢的南蠻雞的套餐](../../assets/images/travel-setonaikai-2025-day6/20250425_191911005.jpg)
+
+<figcaption>使用豐島鹽的唐揚雞與使用仏升山吉的酢的南蠻雞的套餐</figcaption>
+</figure>
 
 ---
 

@@ -20,8 +20,9 @@ wordpressId: 189
 
 如果手機Android版本是11以上，可以藉由將手機與電腦連到同一個無線AP底下，且手機開啟無線adb偵錯的情況下進行連接，這樣就不需要使用到usb線了。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":215,"sizeSlug":"full","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-09_16-23-42.png" alt="scrcpy視窗裡的手機畫面" class="wp-image-215"/><figcaption>scrcpy視窗裡的手機畫面</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![scrcpy視窗裡的手機畫面](../../assets/images/讓android手機畫面顯示在windows電腦上/Snipaste_2022-03-09_16-23-42.png)
+
+<figcaption>scrcpy視窗裡的手機畫面</figcaption>
+</figure>

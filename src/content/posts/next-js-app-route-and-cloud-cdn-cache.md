@@ -22,19 +22,21 @@ Next.js 在 App Route 上不少的改動，導致傳統在 Page Route 上的 Clo
 
 Next.js 在 App Route 時，response 會帶含有數值為 *RSC*、*Next-Router-State-Tree*、*Next-Router-Prefetch 和 Next-Url* 的 Vary header `wp-unconverted: <sup data-fn="90e39d4c-b413-460c-b74c-1f9e33ba2f0f" class="fn"><a id="90e39d4c-b413-460c-b74c-1f9e33ba2f0f-link" href="#90e39d4c-b413-460c-b74c-1f9e33ba2f0f">1</a></sup>`，由於這幾個數值並非 Cloud CDN 預設可被作為 cache key 的 header `wp-unconverted: <sup data-fn="d50384b6-d8ee-4ab3-bd7a-dfe7fafccd0e" class="fn"><a id="d50384b6-d8ee-4ab3-bd7a-dfe7fafccd0e-link" href="#d50384b6-d8ee-4ab3-bd7a-dfe7fafccd0e">2</a></sup>`，導致 response 無法被 CDN 給 cache，幸好，Cloud CDN 提供設定 custom cache key 的方式 `wp-unconverted: <sup data-fn="c07f144e-e7cf-413d-964b-cc1b4d41b5f4" class="fn"><a id="c07f144e-e7cf-413d-964b-cc1b4d41b5f4-link" href="#c07f144e-e7cf-413d-964b-cc1b4d41b5f4">3</a></sup>`，大家可以藉由將 *RSC*、*Next-Router-State-Tree*、*Next-Router-Prefetch* 和 *Next-Url* 增加至 custom cache header，來使 response 可以被 cache，設定如下圖所示
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":422,"sizeSlug":"full","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_15-59-21.png" alt="" class="wp-image-422"/><figcaption class="wp-element-caption">在 CDN 項目中，增加相關 header 至 cache key components 底下的設定</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_15-59-21.png)
+
+<figcaption>在 CDN 項目中，增加相關 header 至 cache key components 底下的設定</figcaption>
+</figure>
 
 而在 CDN cache mode 選擇上，則是設定 <mark>USE_ORIGIN_HEADERS</mark> 的方式，將 cache 設定的主導權交給 Next.js server 而非 CDN，這麼做的原因主要是避免新的版本部屬後，舊有版本的 CDN cache 依舊存在，使得使用者藉由舊版本的頁面，存取到存在於舊版本，但不存在於新版的資源，進而導致頁面發生錯誤的情況。`wp-unconverted: <sup data-fn="f0353324-050b-403c-b3f6-b3ef3898df2a" class="fn"><a id="f0353324-050b-403c-b3f6-b3ef3898df2a-link" href="#f0353324-050b-403c-b3f6-b3ef3898df2a">4</a></sup>`
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":423,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_16-12-54.png" alt="" class="wp-image-423"/><figcaption class="wp-element-caption">在 CDN 項目中 cache mode 的選擇</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_16-12-54.png)
+
+<figcaption>在 CDN 項目中 cache mode 的選擇</figcaption>
+</figure>
 
 ---
 
@@ -42,27 +44,30 @@ Next.js 在 App Route 時，response 會帶含有數值為 *RSC*、*Next-Router-
 
 由於 cache 設定的主導權下放到 server，因此，server 端需要在 response 時，帶有適當的 Cache-Control header`wp-unconverted: <sup data-fn="fa2decc9-a116-492d-bf8e-32ee6ba77f55" class="fn"><a id="fa2decc9-a116-492d-bf8e-32ee6ba77f55-link" href="#fa2decc9-a116-492d-bf8e-32ee6ba77f55">5</a></sup>`，當 response 經由 CDN 回傳給使用者時，才會被 CDN 給 cache 住。為了達成這樣的目標，須先確保 Next.js 版本在 14.2.13 以上`wp-unconverted: <sup data-fn="b3e954e0-8cc4-4cc6-82e4-468a19fe5571" class="fn"><a id="b3e954e0-8cc4-4cc6-82e4-468a19fe5571-link" href="#b3e954e0-8cc4-4cc6-82e4-468a19fe5571">6</a></sup>`，接著，依照官方文件的教學`wp-unconverted: <sup data-fn="c0be3696-a04d-4145-bc43-bebc6934636f" class="fn"><a id="c0be3696-a04d-4145-bc43-bebc6934636f-link" href="#c0be3696-a04d-4145-bc43-bebc6934636f">7</a></sup>`，在 next config 中設定輸出的 header 資訊。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":426,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_16-53-09.png" alt="" class="wp-image-426"/><figcaption class="wp-element-caption">首頁 cache 5 分鐘，並給予一分鐘的更新緩衝時間</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_16-53-09.png)
+
+<figcaption>首頁 cache 5 分鐘，並給予一分鐘的更新緩衝時間</figcaption>
+</figure>
 
 除了 Cache-Control header，也需要增加 ETag header`wp-unconverted: <sup data-fn="a297f12e-c3ef-4216-82a5-ca0aa6cdcd7c" class="fn"><a href="#a297f12e-c3ef-4216-82a5-ca0aa6cdcd7c" id="a297f12e-c3ef-4216-82a5-ca0aa6cdcd7c-link">8</a></sup>`，讓 server 版本更新後，CDN 可以藉由 ETag 資訊的變動，來更新既有 cache 的內容`wp-unconverted: <sup data-fn="f957d511-6d13-4485-8599-3bb686dbecdb" class="fn"><a href="#f957d511-6d13-4485-8599-3bb686dbecdb" id="f957d511-6d13-4485-8599-3bb686dbecdb-link">9</a></sup>`。順道一題，Next.js 雖然預設會輸出 ETag header，但在 dynamic route 的情況下，卻不會輸出 ETag header`wp-unconverted: <sup data-fn="46f68751-140c-4567-87e9-0f84522e4490" class="fn"><a href="#46f68751-140c-4567-87e9-0f84522e4490" id="46f68751-140c-4567-87e9-0f84522e4490-link">10</a></sup>`，為了讓所有路徑都能夠輸出 ETag 資訊，在 next config 中，使用 git commit hash 資訊，來設定 ETag header 到所有的路徑上，設定如下圖所示：
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":427,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_16-52-55.png" alt="" class="wp-image-427"/><figcaption class="wp-element-caption">在所有路徑上，使用 git commit hash 為數值，來設定 ETag header</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_16-52-55.png)
+
+<figcaption>在所有路徑上，使用 git commit hash 為數值，來設定 ETag header</figcaption>
+</figure>
 
 以上設定妥善後，便可得到 CDN cache 頁面的結果，同時，在新的版本部屬後，也能避免發生 version skew 的情況。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":428,"sizeSlug":"full","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_17-12-20-2.png" alt="" class="wp-image-428"/><figcaption class="wp-element-caption">首頁被 CDN cache 住的情況</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_17-12-20-2.png)
+
+<figcaption>首頁被 CDN cache 住的情況</figcaption>
+</figure>
 
 ## 結語
 

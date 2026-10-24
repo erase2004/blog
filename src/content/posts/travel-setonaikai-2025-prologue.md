@@ -6,7 +6,7 @@ updated: 2025-05-16T22:37:25+08:00
 categories: ["旅遊"]
 tags: ["summer-pockets", "岡山", "德島", "瀨戶內國際藝術祭", "聖地巡禮", "香川"]
 description: "在三月下旬某日準備下一季要看的動畫新番清單時，看到 Summer Pockets1 的 PV，同時想起今年初設定的目標—再去一次瀨戶內藝術祭（春或夏），在聖地巡禮與參加瀨戶內藝術祭（之後簡稱瀨戶藝）這兩個目的下，就決定了這次旅行。"
-socialImage: "/wp-content/uploads/2025/05/highlight.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-prologue/highlight.jpg"
 draft: false
 wordpressId: 442
 ---
@@ -35,11 +35,12 @@ https://www.youtube.com/watch?v=2u-RIQst_N4
 
 在進行完整的旅行規劃時，先把日期與地區一一配對，確認每個地區在該日期的可行性，例如：犬島因為週二為休島日，就不能給犬島安排在週二，接著，在接下來的每個晚上，撥出一小段時間，來安排其中一天的行程，經過一週的持續付出後，在出發前幾天完成這次的旅遊計畫。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":468,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-07_22-48-58-1024x592.png" alt="瀨戶藝官方網站上的預計擁堵日曆資訊" class="wp-image-468"/><figcaption class="wp-element-caption">瀨戶藝官方網站上的<a href="https://setouchi-artfest.jp/congestion-calendar/" target="_blank" rel="noopener" title="">預計擁堵日曆資訊</a></figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![瀨戶藝官方網站上的預計擁堵日曆資訊](../../assets/images/travel-setonaikai-2025-prologue/Snipaste_2025-05-07_22-48-58.png)
+
+<figcaption>瀨戶藝官方網站上的<a href="https://setouchi-artfest.jp/congestion-calendar/">預計擁堵日曆資訊</a></figcaption>
+</figure>
 
 ```html title="wp-unconverted: core/file"
 <!-- wp:file {"id":459,"href":"https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf","displayPreview":false} -->

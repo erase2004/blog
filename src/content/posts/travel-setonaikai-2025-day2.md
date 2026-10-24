@@ -6,7 +6,7 @@ updated: 2025-05-20T12:26:42+08:00
 categories: ["旅遊"]
 tags: ["summer-pockets", "ゆゆゆ", "丸龜", "推しが武道館いってくれたら死ぬ", "瀨戶內國際藝術祭", "犬島", "聖地巡禮", "高松"]
 description: "今天的內容主要記錄旅遊第二天，從高松港搭船，經由直島，前往犬島，最後回到丸龜，在丸龜、高松、直島與犬島的收穫。"
-socialImage: "/wp-content/uploads/2025/05/20250421_121407887-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day2/20250421_121407887.jpg"
 draft: false
 wordpressId: 552
 ---
@@ -23,27 +23,30 @@ wordpressId: 552
 
 進到丸龜站，在搭車前，先到超商買了些飯糰和黑咖啡作為今天的早餐。接著，進了閘門後，在月台上等待列車的到來。搭上列車，找個位置坐下，在抵達高松站前，在車內邊觀賞車窗外的景色，邊享用今天的早餐。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":557,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_070312897-1024x768.jpg" alt="JR 四國 2700 柴聯車與其排氣管" class="wp-image-557"/><figcaption class="wp-element-caption">特急しまんと 也是使用 JR 四國 2700 柴聯車，照片的上方有柴聯車才有的排氣管</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![JR 四國 2700 柴聯車與其排氣管](../../assets/images/travel-setonaikai-2025-day2/20250421_070312897.jpg)
+
+<figcaption>特急しまんと 也是使用 JR 四國 2700 柴聯車，照片的上方有柴聯車才有的排氣管</figcaption>
+</figure>
 
 抵達高松站後，快步前往附近的高松港，購買船票，然後在乘船處等候搭船。上船找了位置坐下後，沒多久，船就出發前往直島。在航行過程中，我坐在船艙內靠走道的位置，額頭前方就是螢幕，螢幕上顯示著即時船舶位置圖，我的視線大都在螢幕上。
 
 航行約 30 分後，船抵達直島的宮浦港，下船後，由於距離售票亭開始服務的時間還有不少時間，我先在宮浦港附近散步，順便進行聖地巡禮。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":560,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_080050251-1024x768.jpg" alt="宮浦港內的紅南瓜" class="wp-image-560"/><figcaption class="wp-element-caption">宮浦港內直島知名的「<a href="https://setouchi-artfest.jp/artworks/detail/eb4b590a-7f2b-4fe7-ba24-c3fade979a1f" target="_blank" rel="noopener" title="">紅南瓜</a>」，為常設作品，作者為<a href="https://setouchi-artfest.jp/artists/detail/ceead043-ce9a-4ece-89d6-89f2673d080e" target="_blank" rel="noopener" title="">草間彌生</a></figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":559,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_075046320-1024x768.jpg" alt="宮浦港附近的電動單車出租店 - ふうちゃんレンタサイクル" class="wp-image-559"/><figcaption class="wp-element-caption">宮浦港附近的電動單車出租店 - <a href="https://x.com/naoshima_fuchan" target="_blank" rel="noopener" title="">ふうちゃんレンタサイクル</a></figcaption></figure>
-<!-- /wp:image -->
-```
+![宮浦港內的紅南瓜](../../assets/images/travel-setonaikai-2025-day2/20250421_080050251.jpg)
+
+<figcaption>宮浦港內直島知名的「<a href="https://setouchi-artfest.jp/artworks/detail/eb4b590a-7f2b-4fe7-ba24-c3fade979a1f">紅南瓜</a>」，為常設作品，作者為<a href="https://setouchi-artfest.jp/artists/detail/ceead043-ce9a-4ece-89d6-89f2673d080e">草間彌生</a></figcaption>
+</figure>
+
+<figure>
+
+![宮浦港附近的電動單車出租店 - ふうちゃんレンタサイクル](../../assets/images/travel-setonaikai-2025-day2/20250421_075046320.jpg)
+
+<figcaption>宮浦港附近的電動單車出租店 - <a href="https://x.com/naoshima_fuchan">ふうちゃんレンタサイクル</a></figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1237,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/minato-2.jpg?ssl=1","alt":"","width":1200,"height":675},"imageAfter":{"id":562,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250421_084628.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 裡的鳥白島的港口"} -->
@@ -127,11 +130,12 @@ wordpressId: 552
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":615,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_120017662-768x1024.jpg" alt="關於犬島上定紋石的傳說" class="wp-image-615"/><figcaption class="wp-element-caption">關於犬島上定紋石的傳說</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![關於犬島上定紋石的傳說](../../assets/images/travel-setonaikai-2025-day2/20250421_120017662.jpg)
+
+<figcaption>關於犬島上定紋石的傳說</figcaption>
+</figure>
 
 接下來，在前往「[くらしの植物園](https://setouchi-artfest.jp/artworks/detail/30478873-0218-4700-b2f0-4e442b020597)」的路上，經過「[犬島ハウスプロジェクト」](https://maps.app.goo.gl/KoMNuPvHPKFejL5f8)，這是一座美術館，在海邊的白色小屋的左下角，有隻狗的大型雕塑的上半身鑽出來，使整間看起來很像一間狗窩，十分可愛。
 
@@ -157,15 +161,16 @@ wordpressId: 552
 <!-- /wp:envira/envira-gallery -->
 ```
 
-往回走，在中の谷東屋前的分岔路走另一條路，會來到家計畫的「[C 邸／無題（C邸の花）](https://setouchi-artfest.jp/artworks/detail/99350a5c-1365-4b5f-a7c1-a4121dcdb454)」，這地方是從原本島上的集會所改建，變成藝術品的展示場所。志工爺爺似乎覺得我是中文使用者，所以用中文跟我講解注意事項，他流暢的中文令我印象深刻。`wp-unconverted: <img class="wp-image-636" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/068e430033c03e0651fa93c66664a2b7_w48_h48.jpg" alt="">`
+往回走，在中の谷東屋前的分岔路走另一條路，會來到家計畫的「[C 邸／無題（C邸の花）](https://setouchi-artfest.jp/artworks/detail/99350a5c-1365-4b5f-a7c1-a4121dcdb454)」，這地方是從原本島上的集會所改建，變成藝術品的展示場所。志工爺爺似乎覺得我是中文使用者，所以用中文跟我講解注意事項，他流暢的中文令我印象深刻。![](../../assets/images/travel-setonaikai-2025-day2/068e430033c03e0651fa93c66664a2b7_w48_h48.jpg)
 
 時間已經是中午 12 點，我前往附近的 [Uki Cafe](https://maps.app.goo.gl/66u6LhAXYrhMDcmF6)，由於店家內用空間已經滿了，我在預約表上填寫資訊後，便在店門外等待。輪到我可以用餐時，店員引導我到位置上，坐下後，我跟店員點選餐點，接著，裝取店家免費提供的飲用水來喝，店家提供的飲用水是用一大塊冰塊融化而成的，喝起來味道十分奇特，不太像是純水製成的冰塊。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":637,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_130722471-1024x768.jpg" alt="ほうれん草のヴィーガンジェノベーゼパスタ" class="wp-image-637"/><figcaption class="wp-element-caption">食材是來自店家自己所種植的蔬菜的 ほうれん草のヴィーガンジェノベーゼパスタ，該餐點附帶小份的沙拉</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![ほうれん草のヴィーガンジェノベーゼパスタ](../../assets/images/travel-setonaikai-2025-day2/20250421_130722471.jpg)
+
+<figcaption>食材是來自店家自己所種植的蔬菜的 ほうれん草のヴィーガンジェノベーゼパスタ，該餐點附帶小份的沙拉</figcaption>
+</figure>
 
 用餐完畢後，我前往最後一個家計畫的作品—[I 邸／Self-loop](https://setouchi-artfest.jp/artworks/detail/b2dad6e5-bd17-45cf-adb8-3f4cf167355f)。結束後，我往犬島港的方向前進，來到[山神社](https://maps.app.goo.gl/yMWyL4t2YAP1gEdm9)附近時，由於距離離開還剩下很多時間，我看了一下 Google Map，決定往[海水浴場](https://maps.app.goo.gl/upDd3YhrgFigJTNb6 "海水浴場")的方向前進。
 
@@ -181,11 +186,12 @@ wordpressId: 552
 
 搭上回程的船，船航行約一小時，途中停留在豐島的家浦港，最終抵達直島的家浦港。下船後，加緊腳步前往售票處，購買下午 5:00 前往高松港的渡輪船票。上了渡輪後，我到甲板層找個位置休息。在渡輪航行過程中，由於是傍晚時刻，海面反射出來的陽光一閃一閃的，十分美麗。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":644,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250421_170131834-1024x768.jpg" alt="從渡輪上拍攝的宮浦港" class="wp-image-644"/><figcaption class="wp-element-caption">從渡輪上拍攝的宮浦港，黃色柱子的旁邊是 Summer Pockets 女主角—鳴瀬しろは—所站立的的位置</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![從渡輪上拍攝的宮浦港](../../assets/images/travel-setonaikai-2025-day2/20250421_170131834.jpg)
+
+<figcaption>從渡輪上拍攝的宮浦港，黃色柱子的旁邊是 Summer Pockets 女主角—鳴瀬しろは—所站立的的位置</figcaption>
+</figure>
 
 ```html title="wp-unconverted: envira/envira-gallery"
 <!-- wp:envira/envira-gallery {"galleryId":645,"title":"直島返回高松的渡輪上","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_171524349-scaled.jpg","title":"往瀨戶大橋方向的海面上出現一閃一閃的光芒","link":"https://aniya.moe/wp-content/uploads/2025/05/20250421_171524349-scaled.jpg","alt":"","caption":"","thumb":"","id":646,"height":100,"width":133},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_172923259-scaled.jpg","title":"從渡輪的後方拍攝海面上一閃一閃的光芒","link":"https://aniya.moe/wp-content/uploads/2025/05/20250421_172923259-scaled.jpg","alt":"","caption":"","thumb":"","id":647,"height":100,"width":133},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174424855-scaled.jpg","title":"高松港旁的香川県立アリーナ與高松シンボルタワー","link":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174424855-scaled.jpg","alt":"","caption":"","thumb":"","id":648,"height":100,"width":133},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174810987-scaled.jpg","title":"高松港玉藻防波堤赤灯台","link":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174810987-scaled.jpg","alt":"","caption":"","thumb":"","id":649,"height":100,"width":75},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174831110-scaled.jpg","title":"燈塔、夕陽與海面上的金色波浪","link":"https://aniya.moe/wp-content/uploads/2025/05/20250421_174831110-scaled.jpg","alt":"","caption":"","thumb":"","id":650,"height":100,"width":75}]} -->
@@ -217,7 +223,7 @@ wordpressId: 552
 
 ---
 
-晚餐後，我直接回高松站，搭乘列車前往丸龜站，回到旅館。進到旅館房間後，打開電視，開啟節目表，確定有要看的節目後，先行洗澡。洗澡完後，邊看其他節目，邊整理行李，等待要看的節目的時間到來，其中，看了一個持續一小時的商品促銷節目，節目的呈現手法和台灣購物頻道簡直如出一轍。`wp-unconverted: <img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">`
+晚餐後，我直接回高松站，搭乘列車前往丸龜站，回到旅館。進到旅館房間後，打開電視，開啟節目表，確定有要看的節目後，先行洗澡。洗澡完後，邊看其他節目，邊整理行李，等待要看的節目的時間到來，其中，看了一個持續一小時的商品促銷節目，節目的呈現手法和台灣購物頻道簡直如出一轍。![](../../assets/images/travel-setonaikai-2025-day1/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg)
 
 晚上 11:00，要看的節目開始了，首先是<em>[ざつ旅](https://zatsutabi.com/)</em>第三集，這次主角來到高松，這麼剛好我今天也到過高松，彷彿我們在同一個地方插身而過，如此巧合令我驚訝。ざつ旅結束後接著是 Summer Pockets 第三集，看的過程中，心中多了幾個可以跑的點，不過先擱置一旁，等明天晚上在處理。兩個節目結束後便熄燈就寢。
 

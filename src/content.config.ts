@@ -12,30 +12,31 @@ const slug = z.string().regex(/^[^/\s]+$/, 'A slug is one URL path segment');
 
 const posts = defineCollection({
 	loader: glob({ base: './src/content/posts', pattern: '**/*.{md,mdx}', generateId }),
-	schema: z
-		.object({
-			title: z.string(),
-			/** The last segment of the post's URL, `/YYYY/MM/DD/<slug>/`. */
-			slug,
-			/** The publish time; the URL date is its date in Asia/Taipei. */
-			published: z.coerce.date(),
-			/** The last update. */
-			updated: z.coerce.date(),
-			categories: z.array(reference('categories')).min(1),
-			tags: z.array(reference('tags')).default([]),
-			/** The summary shown in listings; the meta description when there is no `description`. */
-			excerpt: z.string().optional(),
-			/** The meta description (AIOSEO's custom description). */
-			description: z.string().optional(),
-			/** The og:image; for now the old upload path, until ticket 06 moves the images. */
-			socialImage: z.string().optional(),
-			/** Drafts are left out of production builds. */
-			draft: z.boolean().default(false),
-			wordpressId: z.number().int().optional(),
-		})
-		.refine((post) => post.description || post.excerpt, {
-			message: 'A post needs a description or an excerpt (its meta description)',
-		}),
+	schema: ({ image }) =>
+		z
+			.object({
+				title: z.string(),
+				/** The last segment of the post's URL, `/YYYY/MM/DD/<slug>/`. */
+				slug,
+				/** The publish time; the URL date is its date in Asia/Taipei. */
+				published: z.coerce.date(),
+				/** The last update. */
+				updated: z.coerce.date(),
+				categories: z.array(reference('categories')).min(1),
+				tags: z.array(reference('tags')).default([]),
+				/** The summary shown in listings; the meta description when there is no `description`. */
+				excerpt: z.string().optional(),
+				/** The meta description (AIOSEO's custom description). */
+				description: z.string().optional(),
+				/** The og:image (AIOSEO's custom social image): an image of src/assets/images/, relative to the file. */
+				socialImage: image().optional(),
+				/** Drafts are left out of production builds. */
+				draft: z.boolean().default(false),
+				wordpressId: z.number().int().optional(),
+			})
+			.refine((post) => post.description || post.excerpt, {
+				message: 'A post needs a description or an excerpt (its meta description)',
+			}),
 });
 
 const pages = defineCollection({
