@@ -1184,3 +1184,47 @@ describe('robots.txt', () => {
 		expect(robots).not.toMatch(/^Disallow: *\S/im);
 	});
 });
+
+// Expected values from WordPress's llms.txt (made by AIOSEO; aniya.moe/llms.txt,
+// 2026-10-24): 22 posts, 5 pages, 3 categories, 57 tags.
+describe('llms.txt', () => {
+	/** The links under each `## ` heading of a Markdown file. */
+	function linksBySection(markdown: string): Record<string, { text: string; url: string }[]> {
+		const sections: Record<string, { text: string; url: string }[]> = {};
+		let section: { text: string; url: string }[] = [];
+		for (const line of markdown.split('\n')) {
+			const heading = /^## (.+)$/.exec(line);
+			if (heading) sections[heading[1]!] = section = [];
+			const link = /^- \[(.+?)\]\((\S+?)\)/.exec(line);
+			if (link) section.push({ text: link[1]!, url: link[2]! });
+		}
+		return sections;
+	}
+
+	it('names the site, and links to the sitemap and to every post, page, category and tag', async () => {
+		const response = await get('/llms.txt');
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toMatch(/^text\/plain/);
+		const markdown = await response.text();
+		expect(markdown.split('\n').slice(0, 3)).toEqual(['# TsukiStudio', '', '> 生活點滴紀錄']);
+		const sections = linksBySection(markdown);
+		expect(Object.fromEntries(Object.entries(sections).map(([heading, links]) => [heading, links.length]))).toEqual({
+			Sitemaps: 1,
+			文章: 22,
+			頁面: 5,
+			分類: 3,
+			標籤: 57,
+		});
+		expect(sections['文章']![0]).toEqual({
+			text: '從 SSR 到 SSG：ACGN 股市歷史博物館 7 萬頁靜態化的實戰轉型紀錄',
+			url: 'https://aniya.moe/2026/01/23/acgn-museum-ssg/',
+		});
+		const broken = [];
+		for (const { url } of Object.values(sections).flat()) {
+			const { status } = await get(new URL(url).pathname);
+			if (status !== 200) broken.push(`${decodeURI(url)}: ${status}`);
+		}
+		expect(broken).toEqual([]);
+	});
+});
