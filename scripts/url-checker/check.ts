@@ -5,6 +5,7 @@ import type { ExpectedUrl } from './expected-urls.ts';
 import {
 	LOWERCASE_PERCENT_ENCODED_PATHS,
 	type LowercasePercentEncodedPaths,
+	NOT_FOUND_PAGE_TITLE,
 	SITE_ORIGIN,
 	TITLE_FORMAT,
 } from './settings.ts';
@@ -202,11 +203,24 @@ async function replyProblems(entry: ExpectedUrl, reply: Reply, target: Target): 
 			}
 			return redirectToAnyPageProblems(reply, target);
 		case 'not-found':
-			return reply.status === 404 ? [] : [`expected HTTP 404, got ${reply.status}`];
+			return reply.status === 404 ? notFoundPageProblems(reply) : [`expected HTTP 404, got ${reply.status}`];
 		case 'page':
 		case 'file':
 			return reply.status === 200 ? [] : [`expected HTTP 200, got ${reply.status}`];
 	}
+}
+
+/** The body of a 404 must be the site's 404 page, which search engines must not index. */
+function notFoundPageProblems(reply: Reply): string[] {
+	const head = parse(reply.body ?? '').querySelector('head');
+	const title = head?.querySelector('title')?.text.trim();
+	if (title !== NOT_FOUND_PAGE_TITLE) {
+		return [`expected the 404 page, titled "${NOT_FOUND_PAGE_TITLE}"; got ${title ? `"${title}"` : 'no <title>'}`];
+	}
+	const robots = head
+		?.querySelectorAll('meta[name="robots"]')
+		.flatMap((meta) => (meta.getAttribute('content') ?? '').split(',').map((directive) => directive.trim()));
+	return robots?.includes('noindex') ? [] : ['the 404 page is not noindex'];
 }
 
 /** A 301 to a URL of the same site that answers 200. */

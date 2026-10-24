@@ -1267,3 +1267,70 @@ import Gallery from '../../components/Gallery.astro';
 - 14（已合併）：14 號的 `firstImage()` 跟這裡的 `imagesIn()` 用同一種方法找原始檔裡的圖片，合併後 `firstImage()` 改成取 `imagesIn()` 的第一張，只留一份比對規則（採用 14 號較嚴格的寫法：相對路徑、要有圖片副檔名、先 `decodeURI`）；差別只在原始檔提到不存在的圖片時，現在是跳過而不是建置失敗。feed 的頻道圖示（WordPress 用 `cropped-night-32x32.png`）還沒加，網站圖示 14 號已經搬好，之後可以補。作者名稱「Tsuki」寫在 `src/lib/feeds.ts`。14 號建議把 feed 連結放進 `BaseHead.astro`；這裡放在 `BaseLayout.astro` 裡緊接著 `<BaseHead>` 的那一行，輸出位置一樣（`BaseHead` 只有 `BaseLayout` 在用），就沒有再搬。
 - 18：頁面的 meta description 有幾個是截斷的內文（例如 `/about/` 是「我的故事 聯絡方式」），也原樣出現在 `llms.txt`。
 - 19：在預覽網址確認 `_headers` 的 Content-Type 與 `X-Robots-Tag`，並用網址（不是貼內容）再跑一次 W3C Feed Validator。
+
+## 17：404 頁面（2026-10-24）
+
+### 頁面內容
+
+- `src/pages/404.astro`，建成 `dist/404.html`。Workers static assets（`not_found_handling: "404-page"`）對每個沒有檔案的網址回這一頁，HTTP 404。
+- 共用版型本來就有的：頁首的導覽列（6 個連結）、側欄（搜尋、分類、年份、標籤）、回到頂部按鈕。
+- 主欄：標題「找不到頁面」、一句說明、搜尋框（標題「搜尋文章」）、最新 5 篇文章（標題＋發布日期，新到舊；取 `getPosts()` 的前 5 篇，跟首頁一樣不含草稿）、「回到首頁」連結。
+- **主欄自己的搜尋框**：手機上側欄排在主欄下面，要捲過整個主欄才看得到側欄的搜尋框，所以主欄另外放一個。`src/components/Search.astro` 新增 `instance` 屬性，404 頁的框是 `instance="not-found"`，側欄的是 Pagefind 預設的 `default`。同一個 instance 的框共用查詢和結果，不分開的話在一個框打字，兩個框都會跳出結果。外層是 `role="search"` 的 `<section>`，用各自的標題跟側欄的搜尋區塊區分。
+- `noindex` 沿用 14 號的設定；WordPress 的 404 頁也是 `noindex`。
+- 標題維持「找不到頁面 - TsukiStudio」。WordPress 是「找不到符合條件的頁面 – TsukiStudio」，但新站全站都是 ` - TsukiStudio`，而且 404 頁不會被索引，標題不影響 SEO。
+
+### 沒有 canonical
+
+- WordPress 的 404 頁沒有 canonical，也沒有任何 `og:` 標籤（2026-10-24 請求一個不存在的網址確認，回 404）。
+- 14 號時 404 頁的 canonical 是 `https://aniya.moe/404/`（建置時的 `Astro.url` 是 `/404/`），但這一頁是回給所有不存在的網址的，說它的正式網址是 `/404/` 不對。`BaseHead`／`BaseLayout` 新增 `canonical` 屬性（預設 `true`），404 頁傳 `canonical={false}`：不輸出 `<link rel="canonical">` 與 `og:url`。其他 `og:` 標籤與 JSON-LD（WebSite、Person）保留。
+
+### `/404/` 也回 404
+
+- 01 號記下的問題：`html_handling: "force-trailing-slash"` 把 `X.html` 當成 `/X/` 這一頁，所以 `404.html` 在 `/404/` 也是一頁，回 HTTP **200**（`/404`、`/404.html` 則 307 到 `/404/`）。等於多一份 404 頁的副本，回 200 的錯誤頁正是 spec 要避免的 soft 404；`noindex` 只是最低限度的保護。
+- Workers 的設定沒有辦法排除它：`not_found_handling` 一定找 `404.html` 這個檔名，用 `.assetsignore` 排除的話 404 頁也一起沒了；`_redirects` 也不能指定 404 狀態碼（只有 200、301、302、303、307、308）。
+- 做法：`_redirects` 的 **proxy（200）規則**。`_redirects` 比 `html_handling` 先套用；狀態碼 200 的規則不轉址，而是改用另一個路徑去找檔案。`src/integrations/not-found-page.ts` 加一條 `/404/ /404/no-such-page/ 200`：`/404/no-such-page/` 沒有檔案，於是照 `not_found_handling` 回 `404.html`、HTTP 404，跟其他不存在的網址一樣。
+  - 流程對照過 wrangler 內建的 asset worker 原始碼（`node_modules/miniflare/dist/src/workers/assets/assets.worker.js` 的 `handleRedirects`、`getResponseOrAssetIntent`），`wrangler dev` 實測：`/404/` 直接回 404 與 404 頁；`/404`、`/404.html` 先 307 到 `/404/`，最後也是 404。
+  - 純靜態檔案的請求，不經過 Worker（13 號的 Worker 只在首頁執行），不佔免費額度。多一條 static 規則：跟 12 號合併後 `_redirects` 是 1,777 條 static、0 條 dynamic。
+  - **19 號要在預覽網址確認**：官方文件（developers.cloudflare.com/workers/static-assets/redirects/，2026-10-24 讀）列出 Workers static assets 的 `_redirects` 支援 Proxying（200，只能指向同一個網站的相對路徑），不支援的是其他狀態碼的改寫（例如 `404`）；但本機的 workerd 可能跟正式環境不同。12 號日誌說「`_redirects` 的 200 改寫，網址檢查與 Workers 都不支援」，照文件 Workers 是支援的，網址檢查的建置模式現在也支援；12 號 feed 的做法不受影響。網址檢查的預期清單有 `/404/`（見下面），在預覽網址跑 HTTP 模式就會檢查到。
+
+### GA4
+
+- **只在 aniya.moe 上送資料**（新決定）：14 號是正式建置就載入 gtag.js，所以預覽網址的部署（也是正式建置）和本機的 `npm run preview` 也會送資料進同一個 GA4 屬性。現在 `src/components/BaseHead.astro` 的 GA 程式碼先檢查 `location.hostname === 'aniya.moe'`（主機名稱取自 `astro.config.mjs` 的 `site`），符合才定義 `gtag()`、送 `js` 與 `config`、插入 gtag.js 的 `<script async>`；其他主機什麼都不做，`gtag` 也不存在。`astro dev` 仍然沒有這段程式碼（`import.meta.env.PROD`）。14 號說的「預覽網址的造訪也會進同一個屬性，要排除就在 GA4 用主機名稱篩選」已經不成立。
+- gtag.js 原本寫在 HTML 的 `<script async src>`，現在由這段程式碼插入，一樣是 async 載入，只是瀏覽器的 preload scanner 不會提早下載它。
+- **404 事件**（`src/pages/404.astro` 裡的一段內嵌 script）：
+  - 事件名稱 **`page_not_found`**。
+  - 參數：**`page_location`** 是被請求的完整網址（`location.href`，含查詢字串，中文是百分比編碼）；**`page_referrer`** 是連過來的頁面（`document.referrer`，有才送；直接輸入網址或從書籤開就沒有）。站內連結壞掉時 referrer 是完整網址，可以直接找到是哪一篇的連結；從其他網站連過來時，瀏覽器預設（`strict-origin-when-cross-origin`）只給網域，例如 `https://www.google.com/`。
+  - 只在 `typeof gtag === 'function'` 時送，所以只有 aniya.moe 上會送，其他主機上不會出錯。
+  - 為什麼用 GA4 內建的參數名稱，不自訂（例如 `requested_path`）：自訂參數的值最多 100 個字元，而且 GA 以**編碼後的網址長度**計算，一個中文字算 9 個字元（`%E9%9B%BB`），中文 slug 的網址很容易超過；內建的 `page_location` 上限 1,000、`page_referrer` 上限 420。自訂參數還要先在 GA4 註冊成自訂維度才能在報表用，而且只對註冊之後收到的資料有效；內建參數對應的維度直接就能用。（限制見 GA4 說明「Collection and configuration limits」，support.google.com/analytics/answer/9267744，2026-10-24 讀。）
+- **21 號在 GA4 怎麼看**（以下用英文介面的名稱，中文介面是對應的翻譯）：
+  - Reports → Engagement → Events → `page_not_found`：每天的次數。
+  - 哪些網址：Explore → Free form，維度加 `Page path + query string`（或完整網址 `Page location`）與 `Page referrer`，指標 `Event count`，篩選 `Event name` 完全符合 `page_not_found`。表格裡的網址就是要補轉址規則的舊網址；referrer 是站內頁面的話，順便修那篇的連結。
+  - 剛切換時用 Realtime 報表或 DebugView 確認事件有進來。
+
+### 網址檢查
+
+- 預期 `not-found` 的網址，現在除了 HTTP 404，內容也要是 404 頁：`<title>` 是「找不到頁面 - TsukiStudio」（`scripts/url-checker/settings.ts` 的 `NOT_FOUND_PAGE_TITLE`），而且 robots 有 `noindex`。不是的話報 `expected the 404 page, titled "…"; got "…"` 或 `the 404 page is not noindex`。spec 的「不存在的網址回 404，而且內容是 404 頁」就是這一項。對應表的 109 個 `not-found` 網址都通過（2 個帶查詢字串的 `/?p=1887`、`/?page_id=1887` 在建置模式跳過，HTTP 模式仍在待完成清單上，等 13 號）。
+- 建置模式支援 `_redirects` 的 proxy（200）規則（以前遇到就丟錯）：照 asset worker 的做法，換成規則指定的路徑再套 `html_handling` 找檔案，找不到就照 `not_found_handling` 回 404 頁。指向其他網站的 proxy 規則 wrangler 會略過，這裡也略過。
+- 預期清單多一筆 `/404/` → `not-found`（`NOT_FOUND_PAGE_URL`，跟原本的 `/url-checker/no-such-page/` 一樣是網址檢查自己加的），所以預覽網址與正式網域的檢查也會確認 `/404/` 不是一個回 200 的頁面。
+- 待完成清單沒有變。
+
+### 測試
+
+- `tests/url-checker/check-urls.test.ts`（建置與 HTTP 兩種模式）：回 404 而且是 404 頁才通過；fixture 在子資料夾另外放 `404.html`（Workers 用路徑往上最近的 `404.html`），分別測標題不對與沒有 `noindex` 會失敗；proxy 規則指向存在的頁面時回 200、指向不存在的路徑時回 404 頁。
+- `tests/url-checker/expected-urls.test.ts`：預期 404 的是 `/url-checker/no-such-page/` 與 `/404/`。
+- `tests/site-serving.test.ts`：
+  - `unknown URLs`：`/404/`、`/404`、`/404.html` 最後都是 HTTP 404，內容是 `dist/404.html`。
+  - `the 404 page`：最新 5 篇的標題、網址與順序（對照 frontmatter 寫死的值）；只有一個回首頁的連結；用 Playwright 在主欄的搜尋框打「電磁筆」，第一筆是〈電子紙閱讀器使用心得〉，側欄的搜尋框維持空白、沒有結果。
+  - `SEO head`：兩個不存在的網址都沒有 canonical 與 `og:url`。
+  - `SEO head` › `GA4`：Playwright 把 `https://aniya.moe` 的請求交給本機的 `wrangler dev` 回答（`route.fetch`），頁面就像在 aniya.moe 上執行：
+    - 7 種頁面都送 `config G-NWNYVH87N4`、請求 gtag.js（14 號原本的測試，改成在 aniya.moe 上跑）。
+    - 在預覽網址（`https://aniya-moe.example.workers.dev`）與本機網址上，首頁、文章、404 頁都沒有 `dataLayer`、沒有請求 Google 的網域、沒有 JS 錯誤（少了 `typeof gtag` 的檢查，404 頁在這裡會丟 `ReferenceError`）。
+    - 404 頁送一個 `page_not_found`：中文網址加查詢字串、從文章連過來，`page_location` 與 `page_referrer` 都對；直接開的沒有 `page_referrer`；文章頁不送。
+  - 原有的測試已經涵蓋：8 種頁面（含 404 頁）的導覽列與側欄搜尋框、404 頁的 robots 是 `noindex`、手機 320px 寬不會水平捲動。
+- 桌機 1280px、手機 375px 與主欄搜尋框有結果時的截圖自己看過，沒有交給站長、不放進 repo。
+
+### 留給其他 issue 的發現
+
+- 13：Worker 對找不到的 `?p=ID`／`?page_id=ID` 要回 404 頁的內容與 HTTP 404，網址檢查現在會比對標題與 `noindex`（例如向 `env.ASSETS` 要一個不存在的路徑，拿到的應該就是 404 頁和 404；要實測）。新增的 dynamic `_redirects` 規則照舊放在所有 static 規則之後，包括 `/404/` 這一條。
+- 19：在預覽網址確認 `/404/` 回 404（網址檢查 HTTP 模式）、404 頁的兩個搜尋框都能用。預覽網址上 GA4 不會送資料，GA 的即時報表看不到預覽網址的造訪，這是預期的。
+- 20／21：切換後在 aniya.moe 開一個不存在的網址，在 GA4 的 Realtime 或 DebugView 確認 `page_not_found` 有進來；之後每週照上面的 Explore 設定看 404 網址。

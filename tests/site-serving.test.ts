@@ -159,6 +159,63 @@ describe('unknown URLs', () => {
 		expect(response.status).toBe(404);
 		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
 	});
+
+	// Workers static assets would serve dist/404.html at /404/ with HTTP 200,
+	// as a page of its own; /404 and /404.html redirect to /404/.
+	it.each(['/404/', '/404', '/404.html'])("the 404 page's own URL %s ends in HTTP 404 too", async (path) => {
+		const response = await fetch(new URL(path, server!.url));
+
+		expect(response.status).toBe(404);
+		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
+	});
+});
+
+describe('the 404 page', () => {
+	// The site header with the menu and the sidebar with its search box are
+	// tested with the other kinds of page under `layout`.
+	async function main() {
+		const response = await get('/2021/11/30/no-such-post/');
+		expect(response.status).toBe(404);
+		return parse(await response.text()).querySelector('main')!;
+	}
+
+	it('lists the 5 newest posts, newest first', async () => {
+		const latest = (await main())
+			.querySelectorAll('section')
+			.find((section) => section.querySelector('h2')?.text.trim() === '最新文章');
+
+		expect(latest?.querySelectorAll('a').map((link) => [link.text.trim(), decodeURI(link.getAttribute('href')!)])).toEqual([
+			['從 SSR 到 SSG：ACGN 股市歷史博物館 7 萬頁靜態化的實戰轉型紀錄', '/2026/01/23/acgn-museum-ssg/'],
+			['另類日本生活體驗，一個月的瀨戶內藝術祭小蝦隊志工經驗談', '/2025/12/05/2025-koebitai/'],
+			['遊記 – 岡山 / 香川 / 德島八日遊 – Day 8', '/2025/05/17/travel-setonaikai-2025-day8/'],
+			['遊記 – 岡山 / 香川 / 德島八日遊 – Day 7', '/2025/05/17/travel-setonaikai-2025-day7/'],
+			['遊記 – 岡山 / 香川 / 德島八日遊 – Day 6', '/2025/05/17/travel-setonaikai-2025-day6/'],
+		]);
+	});
+
+	it('links back to the home page', async () => {
+		expect((await main()).querySelectorAll('a[href="/"]').map((link) => link.text.trim())).toEqual(['回到首頁']);
+	});
+
+	it("has a search box in the main column that shows the posts found as the reader types, apart from the sidebar's", async () => {
+		const { page, close } = await openPage('/2021/11/30/no-such-post/');
+		try {
+			page.setDefaultTimeout(10_000);
+			const box = page.locator('main [role="search"]');
+			await box.locator('input').fill('電磁筆');
+			const found = box.locator('a[href]');
+			await found.first().waitFor();
+
+			expect(decodeURI(await found.first().evaluate((link) => (link as HTMLAnchorElement).pathname))).toBe(
+				'/2021/11/30/電子紙閱讀器使用心得/',
+			);
+			// The sidebar's search box is another one: it stays empty.
+			expect(await page.locator('aside #search input').inputValue()).toBe('');
+			expect(await page.locator('aside #search a[href]').count()).toBe(0);
+		} finally {
+			await close();
+		}
+	}, BROWSER_TEST_TIMEOUT);
 });
 
 describe('images', () => {
@@ -1888,38 +1945,137 @@ describe('SEO head', () => {
 		});
 	});
 
-	it('every kind of page counts its visit in the GA4 property of the WordPress site, G-NWNYVH87N4', async () => {
-		const browser = await chromium.launch();
-		try {
-			const context = await browser.newContext();
-			// Google's script is not loaded for real: only that the page asks for it.
+	describe('GA4', () => {
+		let browser: Browser | undefined;
+
+		beforeAll(async () => {
+			browser = await chromium.launch();
+		}, 60_000);
+
+		afterAll(async () => {
+			await browser?.close();
+		});
+
+		/**
+		 * A browser in which the built site is at `origin`: the local server
+		 * answers for it. Google's script is not loaded for real: every other
+		 * site answers with an empty script, and the requests are recorded.
+		 */
+		async function siteAt(origin: string) {
+			const context = await browser!.newContext();
 			const outside: string[] = [];
+			const errors: Error[] = [];
 			await context.route(
-				(url) => url.origin !== server!.url,
-				(route) => {
-					outside.push(route.request().url());
+				() => true,
+				async (route) => {
+					const url = new URL(route.request().url());
+					if (url.origin === server!.url) {
+						return route.continue();
+					}
+					if (url.origin === origin) {
+						// Redirects not followed here: the browser follows them, at `origin`.
+						const local = new URL(url.pathname + url.search, server!.url).href;
+						return route.fulfill({ response: await route.fetch({ url: local, maxRedirects: 0 }) });
+					}
+					outside.push(url.href);
 					return route.fulfill({ contentType: 'text/javascript', body: '' });
 				},
 			);
 			const page = await context.newPage();
-			const paths = ['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'];
-			const configs: Record<string, unknown> = {};
-			for (const path of paths) {
-				await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
-				// What the page told gtag.js: its commands, queued in dataLayer.
-				configs[path] = await page.evaluate(() =>
-					((window as unknown as { dataLayer?: IArguments[] }).dataLayer ?? [])
-						.map((command) => Array.from(command))
-						.filter(([name]) => name === 'config'),
-				);
-			}
-
-			expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
-			expect(outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
-		} finally {
-			await browser.close();
+			page.on('pageerror', (error) => errors.push(error));
+			return {
+				/** The other sites' URLs the pages requested. */
+				outside,
+				/** Uncaught errors of the pages' scripts. */
+				errors,
+				/** Opens `path` at `origin`; returns what it told gtag.js, the commands queued in dataLayer, if any. */
+				async open(path: string, { referer }: { referer?: string } = {}) {
+					await page.goto(new URL(path, origin).href, { waitUntil: 'load', referer });
+					return page.evaluate(() =>
+						(window as unknown as { dataLayer?: IArguments[] }).dataLayer?.map((command) => Array.from(command)),
+					);
+				},
+				async close() {
+					// Images may still be loading through route.fetch().
+					await context.unrouteAll({ behavior: 'ignoreErrors' });
+					await context.close();
+				},
+			};
 		}
-	}, 60_000);
+
+		it('every kind of page on aniya.moe counts its visit in the GA4 property of the WordPress site, G-NWNYVH87N4', async () => {
+			const site = await siteAt('https://aniya.moe');
+			try {
+				const paths = ['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'];
+				const configs: Record<string, unknown> = {};
+				for (const path of paths) {
+					configs[path] = (await site.open(path))?.filter(([name]) => name === 'config');
+				}
+
+				expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
+				expect(site.outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
+				expect(site.errors).toEqual([]);
+			} finally {
+				await site.close();
+			}
+		}, 60_000);
+
+		// For finding old URLs that still need a redirect (ticket 21).
+		it('the 404 page tells GA4 which URL was asked for, and the page linking to it: a page_not_found event', async () => {
+			const site = await siteAt('https://aniya.moe');
+			try {
+				const events = async (path: string, referer?: string) =>
+					(await site.open(path, { referer }))?.filter(([name]) => name === 'event');
+
+				// The URLs as the browser has them, percent-encoded.
+				expect(await events('/2021/11/30/不存在的文章/?from=link', 'https://aniya.moe/2021/11/30/電子紙閱讀器使用心得/')).toEqual([
+					[
+						'event',
+						'page_not_found',
+						{
+							page_location: encodeURI('https://aniya.moe/2021/11/30/不存在的文章/?from=link'),
+							page_referrer: encodeURI('https://aniya.moe/2021/11/30/電子紙閱讀器使用心得/'),
+						},
+					],
+				]);
+				// Typed in, or from a bookmark: no referrer.
+				expect(await events('/no-such-page/')).toEqual([
+					['event', 'page_not_found', { page_location: 'https://aniya.moe/no-such-page/' }],
+				]);
+				expect(await events('/2021/11/30/電子紙閱讀器使用心得/')).toEqual([]);
+				expect(site.errors).toEqual([]);
+			} finally {
+				await site.close();
+			}
+		}, 60_000);
+
+		// Visits to a preview deployment, or to the site run locally, are not
+		// readers' visits: they would count in the same GA4 property.
+		it('pages on any other host send nothing to GA4: a preview URL, a local server', async () => {
+			for (const origin of ['https://aniya-moe.example.workers.dev', server!.url]) {
+				const site = await siteAt(origin);
+				try {
+					for (const path of ['/', '/2021/11/30/電子紙閱讀器使用心得/', '/no-such-page/']) {
+						expect(await site.open(path), `${origin}${path}`).toBeUndefined();
+					}
+					// Posts load giscus, for their comments.
+					expect(site.outside.filter((url) => /\.google/.test(new URL(url).hostname)), origin).toEqual([]);
+					expect(site.errors, origin).toEqual([]);
+				} finally {
+					await site.close();
+				}
+			}
+		}, 60_000);
+	});
+
+	// It is served at every unknown URL; WordPress's 404 page had no canonical
+	// URL either (aniya.moe, 2026-10-24).
+	it.each(['/no-such-page/', '/2021/11/30/no-such-post/'])('the 404 page at %s names no canonical URL', async (path) => {
+		const html = parse(await (await get(path)).text());
+
+		expect(html.querySelector('head link[rel="canonical"]')?.getAttribute('href')).toBeUndefined();
+		expect(html.querySelector('head meta[property="og:url"]')?.getAttribute('content')).toBeUndefined();
+	});
 
 	it('link previews on X are summary cards, as on WordPress', async () => {
 		for (const path of ['/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/']) {

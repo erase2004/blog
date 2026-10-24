@@ -6,7 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
-import { NOT_FOUND_PROBE_URL, SITE_ORIGIN } from './settings.ts';
+import { NOT_FOUND_PAGE_URL, NOT_FOUND_PROBE_URL, SITE_ORIGIN } from './settings.ts';
 
 export type ExpectedUrl = {
 	/** Path (plus query string, if any), with non-ASCII characters as UTF-8, e.g. `/category/技術/`. */
@@ -48,6 +48,7 @@ export function loadExpectedUrls({
 	};
 
 	add({ url: NOT_FOUND_PROBE_URL, expect: 'not-found' }, 'url checker');
+	add({ url: NOT_FOUND_PAGE_URL, expect: 'not-found' }, 'url checker');
 	for (const entry of fromSitemapSnapshot(sitemapDir)) add(entry, 'sitemap snapshot');
 	if (mappingTableFile !== undefined && existsSync(mappingTableFile)) {
 		for (const entry of fromMappingTable(mappingTableFile)) add(entry, mappingTableFile);
