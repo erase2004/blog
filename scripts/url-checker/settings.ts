@@ -29,6 +29,12 @@ export const PENDING_LIST_FILE = 'scripts/url-checker/pending.txt';
 export const NOT_FOUND_PROBE_URL = '/url-checker/no-such-page/';
 
 /**
+ * The title of the site's 404 page, which every URL that must not exist
+ * answers with (besides HTTP 404).
+ */
+export const NOT_FOUND_PAGE_TITLE = '找不到頁面 - TsukiStudio';
+
+/**
  * What a request for a non-ASCII path written with lowercase percent-encoding
  * (`/category/%e6%8a%80%e8%a1%93/`, the form WordPress used in canonicals and
  * links) must get. OPEN QUESTION, to be settled on the preview URL in ticket 19:

@@ -46,6 +46,20 @@ function page(
 `;
 }
 
+/** A 404 page with this title and robots meta tag. */
+function notFoundPage({ title, robots }: { title: string; robots: string | null }): string {
+	return `<!doctype html>
+<html lang="zh-TW">
+	<head>
+		<meta charset="utf-8" />
+		<title>${title}</title>
+		${robots === null ? '' : `<meta name="robots" content="${robots}" />`}
+	</head>
+	<body><h1>${title}</h1></body>
+</html>
+`;
+}
+
 const fixtureSite: Record<string, string> = {
 	'index.html': page('/'),
 	'ok/index.html': page('/ok/'),
@@ -65,7 +79,11 @@ const fixtureSite: Record<string, string> = {
 	'img/new.png': 'not really a PNG',
 	'img/new.webp': 'not really a webp',
 	'robots.txt': 'User-agent: *\n',
-	'404.html': '<!doctype html><title>404</title>',
+	'404.html': notFoundPage({ title: '找不到頁面 - TsukiStudio', robots: 'noindex' }),
+	// Workers static assets serve the nearest 404.html up the tree: below
+	// these folders, other 404 pages than the site's.
+	'elsewhere/404.html': notFoundPage({ title: 'Not Found', robots: 'noindex' }),
+	'indexable/404.html': notFoundPage({ title: '找不到頁面 - TsukiStudio', robots: null }),
 	_redirects: [
 		'/ok /ok/ 301',
 		'/wrong-canonical /wrong-canonical/ 301',
@@ -87,6 +105,9 @@ const fixtureSite: Record<string, string> = {
 		'/wp-content/uploads/old.png /img/new.png 301',
 		'/wp-content/uploads/dangling.png /img/missing.png 301',
 		'/wp-content/uploads/video.mp4 https://media.aniya.moe/videos/a/video.mp4 301',
+		// Proxy rules: served as the other path is.
+		'/proxied/ /ok/ 200',
+		'/proxied-to-nothing/ /nowhere/ 200',
 		// Dynamic rules come last; Workers try them after all static rules.
 		'/tag/:tag/feed/ /tag/:tag/ 301',
 		'/archive/* /ok/ 301',
@@ -268,6 +289,16 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 		expect(outcomes(report)).toEqual({ '/tag/中文/feed/': 'pass', '/archive/2021/09/': 'pass' });
 	});
 
+	it('follows _redirects proxy (200) rules: the URL answers as the path it is proxied to', async () => {
+		const report = await check([
+			{ url: '/proxied/', expect: 'file' },
+			{ url: '/proxied-to-nothing/', expect: 'not-found' },
+			{ url: '/proxied-to-nothing/', expect: 'file' },
+		]);
+
+		expect(report.results.map(({ outcome }) => outcome)).toEqual(['pass', 'pass', 'fail']);
+	});
+
 	it('passes a 301 with no given location only when its target answers 200', async () => {
 		const report = await check([
 			{ url: '/wp-content/uploads/old.png', expect: 'redirect' },
@@ -293,7 +324,7 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 		expect(outcomes(report)).toEqual({ '/robots.txt': 'pass', '/sitemap.xml': 'fail' });
 	});
 
-	it('passes a URL that must not exist when it answers 404', async () => {
+	it('passes a URL that must not exist when it answers 404 with the 404 page', async () => {
 		const report = await check([
 			{ url: '/no-such-page/', expect: 'not-found' },
 			{ url: '/ok/', expect: 'not-found' },
@@ -302,6 +333,22 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 		expect(report.results).toEqual([
 			{ url: '/no-such-page/', outcome: 'pass', problems: [] },
 			{ url: '/ok/', outcome: 'fail', problems: ['expected HTTP 404, got 200'] },
+		]);
+	});
+
+	it('fails a URL that answers 404 with another page than the 404 page, or with a 404 page search engines may index', async () => {
+		const report = await check([
+			{ url: '/elsewhere/missing/', expect: 'not-found' },
+			{ url: '/indexable/missing/', expect: 'not-found' },
+		]);
+
+		expect(report.results).toEqual([
+			{
+				url: '/elsewhere/missing/',
+				outcome: 'fail',
+				problems: ['expected the 404 page, titled "找不到頁面 - TsukiStudio"; got "Not Found"'],
+			},
+			{ url: '/indexable/missing/', outcome: 'fail', problems: ['the 404 page is not noindex'] },
 		]);
 	});
 

@@ -81,16 +81,18 @@ export function buildOutput(dir: string): Target {
 			});
 
 			const rule = matchRedirect(redirects, url.pathname);
-			if (rule) {
+			if (rule && rule.status !== 200) {
 				return reply(rule.status, redirectLocation(rule.to, url));
 			}
-			const decodedPath = decodePath(url.pathname);
+			// A proxy (200) rule answers with whatever the path it names has.
+			const pathname = rule ? new URL(rule.to, url).pathname : url.pathname;
+			const decodedPath = decodePath(pathname);
 			const intent = forceTrailingSlash(decodedPath, exists);
 			if (!intent) {
 				return reply(404);
 			}
 			const destination = encodePath(intent.redirect ?? decodedPath);
-			if (intent.redirect !== null || destination !== url.pathname) {
+			if (intent.redirect !== null || destination !== pathname) {
 				return reply(307, destination + url.search);
 			}
 			return reply(intent.asset.status, null, intent.asset.file);
@@ -145,13 +147,12 @@ function parseRedirects(text: string): Redirects {
 		if (tokens.length < 2 || tokens.length > 3) continue;
 		const [from, to, status = '302'] = tokens as [string, string, string?];
 		if (!from.startsWith('/') || !PERMITTED_STATUSES.has(Number(status))) continue;
-		if (status === '200') {
-			throw new Error(`_redirects: proxy (200) rules are not simulated: ${line}`);
-		}
 		const source = normalizePath(from);
 		if (seen.has(source)) continue;
 		seen.add(source);
 		const absolute = /^https:\/\/+(?<host>[^/]+)\/?(?<path>.*)/.exec(to);
+		// Wrangler skips proxy rules to other sites.
+		if (status === '200' && absolute) continue;
 		const rule = {
 			to: absolute
 				? `https://${absolute.groups!.host}${normalizePath(absolute.groups!.path!, true)}`
