@@ -28,7 +28,6 @@
 /2025/12/05/2025-koebitai/feed/
 
 /2026/01/23/acgn-museum-ssg/feed/
-/2026/01/23/從-ssr-到-ssg：acgn-股市歷史博物館-7-萬頁靜態化的實戰轉型/
 
 
 
@@ -36,26 +35,19 @@
 /about/contact/feed/
 /about/feed/
 
-/addl-sitemap.xml
 
-/author/erase2004/
 
-/category-sitemap.xml
 
 /category/技術/feed/
 /category/旅遊/feed/
 /category/閒聊/feed/
 
-/comments/feed/
 
 
-/page-sitemap.xml
 
 /policy/feed/
 
-/post-sitemap.xml
 
-/post_tag-sitemap.xml
 
 
 
@@ -120,4 +112,3 @@
 /tag/鳴門/feed/
 
 
-/wp-sitemap.xml

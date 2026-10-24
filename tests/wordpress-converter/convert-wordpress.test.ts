@@ -314,6 +314,18 @@ describe('the old-URL mapping table', () => {
 		);
 	});
 
+	// The sitemaps AIOSEO's sitemap index (/sitemap.xml) listed: sitemap snapshot, 2026-10-24.
+	it('keeps AIOSEO’s sitemap index URL for the sitemap, and redirects the sitemaps it listed there', () => {
+		expect(urlsOf()).toEqual(
+			expect.arrayContaining([
+				{ url: '/sitemap.xml', expect: 'file' },
+				...['/addl-sitemap.xml', '/post-sitemap.xml', '/page-sitemap.xml', '/category-sitemap.xml', '/post_tag-sitemap.xml'].map(
+					(url) => ({ url, expect: 'redirect', location: '/sitemap.xml' }),
+				),
+			]),
+		);
+	});
+
 	// AIOSEO made it on the WordPress site (seen there on 2026-10-24).
 	it('keeps llms.txt', () => {
 		expect(urlsOf()).toContainEqual({ url: '/llms.txt', expect: 'file' });
