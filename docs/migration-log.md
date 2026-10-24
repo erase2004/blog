@@ -230,6 +230,7 @@ npm run check-urls -- build --prune-pending   # 順便把已經通過的網址�
 - **推送（2026-10-25）**：站長一開始決定先不推，code review 修正合併之後才推上 `main` 與 `feature/wordpress-migration`。分支依 Conventional Branch 的命名規則，從 `wordpress-migration` 改成 `feature/wordpress-migration`。repo 是公開的，推送前掃過整段歷史，沒有 token、金鑰、密碼雜湊或 SQL 備份；出現的 email 只有聯絡方式頁面上本來就公開的地址。推送用的是 gh 的憑證（`git -c credential.helper=… push`），沒有改全域的 git 設定。04 號 CI/CD 可以開始了。
 - 安裝 gh CLI 2.103.2，用 `gh auth login --web` 登入。踩到的坑：Claude Code 的 `!` 指令跑在 bash，PowerShell 的 `& "路徑"` 寫法會出現語法錯誤，要改寫成 `"/c/Program Files/GitHub CLI/gh.exe"`。
 - GitHub Secrets 設了 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`。
+- **保護 `main`（2026-10-25）**：用 `gh api` 建立 ruleset `protect-main`，對象是預設分支，沒有任何人能繞過。規則有三條：不能刪除、不能 force push、合併前必須經過 PR（Required approvals 設成 0，因為 GitHub 不允許核准自己的 PR）。之後 `main` 只能從 PR 合併，本機不能再直接推。04 號的 CI 做好之後，要在同一個 ruleset 加上 Require status checks。
 
 ### Cloudflare
 
