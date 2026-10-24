@@ -27,4 +27,17 @@ describe('post HTML for feeds', () => {
 		expect(html.querySelector('figcaption')?.text).toBe('對照');
 		expect(html.toString()).not.toContain('img-comparison-slider');
 	});
+
+	// The W3C Feed Validator takes a bare & in HTML for a broken entity.
+	it('keeps the & of a URL it makes absolute escaped', () => {
+		const html = feedHtml('<a href="/search/?c=shop&amp;pk=1">店</a>', { postUrl: POST_URL, idPrefix: 'post-1-' });
+
+		expect(html).toBe('<a href="https://aniya.moe/search/?c=shop&amp;pk=1">店</a>');
+	});
+
+	it('leaves out inline styles, which only set the site stylesheet’s variables', () => {
+		const html = forFeed('<ul><li style="--ratio: 1.1665"><img src="/a.webp" alt=""></li></ul><span style="--0:#F97583">const</span>');
+
+		expect(html.querySelectorAll('[style]')).toHaveLength(0);
+	});
 });

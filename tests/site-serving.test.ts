@@ -999,10 +999,7 @@ describe('feeds', () => {
 		for (const item of (await rss()).channel.item) {
 			const { links, images } = urlsIn(parseHtml(item['content:encoded']));
 
-			// Fragment links (footnotes) stay within the item.
-			const relative = [...links.filter((link) => !link.startsWith('#')), ...images].filter(
-				(url) => !/^(https?|mailto):/.test(url),
-			);
+			const relative = [...links, ...images].filter((url) => !/^(https?|mailto):/.test(url));
 			expect(relative, item.link).toEqual([]);
 			expect(images.length + links.length, item.link).toBeGreaterThan(0);
 			for (const url of [...links, ...images].filter((url) => url.startsWith('https://aniya.moe/'))) {
@@ -1025,28 +1022,32 @@ describe('feeds', () => {
 	}, 120_000);
 
 	// A reader may show several items on one page: footnote 1 of one post must
-	// not jump to footnote 1 of another.
-	it('/feed/ items share no element IDs, and their fragment links stay within the item', async () => {
+	// not be footnote 1 of another. Readers resolve links within an item
+	// differently (against the item's URL, the feed's, or not at all); a link
+	// to the footnote on the post page works in all of them.
+	it('/feed/ items share no element IDs, and their footnote links go to the footnotes on the post page', async () => {
 		const seen = new Map<string, string>();
 		const shared: string[] = [];
-		let fragmentLinks = 0;
+		const missing: string[] = [];
+		let footnoteLinks = 0;
 		for (const item of (await rss()).channel.item) {
 			const html = parseHtml(item['content:encoded']);
-			const ids = html.querySelectorAll('[id]').map((element) => element.id);
-			for (const id of ids) {
+			for (const id of html.querySelectorAll('[id]').map((element) => element.id)) {
 				if (seen.has(id)) shared.push(`${id} (${seen.get(id)}, ${item.link})`);
 				seen.set(id, item.link);
 			}
-			const targets = urlsIn(html)
-				.links.filter((link) => link.startsWith('#'))
-				.map((link) => decodeURIComponent(link.slice(1)));
-			expect(targets.filter((target) => !ids.includes(target)), item.link).toEqual([]);
-			fragmentLinks += targets.length;
+			const page = parseHtml(await (await get(new URL(item.link).pathname)).text());
+			for (const link of html.querySelectorAll('a[href*="#"]').map((a) => new URL(a.getAttribute('href')!))) {
+				if (link.origin + link.pathname !== item.link) continue;
+				footnoteLinks++;
+				if (!page.getElementById(decodeURIComponent(link.hash.slice(1)))) missing.push(link.href);
+			}
 		}
 
 		expect(shared).toEqual([]);
+		expect(missing).toEqual([]);
 		// The footnotes of 2025-koebitai, at least.
-		expect(fragmentLinks).toBeGreaterThan(4);
+		expect(footnoteLinks).toBeGreaterThan(4);
 	});
 
 	// Feed readers run no scripts and load no stylesheets of the site.
@@ -1069,7 +1070,7 @@ describe('feeds', () => {
 		expect(link?.querySelector('img')?.getAttribute('src')).toBe('https://i.ytimg.com/vi/x3_Pcru8SS8/hqdefault.jpg');
 		expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
 		expect(html.querySelector('.expressive-code pre')?.text).toContain("const routes = [{ path: '/nested' }]");
-		expect(html.querySelector('sup > a')?.getAttribute('href')).toBe('#post-mdx-user-content-fn-1');
+		expect(html.querySelector('sup > a')?.getAttribute('href')).toBe('https://aniya.moe/converted/mdx/#user-content-fn-1');
 		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
 
