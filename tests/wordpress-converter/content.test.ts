@@ -416,16 +416,8 @@ describe('images', () => {
 });
 
 describe('blocks left for later tickets', () => {
-	// One of each kind the backup has; converted by tickets 09 and 10.
+	// One of each kind the backup has; converted by ticket 10.
 	const blocks = {
-		'core/gallery': `<!-- wp:gallery {"linkTo":"none","align":"center"} -->
-<figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":500,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/岡山駅前桃太郎像-神推-1024x576.jpg" alt="桃太郎像" class="wp-image-500"/></figure>
-<!-- /wp:image --><figcaption class="blocks-gallery-caption wp-element-caption">原本要拍的桃太郎像</figcaption></figure>
-<!-- /wp:gallery -->`,
-		'envira/envira-gallery': `<!-- wp:envira/envira-gallery {"galleryId":572,"title":"直島 \\u0026#8211; イワタコンフェクト","columns":"0","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_081608666-scaled.jpg","title":"店家外面的照片","id":571}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='572']</div>
-<!-- /wp:envira/envira-gallery -->`,
 		'jetpack/image-compare': `<!-- wp:jetpack/image-compare {"imageBefore":{"id":1237,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/minato-2.jpg?ssl=1","alt":"","width":1200,"height":675},"imageAfter":{"id":562,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250421_084628.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 裡的鳥白島的港口"} -->
 <figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1237" src="https://aniya.moe/wp-content/uploads/2025/05/minato-2.jpg" alt="" width="1200" height="675" class="image-compare__image-before"/><img id="562" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250421_084628.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 裡的鳥白島的港口</figcaption></figure>
 <!-- /wp:jetpack/image-compare -->`,
