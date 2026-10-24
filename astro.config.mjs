@@ -6,6 +6,7 @@ import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
 import imageRedirects from './src/integrations/image-redirects';
 import mediaRedirects from './src/integrations/media-redirects';
+import pagefindIndex from './src/integrations/pagefind';
 import redirectsBudget from './src/integrations/redirects-budget';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
 import { contentImageSizes } from './src/lib/image-sizes';
@@ -49,6 +50,7 @@ export default defineConfig({
 		mediaRedirects(),
 		trailingSlashRedirects(),
 		imageRedirects(),
+		pagefindIndex(),
 		redirectsBudget(),
 	],
 });

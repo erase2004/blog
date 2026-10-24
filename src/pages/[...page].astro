@@ -17,7 +17,7 @@ const { Content } = await render(page);
 ---
 
 <BaseLayout title={`${page.data.title} - ${SITE_TITLE}`} description={page.data.description}>
-	<article>
+	<article data-pagefind-body>
 		<h1>{page.data.title}</h1>
 		<div class="prose">
 			<Content />
