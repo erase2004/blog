@@ -415,17 +415,9 @@ describe('images', () => {
 	});
 });
 
-describe('blocks left for later tickets', () => {
-	// One of each kind the backup has; converted by ticket 09.
+describe('blocks no rule converts', () => {
+	// No rule converts quotes: the site has none.
 	const blocks = {
-		'core/gallery': `<!-- wp:gallery {"linkTo":"none","align":"center"} -->
-<figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":500,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/岡山駅前桃太郎像-神推-1024x576.jpg" alt="桃太郎像" class="wp-image-500"/></figure>
-<!-- /wp:image --><figcaption class="blocks-gallery-caption wp-element-caption">原本要拍的桃太郎像</figcaption></figure>
-<!-- /wp:gallery -->`,
-		'envira/envira-gallery': `<!-- wp:envira/envira-gallery {"galleryId":572,"title":"直島 \\u0026#8211; イワタコンフェクト","columns":"0","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250421_081608666-scaled.jpg","title":"店家外面的照片","id":571}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='572']</div>
-<!-- /wp:envira/envira-gallery -->`,
 		'core/quote': `<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>No rule converts quotes: the site has none.</p></blockquote>
 <!-- /wp:quote -->`,

@@ -8,6 +8,7 @@
 //   <Compare before={frame} after={photo}>動畫中出現的公車站</Compare>
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import { CONTENT_IMAGE_SIZES } from '../lib/image-sizes';
 
 interface Props {
 	/** Left of the divider: in the travel posts, the frame from the anime. */
@@ -21,9 +22,8 @@ const { before, after } = Astro.props;
 // The slider takes the shape of the before image, as WordPress's (Jetpack's
 // Juxtapose) did; the after image fills the same frame.
 const shape = `--compare-aspect-ratio: ${before.width} / ${before.height}`;
-// The images are as wide as the post's column: at most 728px beside the
-// sidebar, about the screen's width without it (src/styles/global.css).
-const sizes = '(min-width: 64rem) 728px, 100vw';
+// The images are as wide as the post's column.
+const sizes = CONTENT_IMAGE_SIZES;
 ---
 
 <figure class="compare">

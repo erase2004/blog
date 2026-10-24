@@ -11,6 +11,8 @@ draft: false
 wordpressId: 1797
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 經歷五、六月兩次短暫住院，期間持續回診追蹤檢查，大致確定了健康問題的原因，所幸是類似體質或慢性病方面，而非癌症腫瘤，經過這一段折騰，也讓我更加注重自己的生命，加緊去實現一些尚未完成的目標，其中包含了異國生活體驗，由於我本身就蠻喜歡日本香川這個地方，又今年已經去了瀨戶內藝術祭春會期，加上 2019 年已經去過的秋會期，藝術祭只剩下夏會期還沒去過，況且今年夏會期增加了新的區域，使我對其更感興趣，在閱讀了瀨戶內藝術祭志工團[^1]今年所出版的書[^2]後，綜合起來考量後，我決定在夏會期期間擔任為期將近一個月的小蝦隊志工，除了參加夏會期，同時也增加在日本生活的經驗。
 
 用 e-mail 訂閱小蝦隊的電子報[^3]，並且藉由官網上的連結報名了宿舍後，活動時的住宿和任務的安排基本上就交給小蝦隊事務局來處理。
@@ -247,11 +249,13 @@ wordpressId: 1797
 <figcaption>お盆休み後，志工人數大幅減少，非常缺人的情景</figcaption>
 </figure>
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1832,"title":"島上的生物們","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-12-scaled.jpg","title":"在顧攤時，闖進來並躺在入口處的島貓","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-12-scaled.jpg","alt":"","caption":"","thumb":"","id":1828,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-13-scaled.jpg","title":"在路上遇到的雞","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-13-scaled.jpg","alt":"","caption":"","thumb":"","id":1829,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-14-scaled.jpg","title":"島廚房附近發現蜈蚣","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-14-scaled.jpg","alt":"","caption":"","thumb":"","id":1830,"height":145.6140350877193,"width":193.7}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1832']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/2025-koebitai/photo-12.jpg'), caption: '在顧攤時，闖進來並躺在入口處的島貓' },
+		{ src: import('../../assets/images/2025-koebitai/photo-13.jpg'), caption: '在路上遇到的雞' },
+		{ src: import('../../assets/images/2025-koebitai/photo-14.jpg'), caption: '島廚房附近發現蜈蚣' },
+	]}
+/>
 
 <figure>
 

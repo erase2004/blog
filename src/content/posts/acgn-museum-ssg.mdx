@@ -11,6 +11,8 @@ draft: false
 wordpressId: 1854
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 本文記錄 [ACGN 股市歷史博物館](https://museum.acgn-stock.com/)從 SSR 架構轉型為 SSG 的完整過程，使用 Astro 建構靜態頁面，搭配 React、Firestore 與 CDN 快取策略，成功將近 7 萬頁內容靜態化。過程中包含資料結構跨賽季差異處理、HTML 體積控制、虛擬捲動體驗提昇、Build 時間改善等實務挑戰，同時大幅降低伺服器營運成本並提升頁面載入表現。
 
 一切的開頭是將近八年前的[提案](https://museum.acgn-stock.com/round1/ruleDiscuss/view/edT83mJR9iRhnwaCc/)。
@@ -261,11 +263,12 @@ Tip: react-virtuoso 可以藉由 *totalListHeightChanged* 的參數，來[實現
 
 提昇歷史博物館的功能，與股票市場做區隔。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":1877,"title":"ACGN 歷史博物館 \u0026#8211; 公司頁效能對照","columns":"2","row_height":150,"margins":"custom","lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2026/01/company-ssr.png","title":"股票市場公司頁","link":"https://aniya.moe/wp-content/uploads/2026/01/company-ssr.png","alt":"股票市場公司頁的 PageSpeed Insights 測試結果","caption":"","thumb":"","id":1878,"height":841,"width":981},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2026/01/company-ssg.png","title":"歷史博物館公司頁","link":"https://aniya.moe/wp-content/uploads/2026/01/company-ssg.png","alt":"歷史博物館公司頁的 PageSpeed Insights 測試結果","caption":"","thumb":"","id":1879,"height":842,"width":974}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='1877']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/acgn-museum-ssg/company-ssr.png'), alt: '股票市場公司頁的 PageSpeed Insights 測試結果', caption: '股票市場公司頁' },
+		{ src: import('../../assets/images/acgn-museum-ssg/company-ssg.png'), alt: '歷史博物館公司頁的 PageSpeed Insights 測試結果', caption: '歷史博物館公司頁' },
+	]}
+/>
 
 1.
 

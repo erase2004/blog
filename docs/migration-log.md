@@ -860,3 +860,84 @@ import compare1Before from '../../assets/images/travel-setonaikai-2025-day2/ydmk
 core/gallery: 3 in 3 files
 envira/envira-gallery: 83 in 10 files
 ```
+
+## 09：相簿 `<Gallery>`（2026-10-24）
+
+### 來源資料
+
+- **Envira 相簿**：83 個，在 10 篇文章裡，共 509 張圖。ticket 指定圖片清單取自 block 的 JSON（`<!-- wp:envira/envira-gallery {…"images":[…]} -->`）；block 的 HTML 只有 `[envira-gallery id='…']` 這個 shortcode，線上網站其實是用相簿自己的 postmeta（`_eg_gallery_data`，PHP serialize）產生畫面。兩邊逐一比對過：83 個相簿的張數、順序、`src`、`title`、`alt` 完全一致，所以照 ticket 用 block JSON。
+- 每張圖的 `title` 就是線上 lightbox 顯示的圖說（Envira 輸出成 `data-envira-caption`）。509 張**全部都有** `title`，而且都是站長寫的說明，沒有預設的檔名；`caption` 欄位全部是空的；`alt` 只有 acgn-museum-ssg 的 2 張有。相簿標題裡有 `&#8211;` 這種字元參照，一律解碼。
+- Envira 的版面設定：`columns: "0"`（justified：依原圖比例排成等高的列）、列高 140／150／200px、間距 8px；acgn-museum-ssg 那一個是 `columns: "2"`。lightbox 是 base 主題，每個相簿各自一組（`rel="enviragallery572"`），可以左右切換。
+- **Gutenberg 內建的 gallery block**：3 個，共 5 張圖：webpack 那篇（2 張，相簿下方有圖說）、前言（2 張 App 截圖，各自有圖說）、Day 1（1 張，相簿圖說含一個連結）。
+- 合計 86 個相簿、514 張圖。
+
+### 轉換器（`rules/gallery.ts`）
+
+轉出來長這樣：
+
+```mdx
+import Gallery from '../../components/Gallery.astro';
+
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-day2/20250421_081608666.jpg'), caption: '店家外面的照片' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-day2/20250421_081320309.jpg'), caption: '店家內部的照片，可以看到有 Summer Pockets 的週邊與繪圖' },
+	]}
+/>
+```
+
+- 圖片路徑用 06 號的 `imageSource()`，跟 Markdown 圖片一樣是相對於內容檔的路徑；共用的圖會指到它所在的那篇文章的資料夾。
+- **為什麼用 `import('…')`，而不是檔案開頭的 `import x from '…'`**（10 號的滑桿是後者）：Day 7 有 175 張相簿圖，寫成頂端 import 會有一百多行 import，內文只剩 `image37` 這種名字，逐篇人工檢查時看不出是哪張圖。`src` 直接寫 `import('…')` 是 Astro 文件裡的寫法（`getImage()` 會自己 await），路徑就在圖說旁邊，路徑打錯一樣在建置時失敗，也不會跟 10 號的 `compare<n>Before` 撞名。
+- `alt` 只在有寫、而且跟圖說不同時才寫出來；沒寫時元件用圖說當替代文字（線上 Envira 縮圖的 `alt` 是空的，只有 `title`）。
+- core gallery：每張圖的 `alt` 與圖說取自裡面的 `core/image` block；整個相簿的圖說寫在 `<Gallery>` 標籤中間，是 Markdown，連結保留下來。
+- 含相簿的文章全部是 `.mdx`（合併 10 號之後，這次新改成 MDX 的是 Day 1、Day 7、koebitai、acgn-museum-ssg、webpack 那篇）。
+- **未轉換標記全部清空**：重跑轉換器後沒有任何 `wp-unconverted` 標記。`[envira-gallery]` shortcode 單獨出現在文字裡的情況備份裡沒有，那條規則維持輸出標記。`content.test.ts` 的「留給之後的 ticket」清單只剩一個例子（沒有規則處理的 `core/quote`），改名成「沒有規則處理的 block」。
+
+### `<Gallery>` 元件（`src/components/Gallery.astro`）
+
+- **排版**：照 Envira 的 justified 版面，只用 CSS，不需要 JS。每張圖是一個 flex 項目：`flex: <寬高比> 1 calc(<寬高比> × 列高)`，同一列的圖分配剩下的寬度時跟寬高比成正比，所以同一列的圖一樣高、剛好填滿欄寬，**不裁切**。最後一列用一個 `flex-grow: 1000` 的 `::after` 吃掉剩下的空間，不會把最後兩三張拉得很大（Envira 用的 justifiedGallery 預設也是最後一列不拉齊）。列高桌機 9rem、手機（40rem 以下）6.5rem。Envira 各相簿各自的列高與那個 `columns: "2"` 沒有沿用，全部用同一種版面。
+- **縮圖**：每張用 Astro 的 `fixed` layout 做 1x、2x 兩種寬度（以 192px 高為準：最低列高 144px，再加上整列撐開的空間），不是原圖。
+- **lightbox**：PhotoSwipe 5.4.4（`photoswipe`）。每個相簿一組，可用箭頭按鈕、滑動、方向鍵切換，Esc 關閉，可以放大。核心程式在點下第一張時才載入（`pswpModule: () => import('photoswipe')`），頁面一開始只載入很小的 lightbox 程式。按鈕的說明文字改成中文；圖說是 PhotoSwipe 的自訂 UI 元素（`.pswp__caption`），顯示在畫面下方。
+- lightbox 的大圖是 `srcset`：1280px 寬一張（給手機）加上原圖寬度的 webp。**原圖寬度那張就是 06 號舊圖片網址的轉址目標**（`imageUrl()`），沒有多出一份全尺寸的檔案；沒有 JS 時，縮圖連結也是連到它。
+- **JS 只在有相簿的頁面載入**：Astro 只把元件的 `<script>` 放進有用到這個元件的頁面；列表頁只顯示摘要，不渲染內文。PhotoSwipe 的 CSS 也只在這些頁面。
+- 圖說只在 lightbox 裡顯示（跟 Envira 一樣），縮圖下方不顯示。core gallery 原本在頁面上就看得到的「每張圖的圖說」（前言的 2 張 App 截圖）現在也只在 lightbox 裡；整個相簿的圖說（Day 1、webpack 那篇）顯示在相簿下方。
+- 建置結果：12 篇文章、86 個相簿、514 張縮圖，每個相簿的張數都跟備份一致（測試逐篇比對）。
+- 截圖確認過桌機（1440px）與手機（390px）的相簿與 lightbox（不放進 repo）。
+
+### 內文圖片的 `sizes`（06 號留下的問題）
+
+- 06 號用 `image.layout: 'constrained'`，Astro 給的 `sizes` 是 `(min-width: 2560px) 2560px, 100vw`：螢幕比原圖窄時，瀏覽器以為圖片跟螢幕一樣寬，1920px 的桌機就下載 1920～2048px 寬的檔案，但內文欄最寬只有 728px。
+- 改法：`src/lib/image-sizes.ts` 的 `CONTENT_IMAGE_SIZES` 照 `global.css` 的版面寫出主欄寬度：`(max-width: 40rem) calc(100vw - 2rem), (max-width: 64rem) calc(100vw - 6.5rem), (max-width: 72rem) calc(100vw - 26.5rem), 45.5rem`（手機的左右留白；平板的外距加留白；側欄旁邊的留白、間距與側欄；紙面最寬 72rem）。**版面改了要一起改**，檔案的註解有寫。
+- 套用方式：一個 Sätteri 的 hast plugin（`contentImageSizes`，加在 `astro.config.mjs` 的 `satteri({ hastPlugins })`），在 Astro 處理圖片之前替 Markdown 的 `<img>` 加上 `sizes`。看過原始碼確認：使用者的 hast plugin 排在 Astro 的圖片處理之前；`.md` 的圖片屬性原封不動交給 `getImage()`，MDX 的變成 `<Image>` 的 props；`getImage()` 只在沒有 `sizes` 時才用預設值（`sizes ||= …`）。`sizes` 不算進檔名的 hash，所以轉址目標不變，也沒有多產生檔案。
+- 10 號的滑桿原本自己寫 `(min-width: 64rem) 728px, 100vw`；合併後改成同一個常數（在 64rem 以下它會高估：平板 820px 寬時欄寬其實是 716px）。
+- 效果：用建置結果的 `srcset` 與檔案大小、照 Chromium 的選圖規則，算全部 22 篇文章的 99 張內文圖一次載入的量：1920px 桌機 24.5 MB → 5.1 MB（少 79%）、1440px 桌機 18.7 MB → 5.1 MB（少 73%）、1280px 2x 筆電 32.0 MB → 12.5 MB（少 61%）、820px 2x 平板 18.7 MB → 12.5 MB（少 33%）；390px 3x 手機不變（本來就差不多是欄寬）。
+
+### MDX 文章裡的 Markdown 圖片：同一張圖被做了兩份
+
+- 改成 MDX 之後發現：MDX 裡的 Markdown 圖片由 Astro 的 `<Image>` 元件產生，它會自動加上 `fit: 'cover'` 與 `position: 'center'`，這兩個值會算進檔名的 hash。所以同一張圖在 `.mdx` 裡跟 `.md` 裡的檔名不同：每張內文圖多做一整套 webp（含全尺寸），而且**文章裡顯示的那張不是舊網址轉址過去的那張**（06 號的前提是兩者相同）。08 號的前言從那時就是這樣，10 號與這裡把另外 11 篇改成 MDX 後影響變大。
+- 改法：`src/components/MarkdownImage.astro` 用跟 `.md` 一樣的方式呼叫 `getImage()`，文章頁用 `<Content components={{ img: MarkdownImage }} />` 交給 MDX。現在 `.md` 與 `.mdx` 的內文圖片檔名一致，轉址目標就是文章裡的那張；測試加了一篇 MDX 文章的檢查（改之前是失敗的）。
+- 10 號的 `<Compare>` 直接用 `<Image>`，滑桿的圖一樣有 `fit`／`position`，所以滑桿顯示的檔案跟那兩張圖的轉址目標不同（轉址仍然正常，只是多一份檔案）。要不要統一留給 18 號或之後決定。
+
+### 測試
+
+- `tests/wordpress-converter/gallery.test.ts`：Envira block（取自備份的相簿 572 與 1877）轉成 `<Gallery>`：順序、圖說、`-scaled` 的檔名、`alt`；core gallery：每張的圖說與 `alt`、整個相簿的圖說（含連結）、共用圖指到前一篇的資料夾；輸出能編譯成 MDX。
+- `tests/site-serving.test.ts`（共用同一次建置）：
+  - 12 篇文章逐篇比對每個相簿的張數（期望值是備份裡的數字，共 514）；縮圖連到原圖寬度的 webp，也就是舊網址轉址的目標。
+  - Playwright 點開 Day 2 的第一張：lightbox 顯示這張照片與圖說，方向鍵右／左切到下一張／上一張（圖說跟著變），Esc 關閉。
+  - Day 2 載入的 JS 有 PhotoSwipe，〈Vue Router - Named Views〉沒有。
+  - 縮圖：1440px 1x 與 390px 3x 載入的檔案寬度在顯示寬度的 0.6～2 倍之間（不是 2560px 的原圖）。
+  - 內文圖片：06 號模擬選圖的測試改成在 Chromium 裡實際載入，6 種螢幕（1920、1440 的 1x；1280、820、360 的 2x；390 的 3x）載入的檔案寬度都在實際顯示寬度的 0.8～1.25 倍之間（或已經是最大／最小的那張）。改之前 1920px 與 1440px 會載入 1280px 寬的原圖。
+  - 舊網址轉到「文章裡顯示的那張圖」：原本的 `.md` 文章，再加一篇 `.mdx`（Day 2）。
+  - 用瀏覽器的測試逾時設成 60 秒（vitest 預設 5 秒，機器忙的時候不夠）。
+
+### 建置
+
+- 每張相簿圖多 3 個 webp：縮圖 1x、2x 共 1,028 個，lightbox 的 1280px 版 501 個（13 張原圖本來就不到 1280px 寬），合計 1,529 個；全尺寸那張是 06 號已經有的。建置輸出現在有 3,753 個 webp，離 Cloudflare 每次部署 20,000 個檔案的上限還很遠。
+- 時間：這台機器（16 執行緒）第一次產生這約 1,500 個檔案多花約 2 分半，之後從 `node_modules/.astro` 快取拿。04 號的 CI 更需要快取這個資料夾。`tests/site-serving.test.ts` 建置的逾時（600 秒）沒有改，完全沒有快取時要留意。
+
+### 留給其他 issue 的發現
+
+- 12：全文 RSS 若用 `render()` 渲染 MDX，記得傳 `components={{ img: MarkdownImage }}`，否則內文圖又會多做一份。feed 裡沒有 JS，相簿會是一串連到大圖的縮圖。
+- 13：Envira 的 463 張圖只有 `/?attachment_id=ID`（06 號記錄的），這次沒動。
+- 18：人工檢查時看一下相簿的版面與圖說位置；前言 2 張 App 截圖的圖說從頁面上移到 lightbox 裡。
+- 04：見上面的建置時間。
