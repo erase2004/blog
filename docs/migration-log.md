@@ -1396,3 +1396,69 @@ ticket 寫「1 個舊 slug 與 3 篇改過日期的文章」，但備份裡的 3
 - 04：`wrangler deploy` 現在會打包 `src/worker.ts`（它讀的是 repo 裡的對應表，不是 `dist`）；部署後的 HTTP 網址檢查會一起檢查 Worker。
 - 19：在預覽網址跑 HTTP 模式的網址檢查（883 個查詢字串網址），並確認正式環境的 `run_worker_first` 一樣只讓 `/` 進 Worker（Workers 的指標裡請求數應該只跟首頁的請求數相當）；動態規則對百分比編碼中文路徑（大寫與小寫）的比對也一起看。
 - 21：Worker 的請求數只來自首頁網址；如果接近每天 10 萬次的免費額度，要看是不是被大量打首頁。GA4 的 404 事件會記到 `/?p=…` 這類找不到的 ID。
+
+## Code review 修正
+
+2026-10-25，修正 code review 的 15 項發現，一項一個 commit。標題後面的數字是 review 的編號。
+
+### 對照滑桿的圖片就是舊網址轉過去的檔案（1）
+
+- `<Compare>` 原本用 Astro 的 `<Image>`。設定了 `image.layout: 'constrained'` 時，`<Image>` 會加上 `fit` 與 `position`，檔名的 hash 就跟著變：151 張滑桿圖片都另外做了一份，跟舊網址 301 過去的原寬 webp 不是同一個檔案（例如 Day 2 的 `ydmk705`：頁面上是 `…_13v1WJ.webp`，舊網址轉到 `…_Z1pdkmM.webp`），sitemap 列的則是頁面上沒有用到的檔案。09 號記過這個問題。
+- 改成跟 `MarkdownImage.astro` 一樣用 `getImage()`。151 張圖的原寬檔案現在就是轉址目標；`dist/_astro/` 少了 946 個、多了 795 個檔案（`fit`／`position` 那一份換成跟 Markdown 圖片一樣的各種寬度）。
+- 新測試（`tests/site/converted-content.test.ts`）：每張滑桿圖片 `srcset` 裡最寬的就是它的 `src`，而且是某個舊網址的轉址目標。原本的測試只比對 Markdown 圖片。
+
+### og:image 取讀者看到的第一張圖（4）
+
+- `firstImage()` 取原始檔裡出現的第一個圖片路徑。MDX 把滑桿的圖片 import 在檔案最前面，而且依名稱排序（`compare1After` 在 `compare1Before` 前面），所以文章的第一張圖是滑桿時，取到的會是分隔線右邊那張。
+- 現在依閱讀順序：import 的圖片算在元件用到它的位置（`before={compare1Before}`），Markdown 圖片與相簿的 `import('…')` 算在寫的位置。讀原始檔的部分移到 `src/lib/image-references.ts`（不依賴 Astro，測試可以直接載入）；`imagesIn()` 再濾掉不存在的圖片。
+- 目前沒有文章的 og:image 因此改變：有滑桿的文章都有自己的社群圖片。sitemap 列的圖片不變，只是有滑桿的文章裡，圖片改成閱讀順序。
+- 測試：`tests/image-references.test.ts`，fixture 是滑桿在 Markdown 圖片前面的 MDX（`tests/fixtures/compare-before-image.mdx`）。
+
+### 網址檢查對正式網域也檢查 www 與 HSTS（2）
+
+- HTTP 模式的 base 是 `https://aniya.moe` 時（`scripts/url-checker/settings.ts` 的 `PRODUCTION`），另外檢查：
+  - `https://www.aniya.moe/`、深層路徑 `/2021/09/30/第一篇文章/` 與 `/?p=30`，都要 301 到 aniya.moe 上的同一個網址（路徑與查詢字串都保留）。結果用完整網址列在報告裡，也可以放進待完成清單。
+  - 每個預期網址的回應都要有 `Strict-Transport-Security`，而且符合 HSTS preload 清單的要求：`max-age` 至少 31536000、`includeSubDomains`、`preload`（hstspreload.org）。aniya.moe 現在（WordPress，2026-10-25 查）送的是 `max-age=31536000; includeSubDomains; preload`，www 的轉址與 404 也有。
+- 其他 base（預覽網址、`wrangler dev`）不檢查這兩項。
+- 拿現在的 aniya.moe（還是 WordPress）試跑：HSTS、www 的 `/` 與深層路徑都通過；`https://www.aniya.moe/?p=30` 則直接 301 到文章（WordPress 自己處理 www），不是 `https://aniya.moe/?p=30`，所以不通過。**20 號建立 www 的 Redirect Rule 時要勾選保留查詢字串**，切換後就會通過。
+- 測試（`tests/url-checker/check-urls.test.ts`）：用兩個本機 HTTP server 代替 aniya.moe 與 www。轉址正確時通過；轉到首頁或用 302 時失敗；沒有 HSTS、少了 `preload` 或 `includeSubDomains`、`max-age` 太短都失敗；其他網址不檢查。
+
+### 少了結尾斜線的舊網址也轉址（3）
+
+- 靜態規則只比對完全相同的網址，所以作者頁、舊 slug、各頁的 `…/feed` 少了結尾斜線就是 404；WordPress 是先 301 補上斜線，再轉到目標。
+- `page-redirects.ts`（見下面的改名）為每個轉到站內固定網址的舊網址，多寫一條少斜線版本的靜態規則，直接轉到同一個目標（作者頁、`/comments/feed`、舊 slug，共 3 條）；feed 多一條動態規則 `/*/feed /:splat/ 301`，一樣在所有靜態規則之後。`/comments/feed` 有自己的靜態規則，不會被動態規則轉到不存在的 `/comments/`。
+- 網址檢查：轉到站內固定網址的舊網址（`location` 是站內路徑），少斜線的版本也要 301 到同一個 `location`，跟頁面一樣。對應表裡有 90 個（87 個 feed、作者頁、comments feed、舊 slug）。
+- **附件頁不做**：附件頁少了斜線仍然是 404。圖片的附件頁 306 個、影片與 PDF 9 個，共要 315 條靜態規則，但只剩 211 條的空間。網址檢查也不要求附件頁的少斜線版本（它們的 `location` 是建置後才知道的圖片，或 R2 上的檔案）。
+- `_redirects` 現在是 **1,789 條靜態規則、2 條動態規則**（上限 2,000／100）。
+
+### 測試的穩定性（5、6、7）
+
+- 回到頂部按鈕的 reduced-motion 測試（22、12 號都記過偶爾失敗）有兩種失敗方式：`waitForFunction()` 在頁面跳到頂端後馬上返回，跳轉的 scroll 事件還沒觸發，記錄是空的；或是往下捲之後頁面還在微調（例如圖片載入），點擊前就多記了一筆（這次實際遇到 `[2161, 0]`）。現在從點擊開始記錄（capture 階段的 click listener，比按鈕自己的處理早），回到頂端後再等下一個 frame 才讀記錄。
+- `wrangler dev` 的 port：原本先找一個空的 port、關掉，再交給 wrangler，同時啟動的測試檔可能拿到同一個。現在 server 與 inspector 都用 port 0，由系統在綁定時分配，再從 wrangler 的「Ready on」那一行讀出 port。同時啟動三個實測過，各自拿到不同的 port。
+- 轉換器 fixture 的 `meta_id` 原本是模組層級的計數器，值取決於之前的測試建立過幾筆；現在是那一筆內容（文章、key、值）的 hash，打亂測試順序也一樣。
+
+### 重構（8–12、15）
+
+- **`termPath()`**：分類與標籤的網址，放在 `postPath()`、`pagePath()` 旁邊；文章頁、彙整列表、彙整本身都用它。分類與標籤的彙整帶著自己的 ID，路由直接拿來當參數，不再從網址切出來。
+- **重複的只留一份**：feed 的作者用 `SITE_AUTHOR.name`；`SITE_ORIGIN` 放在 `src/consts.ts`，`astro.config.mjs` 的 `site`、網址檢查與轉換器的設定都從這裡拿；最後更新時間用 `lastUpdated()`（feed 的 `lastBuildDate`、sitemap 的彙整頁）；文章、頁面與 404 頁的 h1 共用 `global.css` 的 `.page-title`（頁面與 404 頁加 `.ruled` 的粗線）；分類與標籤的路由改成 `/category/[slug]/`、`/tag/[slug]/`，共用 `termArchiveRoutes()`；側欄的分類與年份清單合併成 `ArchiveList`（傳入彙整），刪掉 `CategoryList`、`YearList`。CSS 搬動後，在 Chromium 1280px 與 375px 寬比對過標題、側欄與內文的 computed style，都跟原本一樣。
+- **對應表只在一個地方讀**：`src/lib/old-url-map.ts` 用 `import … with { type: 'json' }` 讀進對應表（Node、Vite 與 wrangler 的 esbuild 都接受，Worker 也能用），提供各段的型別，以及 `expectedUrls()`、`mediaFiles()`（照舊檢查格式）、`oldUrlsOf()`、`permalinks()`、`attachmentFiles()`。三個寫 `_redirects` 的 integration、Worker、網址檢查與 R2 的上傳、檢查腳本都用它，`src/` 不再 import `scripts/` 的程式。`scripts/r2-media/media-table.ts` 刪除；對應表的路徑 `MAPPING_TABLE_FILE` 移到轉換器的 `convert.ts`（只有轉換器寫這個檔案）。網址檢查的 `loadExpectedUrls()` 改成直接收對應表，測試直接傳小的表。
+  - 代價：Worker 打包後從 223 KiB（gzip 20 KiB）變成 455 KiB（gzip 37 KiB）。13 號用 named import，esbuild 會丟掉用不到的 `urls` 段；預設 import 整份 JSON 就丟不掉，而 Node 不能 named import JSON。離 Workers 的大小上限還很遠。
+- **`_redirects` 的規則有型別**：`appendRedirects()` 收 `{ from, to, status }`（UTF-8 的路徑），自己用 `encodeURI()` 編碼；五個寫 `_redirects` 的 integration 都改成交規則物件。圖片規則的暫存頁改輸出 JSON；Astro 給的圖片網址已經編碼過，先 `decodeURI()` 再交出去。
+  - review 問到 `trailing-slash-redirects.ts` 沒用 `encodeURI()`、中文路徑寫成 UTF-8 是不是錯的：**不是**。Cloudflare 讀 `_redirects` 時，UTF-8 與百分比編碼都會正規化成大寫的編碼（03 號記錄的 asset worker 行為），網址檢查的建置模式（移植自那段程式）與 `wrangler dev` 都讓中文頁面少斜線的網址 301。現在這 33 條也寫成編碼的形式，跟其他規則一致；`_redirects` 其他的行一個字也沒變，兩種模式的網址檢查結果相同。`tests/redirects-file.test.ts` 用中文路徑測編碼。
+- **改名**：`oldUrlRedirects` → `pageRedirects`（`src/integrations/page-redirects.ts`）。每個寫 `_redirects` 的 integration 都在轉舊網址；這個負責的是對應表轉到站內頁面（或 feed、sitemap）的那些：舊 slug、作者頁、comments feed、舊 sitemap、各頁的 feed。圖片與影片、PDF 各有自己的 integration。
+- 刪掉 Astro 範本留下的註解（`src/consts.ts`、`BaseHead.astro` 開頭，以及每頁 HTML 裡的 `<!-- Global Metadata -->`）；`canonicalURL` 照檔案裡的命名改成 `canonicalUrl`；整理 `BaseLayout.astro` 的 import 順序。
+
+### 測試的結構（13、14）
+
+- 瀏覽器測試共用一個 Chromium（啟動時加 `--enable-smooth-scrolling`，回到頂部按鈕的測試要看捲動的過程），開頁面都用 `openPage()`（可以傳任何 context 選項，例如視窗大小、reduced motion、觸控、關掉 JavaScript），不再各自複製一份擋外站請求的 `context.route()`。GA4 的測試要讓 `https://aniya.moe` 由本機回答，保留自己的 route，但也用同一個瀏覽器。
+- `tests/site-serving.test.ts`（2,432 行、20 個 describe）依功能拆成 `tests/site/` 底下 10 個檔案：serving、404 頁、圖片、彙整、版型、搜尋、文章之後、轉換內容、feed 與 sitemap、SEO head。
+  - 同一個專案的兩次 Astro 建置同時跑會互相破壞（08 號記錄的坑），所以拆開後仍然只建置一次：`vitest.config.ts` 分成兩個 Vitest project。`site` project 的 `globalSetup`（`tests/site/global-setup.ts`）建置網站，啟動一個 `wrangler dev` 與一個 Chromium（`launchServer()`），用 `provide()` 交給各檔案；`tests/site/site.ts` 提供 `siteUrl`、`outDir`、`get()`、`openPage()`。只跑 `unit` project 的測試（例如 `npx vitest run tests/url-checker`）不會建置網站。
+  - `site` 的檔案一次跑一個（`fileParallelism: false`，Vitest 把它們排在其他測試之後）：它們共用同一個 server，網址檢查的上萬個請求會拖慢其他檔案有時間限制的檢查，回到頂部按鈕與滑桿的瀏覽器測試也對時間敏感。跟拆開前同一個檔案裡的跑法一樣。
+  - 代價：建置不再跟其他測試同時進行，整套測試從約 85 秒變成約 100 秒。
+  - 之後要用建置結果的測試：放進 `tests/site/` 的檔案、用 `site.ts`，不要自己再建置一次。
+
+### 數字
+
+- 測試：27 個檔案、414 個測試（原本 16 個檔案、402 個）。
+- `_redirects`：1,789 條靜態規則、2 條動態規則。
+- 待完成清單仍然是空的。網址檢查的建置模式 1,985 個通過、883 個查詢字串網址跳過；HTTP 模式（`npm run preview`）2,868 個全部通過。
