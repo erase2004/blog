@@ -1,6 +1,7 @@
 // A small WordPress site as the converter reads it from the backup: rows of
 // the tables it uses, taken from the real backup and trimmed. Each helper
 // fills in the columns a test does not care about.
+import { createHash } from 'node:crypto';
 import type { Row, Tables } from '../../scripts/wordpress-converter/sql-dump';
 
 type Values = Record<string, string | number | null>;
@@ -49,9 +50,18 @@ export function seo(values: Values): Row {
 	});
 }
 
-let metaId = 1;
+/**
+ * A row of post metadata. Its meta_id (WordPress's order of a post's
+ * metadata, which the converter keeps) comes from what the row holds, so the
+ * same call always makes the same row, whichever rows other tests made first.
+ */
 export const meta = (postId: number, key: string, value: string): Row =>
-	strings({ meta_id: metaId++, post_id: postId, meta_key: key, meta_value: value });
+	strings({
+		meta_id: createHash('sha256').update(JSON.stringify([postId, key, value])).digest().readUInt32BE(0),
+		post_id: postId,
+		meta_key: key,
+		meta_value: value,
+	});
 
 /** A value in PHP's serialize() format, the way WordPress stores array metadata; string lengths in bytes. */
 export function phpSerialize(value: unknown): string {
