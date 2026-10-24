@@ -942,6 +942,262 @@ import Gallery from '../../components/Gallery.astro';
 - 18：人工檢查時看一下相簿的版面與圖說位置；前言 2 張 App 截圖的圖說從頁面上移到 lightbox 裡。
 - 04：見上面的建置時間。
 
+## 16：搜尋、相關文章、分享按鈕與 giscus 留言（2026-10-24）
+
+### 搜尋：Pagefind
+
+- `pagefind` 1.5.2（npm），放在 `dependencies`（建置時要用）。npm 套件依平台另外裝 `@pagefind/<平台>`，Windows 版裡只有 `pagefind_extended.exe`：**extended 版才會斷中文詞**，npm 預設就是它。`package-lock.json` 列了所有平台，CI 的 Linux 也裝得到；沒有 install script，npm 11 的封鎖不影響。
+- 建索引寫成 Astro 整合 `src/integrations/pagefind.ts`：在 `astro:build:done` 用 Pagefind 的 Node API（`createIndex` → `addDirectory` → `writeFiles`）把索引寫到 `/pagefind/`。不在 npm script 裡另外跑 CLI，是因為測試的建置（`tests/support/build-site.mjs` 直接呼叫 Astro 的 `build()`）也要有索引。放在 `redirectsBudget()` 前面（它要維持最後一個）。
+- 語言：`forceLanguage: 'zh-TW'`，全站一個繁中索引（`pagefind-entry.json` 的語言是 `zh-TW`）。不設的話 Pagefind 讀 `<html lang="zh-TW">`，結果一樣（只是寫成小寫 `zh-tw`）。Pagefind 對中文不做詞幹處理，只斷詞。
+- **只索引內文**：文章與頁面的 `<article>` 加 `data-pagefind-body`。沒加時 Pagefind 索引每頁的整個 `<body>`：119 頁全部進索引，首頁、分頁、分類、標籤、日期彙整都因為列出文章標題與摘要而被搜到，而且每筆結果的摘要開頭都是「跳到主要內容 TsukiStudio 生活點滴紀錄…」。加了之後是 27 頁（22 篇文章＋5 個頁面）。分享、相關文章、留言都放在 `<article>` 外面，所以也不在索引裡（不然每篇文章都會因為相關文章裡的標題被搜到）。
+- 中文斷詞實測：「電磁筆」只出現在〈電子紙閱讀器使用心得〉內文的句子中間，搜得到而且排第一；後面還會列出 Day 1、Day 2，因為 Pagefind 也比對詞的開頭（「筆記型電腦」「筆直」）。
+- 搜尋框用 Pagefind 1.5 的 Component UI（`<pagefind-searchbox>`；舊的 `pagefind-ui.js` 官方已列為 legacy），放在側欄最上面、15 號預留的位置，標題「搜尋」（`src/components/Search.astro`）。邊打字邊在下拉選單顯示結果（標題＋摘要，關鍵字用網站的螢光筆色）。顏色、字型、圓角用 `--pf-*` 變數接上 `global.css` 的色票。
+  - 介面文字依 `<html lang>` 用 Pagefind 內建的繁中翻譯（「找不到 X 的相關結果」等），不用自己翻。例外是下拉選單底部的鍵盤提示（navigate／select／close）：不管索引語言寫大寫或小寫都是英文，所以用 `show-keyboard-hints="false"` 拿掉；Ctrl+K 快捷鍵的標示也拿掉（`hide-shortcut`）。
+  - 載入時機（實測）：每頁只載入 `pagefind-component-ui.js`（175 KB，gzip 39 KB）與 CSS（gzip 7 KB）；搜尋引擎、wasm（gzip 68 KB）與索引中繼資料等點進搜尋框才載入，索引分塊與內容片段在搜尋時才載入。
+  - 索引只在建置時產生，`astro dev` 底下搜尋框沒有作用，要看效果用 `npm run preview`。沒有 JavaScript 時搜尋框不會出現。WordPress 的 `/?s=` 搜尋網址不沿用（不在 sitemap 裡，也沒有其他 issue 要求）。
+
+### 分享按鈕
+
+- 純連結（`src/components/ShareLinks.astro`），頁面上沒有任何平台的 script 或 iframe，點下去才在新分頁打開該平台自己的分享頁。平台、順序與標題「分享此文」都照線上 Jetpack 的分享按鈕：
+
+  | 平台 | 網址 | 帶的參數 |
+  | --- | --- | --- |
+  | Threads | `https://www.threads.com/intent/post` | `url`、`text`（標題） |
+  | Facebook | `https://www.facebook.com/sharer/sharer.php` | `u` |
+  | X | `https://x.com/intent/tweet` | `url`、`text` |
+  | Mastodon | `https://share.joinmastodon.org/#text=…` | 標題＋網址 |
+  | LinkedIn | `https://www.linkedin.com/sharing/share-offsite/` | `url` |
+  | Reddit | `https://www.reddit.com/submit` | `url`、`title` |
+  | Tumblr | `https://www.tumblr.com/widgets/share/tool` | `posttype=link`、`canonicalUrl`、`content`、`title` |
+  | Pinterest | `https://www.pinterest.com/pin/create/button/` | `url`、`description`、有自訂社群圖片時加 `media` |
+  | Telegram | `https://t.me/share/url` | `url`、`text` |
+  | WhatsApp | `https://wa.me/` | `text`（標題＋網址） |
+
+- 網址參數依各平台官方文件（Threads、X、Tumblr 的 web intent 文件；Mastodon 官方分享頁的原始碼）。分享的網址是文章的正式網址（canonical，中文 slug 是大寫百分比編碼）。
+- **Mastodon** 沒有中央的分享網址，Jetpack 是跳出視窗問讀者的站台（要 JavaScript）。改用 Mastodon 官方的分享頁 `share.joinmastodon.org`：它會問讀者在哪個站台再轉過去；內容放在 `#text=` 片段裡，不會送到它的伺服器。
+- **Pinterest** 要一張圖。有 AIOSEO 自訂社群圖片的 11 篇帶 `media`（圖片的 webp 網址）；其他文章不帶，Pinterest 那邊的行為沒辦法在本機確認。
+- 驗證：每個分享網址都用 curl／headless Chrome 打開過，都有回應（Threads、X、LinkedIn、Tumblr 轉到登入頁；Facebook 用 curl 是 400，用瀏覽器是 200）。實際發文需要各平台帳號，沒有測。
+
+### 相關文章
+
+- 建置時計算（`src/lib/related-posts.ts`），每篇 3 篇（跟 Jetpack 一樣）：共同標籤多的優先；一樣多時共同分類多的優先；再一樣就新的優先。Jetpack 的相關文章是 WordPress.com 伺服器上的內容分析，無法重現，所以照 spec 用標籤。
+- 共同標籤不夠 3 篇時，用同分類的文章補，例如〈第一篇文章〉的標籤 `murmur` 沒有其他文章用，就列出「閒聊」的另外 3 篇。
+- 顯示標題與發布日期，三欄卡片（窄螢幕變一欄），標題「相關文章」（Jetpack 寫「相關」）。
+
+### giscus 留言
+
+- `src/components/Comments.astro`，只放在文章（頁面沒有留言區）。設定：
+
+  | 屬性 | 值 |
+  | --- | --- |
+  | `data-repo` | `erase2004/blog` |
+  | `data-repo-id` | `R_kgDOVVonIg` |
+  | `data-category` | `Comments` |
+  | `data-category-id` | `DIC_kwDOVVonIs4DJfJF` |
+  | `data-mapping` | `specific` |
+  | `data-term` | 文章路徑去掉開頭的 `/`，例如 `2021/11/30/電子紙閱讀器使用心得/` |
+  | `data-strict` | `1` |
+  | `data-lang` | `zh-TW` |
+  | `data-theme` | `light`（網站沒有深色模式） |
+  | `data-loading` | `lazy` |
+
+  另外 `data-reactions-enabled="1"`、`data-input-position="bottom"`。repo ID 與分類 ID 用 giscus 的 API（`/api/discussions/categories?repo=erase2004/blog`）核對過。
+- **對應方式（跟 issue 寫法的差異）**：issue 寫「依網址 pathname 對應 discussion」。giscus 的 `pathname` 模式取的是瀏覽器的 `location.pathname`，中文 slug 會是百分比編碼，而且編碼的大小寫跟著讀者請求的網址走：WordPress 的 canonical 與 Google 索引的都是小寫編碼，如果正式站對小寫編碼的網址直接回 200（01 號在本機看到的是 307 轉到大寫，正式站要到 19 號才確認），同一篇文章就會對應到兩個 discussion。所以改用 `specific`，在建置時把路徑寫進 `data-term`：一樣是「依路徑對應」，但不受編碼影響，GitHub 上 discussion 的標題也是看得懂的中文。
+- `data-strict="1"`：giscus 用 term 的 SHA-1 找 discussion，不靠 GitHub 的標題模糊搜尋（不嚴格時 giscus 直接取搜尋結果的第一筆，Day 1～Day 8 的路徑只差一個字元，容易對錯）。
+- 沒有 JavaScript 時顯示「留言區需要 JavaScript。」
+- **本機驗證**：在本機建置的文章頁打開 giscus（允許外部請求）：iframe 載入 `giscus.app/zh-TW/widget`，介面是中文（「0 個反應」「0 則留言」「用 GitHub 登入」），找 discussion 的 API 回 404，就是「這篇還沒有 discussion」的正常情況。**實際發表留言與回覆沒有測**：要用 GitHub 帳號登入，而且 discussion 在第一則留言時才建立；上線（或預覽網址）後要實測。
+
+### 測試
+
+`tests/site-serving.test.ts`：
+
+- `search`：用 Chromium 打開建置結果的首頁。索引部分直接呼叫 Pagefind 的 JS API：索引語言是 zh-TW；「電磁筆」第一筆是電子紙那篇；「遊記」剛好找到 9 篇遊記，沒有任何列表頁或其他文章（驗證只索引內文）。搜尋框部分：在側欄的搜尋框輸入「電磁筆」會列出那篇；找不到時顯示中文訊息，而且框裡沒有英文字。
+- `after a post`：分享連結（電子紙那篇的 10 個連結，逐一比對平台網址與參數；沒有 script、iframe；有社群圖片的文章 Pinterest 帶的 `media` 是 aniya.moe 上存在的 webp）；giscus 的設定；相關文章（Day 3：Day 4、Day 2、Day 5；〈第一篇文章〉：閒聊的另外 3 篇）。期望值是照各篇的標籤與分類手算的。
+- `layout`：8 種頁面的側欄第一個區塊都是搜尋框。
+- 踩到的坑：傳給 Playwright `page.evaluate()` 的函式會先經過 Vitest（Vite）轉換，裡面的 `import()` 被改成 `__vite_ssr_dynamic_import__`，送到瀏覽器就是 ReferenceError；改用 `new Function('return import("/pagefind/pagefind.js")')()`。
+- 一開始的「只有文章」測試用搜尋框檢查，結果拿掉 `data-pagefind-body` 也會過：搜尋框只顯示前幾筆，文章排在列表頁前面。改用 Pagefind 的 API 拿全部結果才抓得到。
+
+### 留給其他 issue 的發現
+
+- 17：404 頁透過 `BaseLayout` 已經有側欄的搜尋框。若主欄也要一個，第二個 `<pagefind-searchbox>` 要給不同的 `instance`，否則兩個框共用同一組狀態。404 頁沒有 `data-pagefind-body`，不會被搜到。
+- 04：索引在 `astro build` 裡產生，CI 不用多一個步驟。搜尋與手機寬度的測試都需要 Playwright 的 Chromium（15 號已記）。
+- 14：Pinterest 的 `media` 目前只用自訂社群圖片；14 號做好 og:image 的備援（文章第一張圖 → `night.png`）後，把同一張圖傳給 `ShareLinks` 的 `image`。14 號若決定社群圖片不用 webp，這裡也一起改。
+- 19：在預覽網址用 GitHub 帳號實際留言、回覆，確認 discussion 建在 `Comments` 分類、標題是中文路徑。giscus 建議用「Announcement」格式的分類（只有維護者和 giscus 能開新 discussion），站長可以到 repo 的 Discussions 設定確認 `Comments` 的格式。可以再加 `giscus.json` 限制只有 `aniya.moe`（與預覽網址）能嵌入留言，這次沒加（repo 還沒推送，預覽網址的網域也還不確定）。
+
+## 22：回到頂部按鈕（2026-10-24）
+
+站長核可 15 號版型時追加的需求。
+
+### 行為
+
+- 共用版型（`src/layouts/BaseLayout.astro`）在側欄之後、頁尾之前放 `src/components/BackToTop.astro`，所以每一頁都有，Tab 順序上排在側欄最後一個連結之後。
+- 往下捲超過一個畫面高度（`scrollY > innerHeight`）才出現；回到這個高度以內就隱藏。用 `hidden` 屬性切換，隱藏時不會被 Tab 到，螢幕閱讀器也讀不到。
+- 點擊後平滑捲回頂部；系統設定 `prefers-reduced-motion: reduce` 時直接跳回（`behavior: 'instant'`）。
+- **鍵盤焦點**：點下去的同時把焦點移到 `<body>`（暫時加 `tabindex="-1"`，離開時拿掉，`preventScroll` 不打斷平滑捲動），下一個 Tab 就是頁面開頭的「跳到主要內容」。Chromium 在按鈕隱藏時本來就會把焦點丟回 `<body>`，但這個「focus fixup」各瀏覽器的實作不一致（有的會把焦點留在已經隱藏的按鈕上；這裡只在 Chromium 驗證過），所以不能依賴；測試檢查的是「頁面開始捲動的那一刻，焦點已經不在按鈕上」。
+- 沒有 JS 時不顯示：HTML 裡的按鈕本來就帶 `hidden`，由 JS 拿掉。JS 是 Astro 內嵌的一段 module script，壓縮後 497 bytes（gzip 316 bytes），不依賴任何框架。
+
+### 外觀
+
+- 真正的 `<button type="button" aria-label="回到頂部">`，箭頭是 `aria-hidden` 的 SVG。直徑 44px（WCAG 2.5.5 的觸控目標大小），固定在畫面右下角距邊 1rem。
+- 沿用 15 號的配色：底色是外框色 `#1a1a1a`、白色箭頭，對比 17.4:1。寬螢幕上按鈕落在紙面旁的深色外框上，所以加一圈淡白色細框和陰影讓它看得出輪廓。滑過時底色換成連結藍 `#007acc`（白箭頭 4.6:1）。
+- focus 樣式：3px 的 `#007acc` 外框、間隔 3px。對白色紙面 4.6:1、對深色外框 3.8:1，都超過 WCAG 對 focus 指示的 3:1。被按鈕移過去焦點的 `<body>` 不畫 focus 外框（不然整頁會框一圈藍線）。
+- 列印時不印。
+
+### 手機寬度不遮住內容
+
+- 捲到頁尾時，按鈕下面沒有任何文字或連結：頁尾右側原本的 Mastodon 連結改成隱藏（見下面），頁尾只剩左邊的版權文字。
+- 捲動途中，浮動按鈕難免會暫時蓋住它右下角的一小塊內文（截圖裡就是這樣），再捲一點就露出來，這是所有浮動按鈕的特性。
+- **用 Tab 移動時不會被按鈕蓋住**（WCAG 2.2 的 2.4.11）：瀏覽器把獲得焦點的元素捲進畫面時，會貼著畫面底邊停下，剛好停在按鈕底下。實測在 320px 寬 Tab 過整篇文章，有 5 個標籤雲連結被蓋住。在 `html` 加 `scroll-padding-bottom: 4.25rem`（按鈕高度加上距離），瀏覽器就會把它們停在按鈕上方。這條規則寫在元件的 `<style>` 裡（`:global(html)`），拿掉元件就跟著拿掉。
+- 16 號的留言區（giscus）在文章最後面，手機上後面還有整個側欄，所以捲到底時不會在按鈕底下；捲動途中的情況同上。
+
+### 頁尾的 Mastodon 連結改成隱藏
+
+- 站長決定：15 號放在頁尾、看得到的 `<a rel="me" href="https://g0v.social/@erase2004">Mastodon</a>` 改回 WordPress 時的做法，留在 HTML 裡但不顯示。加上 `hidden` 屬性：不顯示、不能 Tab 到、螢幕閱讀器不讀；Mastodon 驗證個人檔案連結時是解析 HTML 找 `rel="me"`，不受影響。頁尾已經沒有看得到的連結，連結的樣式也一起拿掉。15 號的頁尾測試改成檢查這個連結有 `rel="me"` 而且帶 `hidden`。這是獨立的 commit（`fix: hide the Mastodon rel=me link`）。
+
+### 測試
+
+`tests/site-serving.test.ts` 的 `layout`：
+
+- 8 種頁面都有一個 `type="button"`、名稱是「回到頂部」的按鈕。
+- `the 回到頂部 button`：用 Playwright（Chromium）開一篇長文章：
+  - 在頂端與往下捲半個畫面時看不到，捲過 1.5 個畫面看得到，捲回頂端又看不到。以無障礙名稱找按鈕（`getByRole('button', { name: '回到頂部' })`），名稱也一起驗證。
+  - 關掉 JS 時捲到下面也看不到。
+  - 位置在右下角、至少 44px，底色 `rgb(26, 26, 26)`、箭頭 `rgb(255, 255, 255)`，對比用 WCAG 公式算，至少 4.5:1。
+  - 從側欄最後一個連結按 Tab 會到按鈕；focus 外框是實線、至少 2px，對白色與 `#1a1a1a` 都至少 3:1；按 Enter 會回到頂端。
+  - 點擊後的捲動過程有中間位置（平滑）；`reducedMotion: 'reduce'` 時只有一次捲動事件、直接到 0。
+  - 用鍵盤按下後，頁面開始捲動時焦點已經在 `<body>`；回到頂端後按 Tab 是「跳到主要內容」。
+  - 320px 寬：捲到最底時按鈕下沒有文字或連結、沒有水平捲動；從頁首一路 Tab 到按鈕，沒有任何獲得焦點的元素被按鈕蓋住。
+- **Headless Chromium 預設不做平滑捲動**（`behavior: 'smooth'` 會直接跳過去），這組測試的瀏覽器要加 `--enable-smooth-scrolling` 才測得出平滑捲動。另外關掉 JS 的頁面不會執行 `requestAnimationFrame` 與 timer，那個測試只能用同步的 `evaluate`。
+- 確認過測試抓得到問題：把 Mastodon 連結的 `hidden` 暫時拿掉，「捲到最底時按鈕下沒有文字」就失敗並列出 `Mastodon`；拿掉 `scroll-padding-bottom` 時 Tab 測試列出那 5 個標籤連結。
+
+### 外觀確認
+
+手機（375px）與桌機（1366px）各一張文章頁捲到中段、按鈕出現的截圖交給站長（不放進 repo）。
+
+## 14：SEO head 與 GA4（2026-10-24）
+
+### 先抓下 WordPress 的 head
+
+- 對 sitemap 快照裡的 88 個頁面（首頁、22 篇文章、5 個頁面、3 個分類、57 個標籤）逐一抓線上網站的 HTML（2026-10-24），把 `<title>`、meta description、og:type、og:image、`article:published_time`／`modified_time` 存成 `tests/fixtures/wordpress-head-2026-10-24/heads.json`。WordPress 下線後就拿不到，所以跟 sitemap 快照一樣提交進 repo、不再改。測試直接拿它比對。
+- 另外看過的頁面（不在 sitemap，沒存）：`/page/2/`、`/2025/05/`、`/2025/05/17/`、404 頁。
+
+### 標題
+
+- 格式照 AIOSEO：`<標題> - TsukiStudio`、首頁 `TsukiStudio - 生活點滴紀錄`、彙整頁是 11 號做的（`5 月, 2025 - TsukiStudio`、`… - Page 2`）。
+- **WordPress 會把標題裡前後有空白的 `-` 換成 en dash `–`**（`wptexturize`）：資料庫裡是 `遊記 - 岡山 / 香川 / 德島八日遊 - Day 4`，線上顯示 `遊記 – 岡山 / 香川 / 德島八日遊 – Day 4 - TsukiStudio`（最後的 ` - TsukiStudio` 是 AIOSEO 的分隔符，不轉）。共 12 篇（9 篇遊記、2 篇 Vue Router、〈專案開發遇到的問題整理 – 2022/05/05〉）。
+  - frontmatter 照原樣不改，在輸出時轉：`src/lib/content.ts` 的 `displayTitle()`。用在 `<title>`、og:title、JSON-LD 的 headline 與麵包屑、文章與頁面的 h1、列表頁的標題、相關文章（16 號）與分享連結的標題（16 號）。WordPress 在這些地方也都是 en dash，所以整站一致。
+  - 只做了「前後有空白的 `-`」這一條。`wptexturize` 還會換引號、`--`、`...` 等，目前的標題都用不到，就沒做。
+- **issue 的「1 篇有 AIOSEO 自訂標題的文章」不適用**：05 號就發現 post 352 的 AIOSEO `title` 欄位是 `#post_title #separator_sa #site_title`，就是預設的格式，輸出跟其他文章一樣。沒有真正的自訂標題。
+
+### 逐篇比對的結果
+
+建置結果與線上 WordPress 的 head 比對（88 頁）：
+
+| 項目 | 結果 |
+| --- | --- |
+| `<title>` | 88／88 相同 |
+| meta description | WordPress 有的 28 頁（首頁、5 個頁面、22 篇文章）全部相同。分類、標籤彙整頁 WordPress 沒有 description，新的是 11 號寫的 |
+| canonical | 88／88 指向同一個網址（解碼後比對；WordPress 用小寫百分比編碼，新的是大寫，見下面「留給其他 issue」） |
+| `article:published_time` | 22 篇文章全部相同 |
+| `article:modified_time` | 19 篇相同；3 篇排程發布的遊記（前言、Day 1、Day 7）刻意改成發布時間，見下面 |
+| og:image | 11 篇有自訂社群圖片的：同一張圖；8 篇原本是 `night.png` 的改成文章第一張圖（spec 的決定）；其餘（3 篇沒有圖的文章、頁面、首頁）仍是 `night.png` |
+
+### Open Graph 與其他 meta
+
+| 標籤 | 內容 |
+| --- | --- |
+| `og:type` | 文章、頁面 `article`（同 WordPress），其他 `website` |
+| `og:url` | 等於 canonical |
+| `og:site_name` | `TsukiStudio - 生活點滴紀錄`（同 WordPress） |
+| `og:locale` | `zh_TW`；`<html lang="zh-TW">` 15 號就有了 |
+| `article:published_time` | 文章的發布時間 |
+| `article:modified_time` | 文章用 `postUpdated()`（發布與更新取較晚的，跟頁面上顯示的最後更新一致）；頁面用 `updated` |
+| `article:tag` | 文章的每個標籤名稱 |
+| `fediverse:creator` | `@erase2004@g0v.social`，每頁都有（同 WordPress） |
+| `author` | `Tsuki`，文章與頁面 |
+| `robots` | 一頁一個：預設 `max-image-preview:large`；首頁與彙整的第 2 頁以後 `noindex, nofollow, max-image-preview:large`；404 頁 `noindex`。都跟 AIOSEO 一樣。原本 11 號、404 頁各自在 head slot 加的 robots 標籤改成 `BaseLayout` 的 `robots` |
+| `twitter:card` | `summary`（同 WordPress）。標題、描述、圖片 X 會用 Open Graph 的，不另外輸出 `twitter:*` |
+
+跟 WordPress 不一樣的地方：
+
+- **排程發布的 3 篇遊記**：WordPress 的 `article:modified_time` 比發布時間早（前一晚改完、隔天早上自動發布）。照協調者的決定改用 `postUpdated()`，JSON-LD 的 `dateModified` 也一樣。
+- **頁面沒有 `article:published_time`**：WordPress 的頁面有，但 spec 的頁面 frontmatter 沒有發布時間，就不輸出（`modified_time` 5 頁都相同）。要補的話得在轉換器與 schema 加 `published`。
+- **`article:tag`**：WordPress 只有 1 篇（post 419，AIOSEO 手動填的 `og_article_tags`，輸出時變小寫 `next.js`），其他文章沒有。新的是每篇都輸出自己的標籤（419 那篇的值相同，只是大小寫照標籤名稱）。
+- **`author`**：WordPress 只在文章輸出，新的頁面也有。
+- 彙整頁（分類、標籤、日期、分頁）在 WordPress 上完全沒有 Open Graph，新的跟其他頁一樣都有，og:image 是 `night.png`。
+- 沒有沿用：`og:image:secure_url`（og:image 本來就是 https）、`twitter:title`／`description`／`image`、AIOSEO 與 WordPress 的 `generator`、`rel="profile"`／`pingback`、oEmbed 與 `wp-json` 的 `<link>`、dns-prefetch。
+
+### og:image
+
+- 依序 fallback（`src/lib/seo.ts` 的 `socialImage()`）：frontmatter 的 `socialImage`（AIOSEO 的自訂社群圖片）→ 文章第一張圖 → `src/assets/images/site/night.png`。頁面、首頁、彙整頁直接用 `night.png`。
+- **「第一張圖」**：`src/lib/images.ts` 的 `firstImage()` 在文章原始檔（Markdown／MDX）裡找第一個指向統一圖片目錄的相對路徑，Markdown 圖片、`<img>`、09 號相簿的 `import('…')` 都算。MDX 檔開頭的 `import` 也算，所以如果一篇 MDX 先用了 `<Compare>`（它的圖在檔案開頭 import）、後面才有 Markdown 圖片，會取到對照滑桿的圖，不一定是讀者看到的第一張。目前用到 `<Compare>` 的文章都有自訂社群圖片，不受影響；測試對 WordPress 上是 `night.png` 的 11 篇逐一確認 og:image 就是頁面上第一個 `<img>` 的同一張圖（沒有圖的 3 篇是 `night.png`）。
+- **格式與大小**：不用 webp（照協調者的決定，社群平台不一定支援），JPEG，PNG 原圖維持 PNG（截圖、透明背景），寬度最多 1200px（Facebook 與 X 顯示預覽的寬度），由 Astro 的 `getImage()` 產生（`socialImageFile()`）。`night.png` 是原本的 512×512。同時輸出 `og:image:type`、`og:image:width`、`og:image:height`。
+- 共多出 20 個檔案、約 6 MB。最大的是 acgn-museum-ssg 的 `heroimage.png`：1200×800 的 PNG 有 2.4 MB（原圖是插畫風的 PNG）。在 Facebook（8 MB）與 X（5 MB）的上限內（WordPress 原本給的是 1536px 的原圖），就沒有特別處理；18 號檢查時若想縮小，可以把那張圖改存成 JPEG。
+- 16 號的分享按鈕裡 Pinterest 的 `media` 改成同一張圖（原本只有自訂社群圖片的 11 篇有，而且是 webp）。
+
+### 結構化資料（JSON-LD）
+
+每頁一個 `<script type="application/ld+json">`，一個 `@graph`（`structuredData()`）：
+
+- `WebSite`（每頁）：站名、標語、`zh-TW`，publisher 指向 Person。
+- `Person`（每頁）：`Tsuki`，`url` 是 `/about/`（WordPress 的作者頁 `/author/erase2004/` 轉到那裡），`sameAs` 是 Mastodon 帳號。
+- `BreadcrumbList`（首頁以外）：`首頁` → 文章的第一個分類 → 文章；`首頁` → 關於我 → 聯絡方式；`首頁` → 彙整頁。
+- `BlogPosting`（文章）：headline、description、url、image（＝og:image）、datePublished、dateModified（`postUpdated()`）、author／publisher、articleSection（分類）、keywords（標籤）。
+
+跟 AIOSEO 不一樣的地方：沒有 `Organization`（個人網站，publisher 用 Person）、`WebPage`／`CollectionPage`；麵包屑第一層叫「首頁」不是「Home」；日期彙整的麵包屑是一層（`2025 年 5 月`），AIOSEO 是年、月兩層；BlogPosting 的 image 跟 og:image 同一張（AIOSEO 是內文第一張圖，跟 og:image 不一定一樣）；Person 沒有 Gravatar 頭像。JSON 裡的 `<` 寫成 `<`，標題或描述裡的文字不會提早結束 `<script>`。
+
+### GA4
+
+- 直接嵌入 Google 的 gtag.js 程式碼，屬性 `G-NWNYVH87N4`（`src/consts.ts` 的 `GA4_MEASUREMENT_ID`），每頁都有。`gtag()` 是全域函式，17 號的 404 事件可以直接呼叫 `gtag('event', …)`。
+- **只在正式建置（`import.meta.env.PROD`）輸出**，`astro dev` 沒有：站長在本機寫文章、預覽時不會被算成造訪。預覽網址的部署是正式建置，會送資料到同一個屬性；要排除的話在 GA4 用主機名稱篩選。
+- MonsterInsights 額外做的（`link_attribution`、`forceSSL`、退出追蹤的 cookie、舊 analytics.js 的相容層）沒有沿用。Jetpack Stats、MonsterInsights 本身照 spec 不搬。
+- **踩到的坑**：測試用 Vitest 跑，Vitest 會把自己的 `import.meta.env` 放進環境變數（`NODE_ENV`、`MODE` 是 `test`，`PROD` 是空字串，`DEV` 是 `1`），`tests/support/build-site.mjs` 啟動的建置程序繼承之後，Astro 把它們當成網站的設定，結果測試建出來的網站 `PROD` 是 false、GA 不見。`build-site.mjs` 現在先刪掉這些變數，測試的建置跟 `astro build` 一樣（這也影響 `draft: true` 的文章：以前測試建置會包含草稿，現在跟正式建置一樣排除；目前沒有草稿）。
+
+### 網站圖示
+
+- WordPress 的網站圖示是 `cropped-night.png`（512px），WordPress 另外產生了幾個尺寸。把它實際提供的檔案從備份的 uploads（只讀）複製到 `public/`，換成慣用的檔名：
+
+  | 用途 | WordPress | 新的 |
+  | --- | --- | --- |
+  | `<link rel="icon" sizes="32x32">` | `cropped-night-32x32.png` | `/favicon-32x32.png` |
+  | `<link rel="icon" sizes="192x192">` | `cropped-night-192x192.png` | `/favicon-192x192.png` |
+  | `<link rel="apple-touch-icon">` | `cropped-night-180x180.png` | `/apple-touch-icon.png`（iOS 預設會找這個路徑） |
+  | `<meta name="msapplication-TileImage">` | `cropped-night-270x270.png` | `/mstile-270x270.png` |
+  | `/favicon.ico` | 302 到 32px 的 PNG | 32px 的 PNG 包成 ICO（ICO 格式可以直接放 PNG 資料，6 bytes 檔頭＋16 bytes 目錄＋PNG），用一次性的小腳本產生 |
+
+- `/favicon.ico` 留著是因為不看 `<link>` 的程式（不少 RSS 閱讀器、舊瀏覽器）會直接找它。原本 `public/` 裡的 `favicon.ico` 與 `favicon.svg` 是 Astro 範本的 Astro 標誌，已換掉／刪掉。
+- 舊網址 `/wp-content/uploads/2021/09/cropped-night*.png` 照 06 號的對應表維持 404（`-WxH` 縮圖不轉址；原圖沒有被內容引用）。
+
+### 網址檢查
+
+`scripts/url-checker/check.ts` 的 head 抽驗（每個預期是頁面的網址都會跑）新增兩項：
+
+- **標題格式**：`<名稱> - TsukiStudio` 或 `TsukiStudio - 生活點滴紀錄`，後面可以接 ` - Page N`（`settings.ts` 的 `TITLE_FORMAT`）。
+- **og:image**：要有，要是 `https://aniya.moe` 上的完整網址，副檔名是 JPEG 或 PNG，而且對檢查的目標（建置結果或預覽網址）請求那個路徑回 200。
+
+待完成清單沒有變（全部通過，沒有新增）。
+
+### 測試
+
+- `tests/url-checker/check-urls.test.ts`：建置結果與 HTTP 兩種模式都測：三種正確的標題格式通過、格式不對的失敗；沒有 og:image、og:image 回 404、是 webp、不是完整網址的各自失敗。
+- `tests/site-serving.test.ts` 的 `SEO head`：
+  - sitemap 快照的 88 頁標題全部等於 WordPress 的；WordPress 有 description 的 28 頁全部相同。
+  - 22 篇文章的 `og:type` 與發布、更新時間等於 WordPress 的（排程的 3 篇是發布時間）；5 個頁面的更新時間。
+  - 標籤與作者；8 種頁面的語言、`og:locale`、`og:site_name`、`fediverse:creator`；`twitter:card`；每種頁面只有一個 robots 標籤、內容跟 AIOSEO 一樣。
+  - og:image：自訂社群圖片、第一張圖（含 WordPress 上是 `night.png` 的 11 篇逐一比對）、PNG 維持 PNG、沒有圖的頁面是 `night.png`；實際下載圖片用 sharp 讀尺寸，確認宣告的 type、寬高與檔案一致、寬度不超過 1200。比對「是不是同一張圖」用 Astro 檔名裡來源檔的 hash（`<名稱>.<來源 hash>_<尺寸格式 hash>.<格式>`）。
+  - JSON-LD：WebSite 與 Person、文章的 BlogPosting、文章／頁面／標籤彙整的麵包屑、首頁與頁面沒有 BlogPosting。
+  - GA4：用 Chromium 打開 7 種頁面（外部請求攔下來回空的 script），確認每頁都向 gtag.js 送出 `config G-NWNYVH87N4`，而且請求了 gtag.js。
+  - 網站圖示：4 種頁面的圖示連結都存在、回 200、是該尺寸的 PNG；`/favicon.ico` 是 32×32 的 ICO（Workers 給的 Content-Type 是 `image/vnd.microsoft.icon`）。
+- 16 號的 Pinterest 測試改成「`media` 等於 og:image」（自訂社群圖片、第一張圖、`night.png` 三種文章各一篇）。
+
+### 留給其他 issue 的發現
+
+- 12：feed 的文章標題也用 `displayTitle()`（WordPress 的 feed 標題同樣經過 `wptexturize`，是 en dash）。feed 的 `<link rel="alternate">` 加在 `src/components/BaseHead.astro`，它現在依序是：全站 meta 與圖示、canonical、title／description／robots、作者、Open Graph、X、JSON-LD、GA4。sitemap 的圖片網址照 06 號用 `imageUrl()`，跟 og:image 不同檔沒關係。
+- 17：`gtag()` 是全域的，404 事件直接 `gtag('event', '…', { page_location: location.href })`；dev 底下沒有 GA，呼叫前要確認 `typeof gtag === 'function'`。404 頁現在有 `canonical` 指向 `https://aniya.moe/404/`（`Astro.url` 是 `/404/`），WordPress 的 404 頁沒有 canonical，17 號可以考慮拿掉（`BaseHead` 目前沒有這個選項）。404 頁的 robots 用 `BaseLayout` 的 `robots="noindex"`。
+- 18：`heroimage.png` 的 og:image 有 2.4 MB；標題的 en dash 只在輸出時轉，frontmatter 仍是 ` - `。
+- 19：canonical、og:url、JSON-LD 裡的中文網址是大寫百分比編碼，WordPress 是小寫（Google 已索引的是小寫）。兩者是同一個網址，但小寫的請求在本機會先 307 到大寫，跟 01、03 號記的是同一個問題，在預覽網址確認。og:image 是 `https://aniya.moe/_astro/…`，**切換 DNS 之前在預覽網址用 Facebook 分享偵錯工具之類的工具看不到圖**（指向的正式網域還是 WordPress）；切換後再用 Facebook 的分享偵錯工具重新抓幾篇，確認卡片的圖。
+- 20／21：GA4 屬性沿用，切換後在 GA4 的即時報表確認有資料進來；預覽網址的造訪也會進同一個屬性。
+
 ## 12：Feed、sitemap、robots.txt、llms.txt（2026-10-24）
 
 ### 產生的檔案

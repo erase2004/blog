@@ -14,6 +14,18 @@ export async function imageAt(file: string): Promise<ImageMetadata> {
 }
 
 /**
+ * The first image of the uniform image directory that a post's or page's
+ * Markdown (or MDX) source refers to, by a path relative to the file: the
+ * first image readers see, unless an MDX file imports images for a
+ * component before a Markdown image. None if it refers to none.
+ */
+export async function firstImage(entry: { filePath?: string; body?: string }): Promise<ImageMetadata | undefined> {
+	const path = /(?:\.\.\/)+assets\/images\/[^\n"'()<>]+?\.(?:avif|gif|jpe?g|png|svg|webp)\b/i.exec(entry.body ?? '')?.[0];
+	if (path === undefined || entry.filePath === undefined) return undefined;
+	return imageAt(posix.join(posix.dirname(entry.filePath.replaceAll('\\', '/')), decodeURI(path)));
+}
+
+/**
  * The image's own URL: the webp Astro makes of it at its full size. It is the
  * `src` of the image in a post (Markdown images) and the largest size the
  * post offers; old image URLs redirect here.

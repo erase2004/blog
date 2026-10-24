@@ -3,22 +3,35 @@
 import { render } from 'astro:content';
 import { SITE_TITLE } from '../consts';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getPages, type Page, pagePath } from '../lib/content';
+import { displayTitle, getPages, type Page, pagePath } from '../lib/content';
 
 export async function getStaticPaths() {
-	return (await getPages()).map((page) => ({
+	const pages = await getPages();
+	return pages.map((page) => ({
 		params: { page: pagePath(page).slice(1, -1) },
-		props: { page },
+		// The page and the pages above it (/about/ for /about/contact/), from the top.
+		props: {
+			page,
+			trail: pages
+				.filter((other) => pagePath(page).startsWith(pagePath(other)))
+				.sort((a, b) => pagePath(a).length - pagePath(b).length),
+		},
 	}));
 }
 
-const { page } = Astro.props as { page: Page };
+const { page, trail } = Astro.props as { page: Page; trail: Page[] };
 const { Content } = await render(page);
+const title = displayTitle(page.data.title);
 ---
 
-<BaseLayout title={`${page.data.title} - ${SITE_TITLE}`} description={page.data.description}>
-	<article>
-		<h1>{page.data.title}</h1>
+<BaseLayout
+	title={`${title} - ${SITE_TITLE}`}
+	description={page.data.description}
+	article={{ headline: title, modified: page.data.updated }}
+	breadcrumbs={trail.map((step) => ({ name: displayTitle(step.data.title), path: pagePath(step) }))}
+>
+	<article data-pagefind-body>
+		<h1>{title}</h1>
 		<div class="prose">
 			<Content />
 		</div>

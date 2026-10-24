@@ -1,0 +1,57 @@
+---
+// The related posts after a post (src/lib/related-posts.ts): title and date.
+import { displayTitle, formatSiteDate, type Post, postPath } from '../lib/content';
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<section class="related-posts" aria-labelledby="related-posts-heading">
+	<h2 id="related-posts-heading">相關文章</h2>
+	<ul>
+		{
+			posts.map((post) => (
+				<li>
+					<a href={postPath(post)}>{displayTitle(post.data.title)}</a>
+					<time datetime={post.data.published.toISOString()}>{formatSiteDate(post.data.published)}</time>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		padding: 0.875rem 1rem;
+		border-top: 3px solid var(--color-frame);
+		background: var(--color-surface);
+		line-height: 1.5;
+	}
+	a {
+		color: var(--color-text);
+		font-weight: 700;
+		text-decoration: none;
+	}
+	a:hover {
+		color: var(--color-link);
+		text-decoration: underline;
+	}
+	time {
+		color: var(--color-muted);
+		font-size: 0.8125rem;
+	}
+</style>

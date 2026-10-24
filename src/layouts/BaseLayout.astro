@@ -1,24 +1,42 @@
 ---
 // Every page: the site header with the menu, the main column, the sidebar
 // and the site footer.
+import type { ImageMetadata } from 'astro';
+import BackToTop from '../components/BackToTop.astro';
 import BaseHead from '../components/BaseHead.astro';
 import FeedLinks from '../components/FeedLinks.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Sidebar from '../components/Sidebar.astro';
+import type { Article, Breadcrumb } from '../lib/seo';
 
 interface Props {
 	title: string;
 	description: string;
+	/** The image of the page's link previews; the site image if none. */
+	image?: ImageMetadata;
+	/** For a post or page: when it was published and last updated. */
+	article?: Article;
+	/** The trail from the home page to the page, ending with it; none for the home page. */
+	breadcrumbs?: Breadcrumb[];
+	/** The robots meta tag, if not the default: indexable, with large image previews. */
+	robots?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image, article, breadcrumbs, robots } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="zh-TW">
 	<head>
-		<BaseHead title={title} description={description} />
+		<BaseHead
+			title={title}
+			description={description}
+			image={image}
+			article={article}
+			breadcrumbs={breadcrumbs}
+			robots={robots}
+		/>
 		<FeedLinks />
 		<slot name="head" />
 	</head>
@@ -31,6 +49,7 @@ const { title, description } = Astro.props;
 			</main>
 			<Sidebar />
 		</div>
+		<BackToTop />
 		<Footer />
 	</body>
 </html>

@@ -72,6 +72,16 @@ export function postUpdated(post: Post): Date {
 	return updated > published ? updated : published;
 }
 
+/**
+ * A post's or page's title as WordPress showed it, in the page title, the
+ * heading and lists: a hyphen with spaces around it is an en dash
+ * (wptexturize), `遊記 - Day 1` → `遊記 – Day 1`. The frontmatter keeps the
+ * title as written.
+ */
+export function displayTitle(title: string): string {
+	return title.replace(/(?<=^|\s)-(?=$|\s)/g, '–');
+}
+
 /** The meta description of a post: its own description, else its excerpt. */
 export function postDescription(post: Post): string {
 	return post.data.description ?? post.data.excerpt!;
