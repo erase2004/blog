@@ -799,3 +799,64 @@ npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備�
 - 版型（15 號已合併，`figure`／`figcaption` 已有樣式）：圖片的 `sizes` 改成實際欄寬。合併後 15 號的 320px 不水平捲動測試在全部文章上通過。
 - 18：手動調過寬度的圖；含零寬空格的檔名。
 - 04：CI 快取 `node_modules/.astro`，否則每次部署都要多花 2 分半做 webp。
+
+## 10：對照滑桿（2026-10-24）
+
+### 來源：其實是 80 個滑桿
+
+- 備份裡有 72 個 `jetpack/image-compare` block，另外還有 8 個是把滑桿的 markup 手動貼成「自訂 HTML」（`wp:html`）block。issue 寫「72 個（含 `wp:html`）」，實際是 72 + 8 = **80 個**，線上網站也是 80 個滑桿（4 篇有複本的文章也都有 block 版，Jetpack 的前端 script 會一起處理）。
+- 各篇：Day 2 6 個、Day 3 9 個（7 + 2）、Day 4 13 個（11 + 2）、Day 5 19 個（17 + 2）、Day 6 12 個、Day 8 21 個（19 + 2）。
+- **8 個 `core/html` 全部都是對照滑桿**：`<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal">` 加前後兩張圖與圖說，跟 block 存下來的 HTML 一模一樣。全站沒有其他自訂 HTML，所以不需要「安全的 HTML 直通」；不是滑桿的自訂 HTML（實際沒有）留下未轉換標記。
+- 兩種的 HTML 結構相同：前圖 `image-compare__image-before`、後圖 `image-compare__image-after`、`<figcaption>`。80 個全部是水平方向、圖都沒有 alt、每個都有圖說。block 屬性裡的圖片網址有些是 Photon（`i0.wp.com`），HTML 裡則是原本的 upload 網址；轉換器只讀 HTML，兩種網址反正都會由 06 號的 `imageSource()` 對到搬好的檔案。
+- Day 8 的「(重拍)」那幾個滑桿，有 8 張前圖跟 Day 4 是同一張；06 號把共用圖放在最早發布的文章（Day 4）的資料夾，import 路徑直接指過去。
+
+### 轉換結果
+
+`rules/compare.ts` 把兩種 block 都轉成 `<Compare>`：
+
+```mdx
+import Compare from '../../components/Compare.astro';
+import compare1After from '../../assets/images/travel-setonaikai-2025-day2/pi_20250421_063159.jpg';
+import compare1Before from '../../assets/images/travel-setonaikai-2025-day2/ydmk705.jpg';
+
+<Compare before={compare1Before} after={compare1After}>[結城友奈は勇者である](https://yuyuyu.tv/season1/)中出現的公車站</Compare>
+```
+
+- 圖片用 import 傳給元件（Astro 在 MDX 裡使用本地圖片的標準做法）。名稱是 `compare<n>Before`／`compare<n>After`，用 `compare` 開頭以免跟 09 號相簿的 import 撞名。import 由轉換器統一排序，`compare10…` 會排在 `compare1…` 前面，不影響結果。
+- 圖說是元件的內容，跟標籤寫在同一行，MDX 會把它當成行內 Markdown（不會多包一層 `<p>`）。連結轉成 Markdown 連結（拿掉 `target`、`rel` 與空的 `title`），`<ruby>` 照 05 號的規則保留 HTML。
+- 圖說裡的 3 個 `<ruby>`（Day 5，「豊川」「三角」）原文寫成 `<ruby>豊川<br><rp>（<small>とがわ</small>）</rp></ruby>`，沒有 `<rt>`。支援 ruby 的瀏覽器會把 `<rp>` 藏起來，所以讀音在 WordPress 上本來就看不到。照原樣保留，留給 18 號人工檢查時決定要不要改成 `<rt>`。
+- 6 篇文章因此變成 `.mdx`，對應表的 `file` 跟著改。
+
+### 元件 `src/components/Compare.astro`
+
+- 包裝 `img-comparison-slider` 8.0.7（web component，壓縮後約 11 kB，滑鼠、觸控、取得焦點後的方向鍵都能拖曳）。前圖放在 `slot="first"`（分隔線左邊），後圖放在 `slot="second"`，分隔線一開始在中間。
+- 圖片用 Astro 的 `<Image>`：webp、多種寬度。`sizes` 是 `(min-width: 64rem) 728px, 100vw`，也就是 15 號版型的內文欄寬：有側欄時最寬 728px，窄螢幕時接近螢幕寬。實測 1440px 寬的桌機選到 750w，390px 寬的手機（DPR 1）選到 640w。
+- **滑桿的形狀**：web component 的框由後圖決定，但 WordPress 用的 Juxtapose 是依前圖的長寬比。所以兩張圖都用前圖的長寬比、`object-fit: cover` 填滿同一個框。80 組裡有 79 組前後兩張圖的比例差不到 3%，看不出裁切；只有 Day 5「夜行巴士」那組（前圖 16:9、後圖 4:3）的後圖上下會被裁掉一些。
+- 元件的 `<script>` 只有 `import 'img-comparison-slider'`。Astro 把它打包成 `/_astro/Compare.astro_astro_type_script_index_0_lang.*.js`，只出現在有滑桿的 6 篇文章。首頁與彙整頁只列摘要，沒有滑桿，也就不會載入。
+- 套件附的 `styles.css` 沒有用：它會在 script 執行前把整個滑桿藏起來，沒有 JavaScript 就完全看不到圖。改用 `:not(:defined)` 讓 script 執行前的樣子跟執行後一樣（前圖左半、後圖右半，分隔線在中間），不會有版面位移，關掉 JavaScript 的讀者也看得到兩張圖各一半（截圖確認過）。
+
+### 測試
+
+- `tests/wordpress-converter/compare.test.ts`：block 版（圖說含連結，屬性裡是 Photon 網址）、`wp:html` 版、同一篇裡多個滑桿各自編號、圖說裡的 `<ruby>`、不是滑桿的自訂 HTML 留下標記，並確認輸出能編譯成 MDX。`content.test.ts` 的「留給後續 issue」清單拿掉這兩種。
+- `tests/site-serving.test.ts`（共用同一次建置）：
+  - `/converted/mdx/` 的 fixture 加一個 `<Compare>`：前圖在 first slot、後圖在 second slot，都是有多種寬度的 webp，圖說與連結都在。
+  - 6 篇遊記建置後的滑桿數，等於備份裡 block 加 `wp:html` 的數量（共 80 個）。
+  - 用 Playwright 實際操作：滑鼠從中間拖到四分之一寬，分隔線停在 25%；手機（390px、觸控）用 DevTools Protocol 送出 touch 事件，從中間拖到四分之三寬，分隔線停在 75%。
+  - `customElements.get('img-comparison-slider')` 只在有滑桿的頁面有定義；Day 1、〈電子紙閱讀器使用心得〉、`/converted/md/` 都沒有。
+- 15 號的 320px 不水平捲動測試在這 6 篇上也通過。
+- 另外用截圖確認了桌機、手機與關掉 JavaScript 時的樣子。
+
+### 留給其他 issue 的發現
+
+- 09：相簿也會在這幾篇 `.mdx` 加 import，滑桿的 import 名稱都以 `compare` 開頭。內文圖片的 `sizes` 如果要改成實際欄寬，可以跟這裡的 `(min-width: 64rem) 728px, 100vw` 共用一個值。
+- 12：全文 RSS 需要把 MDX（含 `<Compare>`）渲染成 HTML。feed 裡沒有 CSS 也沒有 JavaScript，滑桿會變成上下兩張圖加圖說，內容不會遺失。
+- 18：圖說 `<ruby>` 的讀音（見上面）、Day 5「夜行巴士」那組的裁切。
+
+### 未轉換標記
+
+10 號負責的 `jetpack/image-compare`（72）與 `core/html`（8）全部處理掉。重跑轉換器後剩下的都屬於 09 號：
+
+```text
+core/gallery: 3 in 3 files
+envira/envira-gallery: 83 in 10 files
+```

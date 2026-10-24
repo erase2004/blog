@@ -11,7 +11,32 @@ draft: false
 wordpressId: 1158
 ---
 
+import Compare from '../../components/Compare.astro';
 import Gallery from '../../components/Gallery.astro';
+import compare10After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_122900.jpg';
+import compare10Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_27.jpg';
+import compare11After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_123758.jpg';
+import compare11Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_5.jpg';
+import compare12After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_124114.jpg';
+import compare12Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_6.jpg';
+import compare1After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_091836.jpg';
+import compare1Before from '../../assets/images/travel-setonaikai-2025-day6/Snipaste_2025-05-14_10-30-25.png';
+import compare2After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_093153.jpg';
+import compare2Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_13.jpg';
+import compare3After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_093041.jpg';
+import compare3Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_14.jpg';
+import compare4After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_095623.jpg';
+import compare4Before from '../../assets/images/travel-setonaikai-2025-day6/tameike-1.jpg';
+import compare5After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_110123.jpg';
+import compare5Before from '../../assets/images/travel-setonaikai-2025-day6/Snipaste_2025-05-14_10-29-14.png';
+import compare6After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_110737.jpg';
+import compare6Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_38.jpg';
+import compare7After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_115133-1.jpg';
+import compare7Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_8.jpg';
+import compare8After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_120132.jpg';
+import compare8Before from '../../assets/images/travel-setonaikai-2025-day6/simahazure-6-1.jpg';
+import compare9After from '../../assets/images/travel-setonaikai-2025-day6/pi_20250425_120412.jpg';
+import compare9Before from '../../assets/images/travel-setonaikai-2025-day6/si_20250418_220750_10.jpg';
 
 旅遊第六天，早上，我在高松港搭船前往直島，在直島上，藉由單車和走路進行旅行。傍晚，搭船返回高松港。
 
@@ -42,23 +67,11 @@ import Gallery from '../../components/Gallery.astro';
 <figcaption>石井商店，已於 2024 年 12 月停業，旁邊的民宿繼續營業。為 Summer Pockets 中登場的食堂的參考原型</figcaption>
 </figure>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1248,"url":"https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-14_10-30-25.png","alt":"","width":1192,"height":671},"imageAfter":{"id":1164,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250425_091836.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，主角從食堂回家的途中"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1248" src="https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-14_10-30-25.png" alt="" width="1192" height="671" class="image-compare__image-before"/><img id="1164" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_091836.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，主角從食堂回家的途中</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare1Before} after={compare1After}>Summer Pockets 中，主角從食堂回家的途中</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1175,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_13.jpg","alt":"","width":512,"height":288},"imageAfter":{"id":1176,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_093153.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中的街道，拍攝地點為石井商店附近"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1175" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_13.jpg" alt="" width="512" height="288" class="image-compare__image-before"/><img id="1176" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_093153.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中的街道，拍攝地點為石井商店附近</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare2Before} after={compare2After}>Summer Pockets 中的街道，拍攝地點為石井商店附近</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1177,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_14.jpg","alt":"","width":512,"height":288},"imageAfter":{"id":1178,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_093041.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中加藤家前的街道，拍攝地點為石井商店附近"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1177" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_14.jpg" alt="" width="512" height="288" class="image-compare__image-before"/><img id="1178" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_093041.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中加藤家前的街道，拍攝地點為石井商店附近</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare3Before} after={compare3After}>Summer Pockets 中加藤家前的街道，拍攝地點為石井商店附近</Compare>
 
 在石井商店附近拍照時，注意到一組人往石井商店旁的民宿探頭進去並拍照，我想他們也是來聖地巡禮（笑。
 
@@ -72,11 +85,7 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1238,"url":"https://aniya.moe/wp-content/uploads/2025/05/tameike-1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1174,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250425_095623.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，女主角—鳴瀬しろは—練習招式的地方"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1238" src="https://aniya.moe/wp-content/uploads/2025/05/tameike-1.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="1174" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_095623.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，女主角—鳴瀬しろは—練習招式的地方</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare4Before} after={compare4After}>Summer Pockets 中，女主角—鳴瀬しろは—練習招式的地方</Compare>
 
 我在附近又逛了一些地點，首先是即將開幕的[直島新美術館](https://setouchi-artfest.jp/artworks/detail/aff68685-272c-4fd3-83a6-630230964b1b)，由於還在施工中無法進入，我只能在外圍拍照；接著，經過[八幡神社鳥居](https://maps.app.goo.gl/xr81RWYdSpjoFHfL8)往上走，到達[八幡神社](https://maps.app.goo.gl/3re5bXi7b9XDTnV86)；最後，從另一條路走下去，經過 [ANDO MUSEUM](https://maps.app.goo.gl/54TLHM24aNv2Tymq5) 回到南寺。
 
@@ -89,17 +98,9 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1249,"url":"https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-14_10-29-14.png","alt":"","width":1192,"height":671},"imageAfter":{"id":1187,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250425_110123.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 第一集，男主角所通過的鳥居，拍攝地點為八幡神社鳥居前"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1249" src="https://aniya.moe/wp-content/uploads/2025/05/Snipaste_2025-05-14_10-29-14.png" alt="" width="1192" height="671" class="image-compare__image-before"/><img id="1187" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_110123.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 第一集，男主角所通過的鳥居，拍攝地點為八幡神社鳥居前</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare5Before} after={compare5After}>Summer Pockets 第一集，男主角所通過的鳥居，拍攝地點為八幡神社鳥居前</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1188,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_38-scaled.jpg","alt":"","width":2560,"height":1433},"imageAfter":{"id":1189,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_110737.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 第二集，男主角所參拜的神社，拍攝地點為八幡神社"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1188" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_38-scaled.jpg" alt="" width="2560" height="1433" class="image-compare__image-before"/><img id="1189" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_110737.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 第二集，男主角所參拜的神社，拍攝地點為八幡神社</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare6Before} after={compare6After}>Summer Pockets 第二集，男主角所參拜的神社，拍攝地點為八幡神社</Compare>
 
 10:35，終於到了預約的時間，我與其他參觀者一樣，在南寺的入口處排隊，等候工作人員的引導。工作人員講解完注意事項後，將參觀者分成兩組，一組接著一組帶到南寺內兩側牆邊的座位上。南寺是一間完全不透光的大暗室，一開始，待在這個空間裡，伸手不見五指，四處張望時，所看到的景色依舊沒有改變，感覺眼睛完全失明了。後來，當前方開始有微弱的光時，剛開始以為是錯覺，但隨著光的亮度漸漸提昇，似乎看到模糊的海浪，此時，工作人員告知大家可以站起來，朝光源的方向移動，我小心翼翼往前移動，當十分接近光時，發現一面矮牆把發光區域與暗室完全隔開，形成兩個明顯的對比的空間，我嘗試搞懂發光機制，但沒有成功。結束前，我用雙腳掌一前一後的方式交替往後走，嘗試測量出暗室的深度，最後得出約 9 米的結果。走出南寺時，令我感到意外的是沒有發生光適應的情況。
 
@@ -136,31 +137,15 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1207,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_8.jpg?ssl=1","alt":"","width":1256,"height":1798},"imageAfter":{"id":1218,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_115133-1.jpg","alt":"","width":1080,"height":1546},"caption":"Summer Pockets 中，うみちゃん的主視覺，拍攝地點為弁財天附近的海邊"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1207" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_8.jpg" alt="" width="1256" height="1798" class="image-compare__image-before"/><img id="1218" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_115133-1.jpg" alt="" width="1080" height="1546" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，うみちゃん的主視覺，拍攝地點為弁財天附近的海邊</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare7Before} after={compare7After}>Summer Pockets 中，うみちゃん的主視覺，拍攝地點為弁財天附近的海邊</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1240,"url":"https://aniya.moe/wp-content/uploads/2025/05/simahazure-6-1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1210,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250425_120132.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中的海邊，拍攝地點為前往弁財天的聯絡橋上"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1240" src="https://aniya.moe/wp-content/uploads/2025/05/simahazure-6-1.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="1210" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_120132.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中的海邊，拍攝地點為前往弁財天的聯絡橋上</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare8Before} after={compare8After}>Summer Pockets 中的海邊，拍攝地點為前往弁財天的聯絡橋上</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1211,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_10.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1212,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_120412.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，女主角—鳴瀬しろは—在海邊釣魚的畫面，拍攝地點為弁財天周遭的岩石堆"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1211" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_10.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="1212" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_120412.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，女主角—鳴瀬しろは—在海邊釣魚的畫面，拍攝地點為弁財天周遭的岩石堆</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare9Before} after={compare9After}>Summer Pockets 中，女主角—鳴瀬しろは—在海邊釣魚的畫面，拍攝地點為弁財天周遭的岩石堆</Compare>
 
 回到岸上後，騎著單車往[つつじ荘](https://maps.app.goo.gl/Fo29MFEEzQNzxP2g9)前進，途中經過[積浦漁港](https://maps.app.goo.gl/88U3hHCtcsC5s4te7)，到達[琴弾地海水浴場](https://maps.app.goo.gl/EkFk5HMwHwfW8Q1L7)，將單車停在旁邊的停車場，穿過つつじ荘的入口，到[直島食堂](https://maps.app.goo.gl/GjdNMYnA27WTyVZ56)點了海鮮丼當作午餐。
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1263,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_27.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":1264,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_122900.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景，拍攝地點為積浦漁港"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1263" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_27.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="1264" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_122900.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景，拍攝地點為積浦漁港</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare10Before} after={compare10After}>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景，拍攝地點為積浦漁港</Compare>
 
 <figure>
 
@@ -169,17 +154,9 @@ import Gallery from '../../components/Gallery.astro';
 <figcaption>琴弾地海水浴場前的恵美須神社鳥居</figcaption>
 </figure>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1258,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_5.jpg","alt":"","width":1920,"height":1758},"imageAfter":{"id":1259,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_123758.jpg","alt":"","width":1180,"height":1080},"caption":"Summer Pockets 中，水織静久與後面的鳥居"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1258" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_5.jpg" alt="" width="1920" height="1758" class="image-compare__image-before"/><img id="1259" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_123758.jpg" alt="" width="1180" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，水織静久與後面的鳥居</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare11Before} after={compare11After}>Summer Pockets 中，水織静久與後面的鳥居</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1260,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_6.jpg","alt":"","width":1679,"height":944},"imageAfter":{"id":1261,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_124114.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 裡的海邊小屋，實際為つつじ荘裡的直島食堂"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1260" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_6.jpg" alt="" width="1679" height="944" class="image-compare__image-before"/><img id="1261" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250425_124114.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 裡的海邊小屋，實際為つつじ荘裡的直島食堂</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare12Before} after={compare12After}>Summer Pockets 裡的海邊小屋，實際為つつじ荘裡的直島食堂</Compare>
 
 <figure>
 

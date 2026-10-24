@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
-import { type Browser, chromium } from 'playwright';
+import { type Browser, type BrowserContextOptions, chromium, type Locator } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
@@ -762,6 +762,113 @@ describe('converted content', () => {
 			expect(link?.querySelector('img')?.getAttribute('src')).toBe('https://i.ytimg.com/vi/x3_Pcru8SS8/hqdefault.jpg');
 			expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
 			expect(html.querySelectorAll('iframe')).toHaveLength(0);
+		});
+	});
+
+	describe('before/after sliders', () => {
+		it('show the before image left of the divider and the after image right of it, as webp in several widths, with their caption', () => {
+			const figure = page(CONVERTED.mdx).querySelector('img-comparison-slider')?.closest('figure');
+			const image = (slot: string) => figure?.querySelector(`img-comparison-slider [slot="${slot}"] img`);
+
+			expect(image('first')?.getAttribute('src')).toMatch(/\/ydmk705\.[^/]+\.webp$/);
+			expect(image('second')?.getAttribute('src')).toMatch(/\/pi_20250421_063159\.[^/]+\.webp$/);
+			for (const slot of ['first', 'second']) {
+				expect(image(slot)?.getAttribute('srcset')?.split(',').length).toBeGreaterThan(1);
+			}
+			expect(figure?.querySelector('figcaption')?.text).toBe('結城友奈は勇者である中出現的公車站');
+			expect(figure?.querySelector('figcaption a')?.getAttribute('href')).toBe('https://yuyuyu.tv/season1/');
+		});
+
+		// The sliders in the WordPress backup: jetpack/image-compare blocks, plus
+		// the copies of their markup pasted as Custom HTML (wp:html) blocks.
+		it.each([
+			['/2025/05/17/travel-setonaikai-2025-day2/', 6 + 0],
+			['/2025/05/17/travel-setonaikai-2025-day3/', 7 + 2],
+			['/2025/05/17/travel-setonaikai-2025-day4/', 11 + 2],
+			['/2025/05/17/travel-setonaikai-2025-day5/', 17 + 2],
+			['/2025/05/17/travel-setonaikai-2025-day6/', 12 + 0],
+			['/2025/05/17/travel-setonaikai-2025-day8/', 19 + 2],
+		])('%s has the %i sliders it had on WordPress', (path, sliders) => {
+			const html = page(path);
+
+			expect(html.querySelectorAll('main img-comparison-slider')).toHaveLength(sliders);
+			expect(html.querySelectorAll('main img-comparison-slider [slot] img')).toHaveLength(2 * sliders);
+		});
+
+		describe('in a browser', () => {
+			let browser: Browser | undefined;
+
+			beforeAll(async () => {
+				browser = await chromium.launch();
+			}, 60_000);
+
+			afterAll(async () => {
+				await browser?.close();
+			});
+
+			/** A page with the slider in view, once its script has run; only the site itself loads. */
+			async function openSlider(options: BrowserContextOptions = {}) {
+				const context = await browser!.newContext(options);
+				await context.route((url) => url.origin !== server!.url, (route) => route.abort());
+				const page = await context.newPage();
+				await page.goto(new URL(CONVERTED.mdx, server!.url).href);
+				const slider = page.locator('img-comparison-slider');
+				await slider.scrollIntoViewIfNeeded();
+				await expect.poll(() => slider.evaluate((element) => element.classList.contains('rendered'))).toBe(true);
+				return { context, page, slider, box: (await slider.boundingBox())! };
+			}
+
+			/** Where the divider is, in percent of the slider's width from its left edge. */
+			const dividerAt = async (slider: Locator) =>
+				Math.round(await slider.evaluate((element) => (element as HTMLElement & { value: number }).value));
+
+			it('the divider starts in the middle and follows the mouse when dragged', async () => {
+				const { context, page, slider, box } = await openSlider();
+				const y = box.y + box.height / 2;
+
+				expect(await dividerAt(slider)).toBe(50);
+				await page.mouse.move(box.x + box.width / 2, y);
+				await page.mouse.down();
+				await page.mouse.move(box.x + box.width / 4, y, { steps: 5 });
+				await page.mouse.up();
+
+				expect(await dividerAt(slider)).toBe(25);
+				await context.close();
+			});
+
+			it('the divider follows a finger dragging it sideways on a phone', async () => {
+				const { context, page, slider, box } = await openSlider({ viewport: { width: 390, height: 844 }, hasTouch: true });
+				const cdp = await context.newCDPSession(page);
+				const touch = (type: 'touchStart' | 'touchMove' | 'touchEnd', x?: number) =>
+					cdp.send('Input.dispatchTouchEvent', {
+						type,
+						touchPoints: x === undefined ? [] : [{ x, y: box.y + box.height / 2 }],
+					});
+
+				await touch('touchStart', box.x + box.width / 2);
+				for (const at of [0.55, 0.6, 0.65, 0.7, 0.75]) await touch('touchMove', box.x + box.width * at);
+				await touch('touchEnd');
+
+				expect(await dividerAt(slider)).toBe(75);
+				await context.close();
+			});
+
+			it('load their script only on pages that have a slider', async () => {
+				const context = await browser!.newContext();
+				await context.route((url) => url.origin !== server!.url, (route) => route.abort());
+				const page = await context.newPage();
+				const sliderScriptRan = async (path: string) => {
+					await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
+					return page.evaluate(() => customElements.get('img-comparison-slider') !== undefined);
+				};
+
+				expect(await sliderScriptRan(CONVERTED.mdx)).toBe(true);
+				expect(await sliderScriptRan('/2025/05/17/travel-setonaikai-2025-day2/')).toBe(true);
+				expect(await sliderScriptRan(CONVERTED.md)).toBe(false);
+				expect(await sliderScriptRan('/2025/05/17/travel-setonaikai-2025-day1/')).toBe(false);
+				expect(await sliderScriptRan('/2021/11/30/電子紙閱讀器使用心得/')).toBe(false);
+				await context.close();
+			});
 		});
 	});
 });

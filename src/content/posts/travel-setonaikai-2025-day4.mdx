@@ -11,7 +11,34 @@ draft: false
 wordpressId: 767
 ---
 
+import Compare from '../../components/Compare.astro';
 import Gallery from '../../components/Gallery.astro';
+import compare10After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_142638.jpg';
+import compare10Before from '../../assets/images/travel-setonaikai-2025-day4/1e8177190b6d34eaa8f96d3c4b938828.jpg';
+import compare11After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_141827.jpg';
+import compare11Before from '../../assets/images/travel-setonaikai-2025-day4/8442820bc1a675c0d280aadc8162a799.jpg';
+import compare12After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_143638.jpg';
+import compare12Before from '../../assets/images/travel-setonaikai-2025-day4/puru-1536x864-1.jpg';
+import compare13After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_144650.jpg';
+import compare13Before from '../../assets/images/travel-setonaikai-2025-day4/yakuba02-1.jpg';
+import compare1After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_073355.jpg';
+import compare1Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250422_062630_2.jpg';
+import compare2After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_084811.jpg';
+import compare2Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_16.jpg';
+import compare3After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_123206.jpg';
+import compare3Before from '../../assets/images/travel-setonaikai-2025-day4/torisirojima01-1.jpg';
+import compare4After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_124545.jpg';
+import compare4Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_23.jpg';
+import compare5After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_124821-1.jpg';
+import compare5Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_26.jpg';
+import compare6After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_135020-1.jpg';
+import compare6Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_24.jpg';
+import compare7After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_135809-1.jpg';
+import compare7Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_25.jpg';
+import compare8After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_140503.jpg';
+import compare8Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_28.jpg';
+import compare9After from '../../assets/images/travel-setonaikai-2025-day4/pi_20250423_141242.jpg';
+import compare9Before from '../../assets/images/travel-setonaikai-2025-day4/si_20250418_220750_29.jpg';
 
 旅遊第四天，早上，我在高松港搭船前往女木島，藉由公車和走路在該島上觀光。中午時，我搭船前往男木島，用走路的方式穿梭於該島。傍晚，我搭乘最後的船班回到高松港。
 
@@ -39,11 +66,7 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":781,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630_2.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":782,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_073355.jpg","alt":"","width":1920,"height":1080},"caption":"ざつ旅第三集中出現的高松築港站"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="781" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250422_062630_2.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="782" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_073355.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>ざつ旅第三集中出現的高松築港站</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare1Before} after={compare1After}>ざつ旅第三集中出現的高松築港站</Compare>
 
 <Gallery
 	images={[
@@ -72,11 +95,7 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":798,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_16.jpg","alt":"","width":512,"height":288},"imageAfter":{"id":799,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_084811.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中出現的洞窟入口，其參考原型為女木島大洞窟入口"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="798" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_16.jpg" alt="" width="512" height="288" class="image-compare__image-before"/><img id="799" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_084811.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中出現的洞窟入口，其參考原型為女木島大洞窟入口</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare2Before} after={compare2After}>Summer Pockets 中出現的洞窟入口，其參考原型為女木島大洞窟入口</Compare>
 
 進到大洞窟，開始探險。雖然被稱作大洞窟，但裡面有些通道的高度很低，即便我努力蹲下並低頭通過，還是有可能摩擦到通道的上緣。大洞窟裡相較於外面，比較溼冷，搭配昏暗的燈光，給人陰冷的感覺。大洞窟裡有岔路與小空間，以及四處充滿了[オニノコ瓦](https://setouchi-artfest.jp/artworks/detail/5e9d78b6-421f-4416-b342-667e93b1606f)，小空間裡有的是存放鬼的寶藏，有的是一群正在分贓的鬼，也有鬼和被監禁的女子，以及鬼大將和其手下等，此外，牆壁上也有瀨戶藝的作品「[生成するウォールドローイング](https://setouchi-artfest.jp/artworks/detail/092583a6-2e70-4aaa-9432-153138691a26)」。
 
@@ -190,23 +209,11 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1242,"url":"https://aniya.moe/wp-content/uploads/2025/05/torisirojima01-1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":845,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250423_123206.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"さしずめ俺は……"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1242" src="https://aniya.moe/wp-content/uploads/2025/05/torisirojima01-1.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="845" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_123206.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>さしずめ俺は……</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare3Before} after={compare3After}>さしずめ俺は……</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":846,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_23.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":847,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_124545.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中一個重要的場景"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="846" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_23.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="847" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_124545.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中一個重要的場景</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare4Before} after={compare4After}>Summer Pockets 中一個重要的場景</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":848,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_26-scaled.jpg?ssl=1","alt":"","width":2560,"height":1283},"imageAfter":{"id":1220,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_124821-1.jpg","alt":"","width":1920,"height":964},"caption":"Summer Pockets 中，野村美希所站在的鐵塔"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="848" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_26-scaled.jpg" alt="" width="2560" height="1283" class="image-compare__image-before"/><img id="1220" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_124821-1.jpg" alt="" width="1920" height="964" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，野村美希所站在的鐵塔</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare5Before} after={compare5After}>Summer Pockets 中，野村美希所站在的鐵塔</Compare>
 
 在男木港一帶拍完照後，我繼續參觀其他的作品。
 
@@ -243,17 +250,9 @@ import Gallery from '../../components/Gallery.astro';
 <figcaption>作品「男木島パビリオン」中間的落地窗</figcaption>
 </figure>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":871,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_24.jpg?ssl=1","alt":"","width":1341,"height":1920},"imageAfter":{"id":1222,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_135020-1.jpg","alt":"","width":1080,"height":1546},"caption":"Summer Pockets 中，站在鳥居前的水織静久"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="871" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_24.jpg" alt="" width="1341" height="1920" class="image-compare__image-before"/><img id="1222" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_135020-1.jpg" alt="" width="1080" height="1546" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，站在鳥居前的水織静久</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare6Before} after={compare6After}>Summer Pockets 中，站在鳥居前的水織静久</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":873,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_25.jpg?ssl=1","alt":"","width":1270,"height":1920},"imageAfter":{"id":1224,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_135809-1.jpg","alt":"","width":1080,"height":1634},"caption":"Summer Pockets 動畫主視覺圖"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="873" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_25.jpg" alt="" width="1270" height="1920" class="image-compare__image-before"/><img id="1224" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_135809-1.jpg" alt="" width="1080" height="1634" class="image-compare__image-after"/></div><figcaption>Summer Pockets 動畫主視覺圖</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare7Before} after={compare7After}>Summer Pockets 動畫主視覺圖</Compare>
 
 穿過豐玉姬神社，往[男木漁港](https://maps.app.goo.gl/xMth4njvUmwzdina6)的方向前進，途中皆是下坡，到達男木漁港後左轉，沿著海邊的道路往前走，會看到島上著名的作品「[歩く方舟](https://setouchi-artfest.jp/artworks/detail/2d93cbaa-56b0-4b5a-9f89-5fed706ce66f)」，在這裡，會有不少人到作品旁，跟在作品後面，擺著相同的姿勢，試圖以與作品融為一體的方式合照。
 
@@ -265,29 +264,13 @@ import Gallery from '../../components/Gallery.astro';
 	]}
 />
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":880,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_28.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":881,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_140503.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="880" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_28.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="881" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_140503.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare8Before} after={compare8After}>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景</Compare>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":882,"url":"https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_29.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":883,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_141242.jpg","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="882" src="https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_29.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="883" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_141242.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare9Before} after={compare9After}>Summer Pockets 動畫中，男主角—鷹原羽依里—前往留宿地點，路途中一景</Compare>
 
-```html title="wp-unconverted: core/html"
-<!-- wp:html -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1760" src="https://aniya.moe/wp-content/uploads/2025/05/1e8177190b6d34eaa8f96d3c4b938828.jpg" alt="" width="1626" height="915" class="image-compare__image-before"/><img id="885" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_142638.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 動畫中，傍晚時，男主角—鷹原羽依里—推著行李箱，與坐在行李箱上的女主角—久島鴎—前進。</figcaption></figure>
-<!-- /wp:html -->
-```
+<Compare before={compare10Before} after={compare10After}>Summer Pockets 動畫中，傍晚時，男主角—鷹原羽依里—推著行李箱，與坐在行李箱上的女主角—久島鴎—前進。</Compare>
 
-```html title="wp-unconverted: core/html"
-<!-- wp:html -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1765" src="https://aniya.moe/wp-content/uploads/2025/05/8442820bc1a675c0d280aadc8162a799.jpg" alt="" width="1626" height="915" class="image-compare__image-before"/><img id="887" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_141827.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>久島鴎坐在行李箱上往下衝一景</figcaption></figure>
-<!-- /wp:html -->
-```
+<Compare before={compare11Before} after={compare11After}>久島鴎坐在行李箱上往下衝一景</Compare>
 
 拍完照，往男木港的方向折返回去，途中經過在學校體育館外牆上的作品「[青空を夢見て](https://setouchi-artfest.jp/artworks/detail/58cb6e19-0346-4087-ae23-daff1394191d)」，以及在[老人憩の家](https://maps.app.goo.gl/YtJdytyZ3x96z9QD8)展出的作品「[私たちの島](https://setouchi-artfest.jp/artworks/detail/6d608389-4897-41e8-8fd9-17bd28dae879)」，在「私たちの島」這個作品中，作者使用不同層次的藍色布，堆疊出整座島立體的樣子。
 
@@ -298,11 +281,7 @@ import Gallery from '../../components/Gallery.astro';
 <figcaption>作品「私たちの島」</figcaption>
 </figure>
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1244,"url":"https://aniya.moe/wp-content/uploads/2025/05/puru-1536x864-1.jpg","alt":"","width":1536,"height":864},"imageAfter":{"id":891,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250423_143638.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，女主角—鳴瀬しろは—游泳的地方，圍牆上有告示，禁止對學生拍照。"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1244" src="https://aniya.moe/wp-content/uploads/2025/05/puru-1536x864-1.jpg" alt="" width="1536" height="864" class="image-compare__image-before"/><img id="891" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_143638.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>Summer Pockets 中，女主角—鳴瀬しろは—游泳的地方，圍牆上有告示，禁止對學生拍照。</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare12Before} after={compare12After}>Summer Pockets 中，女主角—鳴瀬しろは—游泳的地方，圍牆上有告示，禁止對學生拍照。</Compare>
 
 往前走一小段路，會看到一戶人家門口擺著各種貓與 Summer Pockets 相關的週邊，兩旁的牆壁上貼滿各種圖畫與照片，這裡是同好間有名的[ねこポケハウス](https://maps.app.goo.gl/eXVKg6mNcGdbMrQSA)，裡面住著[豊爺](https://x.com/nekopoketoyoji)，可以從旁邊的小門進去拜訪他，門口是自助商店，週邊可以自行購買並結帳。
 
@@ -327,11 +306,7 @@ import Gallery from '../../components/Gallery.astro';
 
 回到男木港，由於距離返回高松的船班還有一大段時間，我在男木港附近閒晃，等待船班的到來。
 
-```html title="wp-unconverted: jetpack/image-compare"
-<!-- wp:jetpack/image-compare {"imageBefore":{"id":1243,"url":"https://aniya.moe/wp-content/uploads/2025/05/yakuba02-1.jpg","alt":"","width":1920,"height":1080},"imageAfter":{"id":916,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250423_144650.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"在 Summer Pockets 中登場的市政廳舍"} -->
-<figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1243" src="https://aniya.moe/wp-content/uploads/2025/05/yakuba02-1.jpg" alt="" width="1920" height="1080" class="image-compare__image-before"/><img id="916" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_144650.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>在 Summer Pockets 中登場的市政廳舍</figcaption></figure>
-<!-- /wp:jetpack/image-compare -->
-```
+<Compare before={compare13Before} after={compare13After}>在 Summer Pockets 中登場的市政廳舍</Compare>
 
 <Gallery
 	images={[
