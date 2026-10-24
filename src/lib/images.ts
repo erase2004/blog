@@ -20,9 +20,8 @@ export async function imageAt(file: string): Promise<ImageMetadata> {
  * component before a Markdown image. None if it refers to none.
  */
 export async function firstImage(entry: { filePath?: string; body?: string }): Promise<ImageMetadata | undefined> {
-	const path = /(?:\.\.\/)+assets\/images\/[^\n"'()<>]+?\.(?:avif|gif|jpe?g|png|svg|webp)\b/i.exec(entry.body ?? '')?.[0];
-	if (path === undefined || entry.filePath === undefined) return undefined;
-	return imageAt(posix.join(posix.dirname(entry.filePath.replaceAll('\\', '/')), decodeURI(path)));
+	const [file] = imagesIn(entry);
+	return file === undefined ? undefined : imageAt(file);
 }
 
 /**
@@ -32,4 +31,21 @@ export async function firstImage(entry: { filePath?: string; body?: string }): P
  */
 export async function imageUrl(image: ImageMetadata): Promise<string> {
 	return (await getImage({ src: image, layout: 'none' })).src;
+}
+
+/**
+ * The images of the uniform image directory that a post's or page's content
+ * shows, by path from the project root, each once, in the order its source
+ * names them: Markdown images and MDX imports name them by a path relative
+ * to the file (`../../assets/images/<slug>/<file>`). Its `socialImage` is not
+ * among them unless the content shows it too.
+ */
+export function imagesIn({ filePath, body }: { filePath?: string; body?: string }): string[] {
+	if (filePath === undefined) return [];
+	const dir = posix.dirname(filePath.replaceAll('\\', '/'));
+	const paths = [...(body ?? '').matchAll(/(?:\.\.\/)+assets\/images\/[^\n"'()<>]+?\.(?:avif|gif|jpe?g|png|svg|webp)\b/gi)].map(
+		([path]) => posix.join(dir, decodeURI(path)),
+	);
+	// Paths elsewhere, e.g. in a code block, are not the site's images.
+	return [...new Set(paths)].filter((path) => `/${path}` in images);
 }
