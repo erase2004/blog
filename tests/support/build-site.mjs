@@ -16,6 +16,13 @@ if (!outDir || !probePath || !widgetsPath) {
 
 const fixture = (name) => fileURLToPath(new URL(`../fixtures/${name}`, import.meta.url));
 
+// Build as `astro build` does. Vitest leaves its own `import.meta.env` in the
+// environment (NODE_ENV and MODE `test`, PROD empty, …), which Astro would
+// take for the site's: the site would be built as not for production.
+for (const name of ['NODE_ENV', 'MODE', 'PROD', 'DEV', 'SSR', 'BASE_URL']) {
+	delete process.env[name];
+}
+
 await build({
 	root: fileURLToPath(new URL('../../', import.meta.url)),
 	outDir,
