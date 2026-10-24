@@ -624,6 +624,63 @@ img: 6 in 4 files
 jetpack/image-compare: 72 in 6 files
 ```
 
+## 15：版型設計（2026-10-24）
+
+### 配色：沿用 Twenty Sixteen 的自訂色
+
+- 來源是 WordPress 的 `theme_mods_twentysixteen`：`background_color` `#1a1a1a`、`page_background_color` `#ffffff`、`main_text_color` `#1a1a1a`、`secondary_text_color` `#686868`、`link_color` `#007acc`（`color_scheme` 是 default）。線上網站看起來就是「#1a1a1a 的外框裡放一張白紙」。
+- 「附加 CSS」（`custom_css`，404 bytes）只有兩條修正圖片邊距的規則（`.below-entry-meta` 的 `margin`、`max-width`），沒有顏色；新版的圖片本來就不會超出內文寬度，這兩條不需要。
+- 新版保留這個基調：頁首、頁尾與寬螢幕兩側是 `#1a1a1a`，內容放在白色的紙面上；內文 `#1a1a1a`、次要文字 `#686868`、連結 `#007acc`。另外衍生幾個顏色：深色底上的連結藍 `#5ab4f0`、分隔線 `#e2e2e2`、淺灰底 `#f4f5f6`、螢光筆 `#ffe98a`。全部寫成 `src/styles/global.css` 開頭的 CSS 變數。
+- 對比度：`#686868`／白 5.5:1、`#007acc`／白 4.6:1、白字／`#007acc` 4.6:1，都過 WCAG AA。
+- 舊的頁首圖（夜空與月亮，`cropped-akiba07-scaled-3.jpg`）沒有沿用；改在站名前放一個月牙圖示（Tsuki＝月），呼應原本的意象。
+
+### 版面
+
+- 頁首（站名、標語、導覽列）→ 白色紙面（主欄＋右側欄，側欄 17rem）→ 頁尾。結構在 `src/layouts/BaseLayout.astro`，各區塊在 `src/components/Header.astro`、`Sidebar.astro`、`Footer.astro`。
+- 響應式：寬度 64rem 以下側欄移到主欄下方（分類、年份並排，標籤雲全寬）；40rem 以下紙面貼齊螢幕兩邊，導覽列排成 3×2 的格子。
+- **導覽列**：6 個連結的順序照線上 WordPress 的選單：首頁、關於我、我的故事、聯絡方式、訂閱、隱私權政策（issue 裡列的順序不一樣，以線上網站為準）。WordPress 把「我的故事」「聯絡方式」做成「關於我」底下的下拉選單，新版攤平成 6 個並排的連結。文字直接取頁面的標題（從 content collection 讀，頁面不存在就建置失敗），站長改頁面標題時導覽列跟著變。目前所在的頁面加 `aria-current="page"`。
+- **側欄**：順序照 WordPress 側欄（搜尋、熱門文章、Category、ARCHIVES、標籤雲；熱門文章不搬）：搜尋（預留）、分類、年份、標籤。每個小工具上方一條粗線，是 Twenty Sixteen 的特徵。搜尋框的位置在 `Sidebar.astro` 開頭，用 `SEARCH SLOT (ticket 16)` 註解標出來，16 號照註解放一個 `<section class="widget" id="search">` 就有一樣的外觀。
+- **文章頁**：分類、標題、發布日期與最後更新、內文、標籤。16 號的分享按鈕、相關文章、留言接在文章後面（`[slug].astro` 裡有註解標出位置）。
+- **列表頁**（首頁、分類、標籤、日期彙整）：每篇顯示日期、分類、標題、摘要，下面是「較新的文章／第 N 頁，共 M 頁／較舊的文章」。首頁的 h1（站名）跟頁首重複，只留給螢幕閱讀器。
+- **頁尾**：版權、Mastodon 連結。
+
+### 日期
+
+- 發布日期與最後更新都用 WordPress 的 `date_format`（`Y 年 n 月 j 日`）、Asia/Taipei 時區（`formatSiteDate()`），`<time datetime>` 帶完整時間。
+- **排程發布的文章**：有 3 篇遊記（前言、Day 1、Day 7）的 `updated` 比 `published` 早：前一天晚上改完、設定隔天早上發布。WordPress 的 Twenty Sixteen 只顯示發布日期（`updated` 藏起來），所以以前看不出來。新版若照實顯示，會出現「最後更新比發布早」，所以最後更新取兩者較晚的那個（`src/lib/content.ts` 的 `postUpdated()`）。14 號輸出 `article:modified_time` 時要用原始值還是這個，由 14 號決定。
+
+### 字型
+
+- 拿掉範本的 Atkinson 字型（兩個 woff 檔與 `astro.config.mjs` 的 `fonts` 設定）。它只有拉丁字母，中文一律落到系統字型，中英混排時字重與字高對不起來。改用系統字型（Segoe UI／蘋方／微軟正黑體／Noto Sans TC），中英文由同一套系統字型搭配，也不用下載任何字型檔。
+- 內文 17px（手機 16px），文章內文行高 1.85。
+
+### 文章內文的樣式
+
+只依賴一般的 HTML，不依賴 06、09、10 號的元件：
+
+- 圖片、影片、iframe 不超過內文寬度；`figure`／`figcaption` 置中、說明文字用次要色。
+- 表格太寬時在表格裡左右捲動（`display: block; overflow-x: auto`），整頁不會變寬；儲存格至少 6em 寬，窄欄的中文不會一字一行。
+- 段落裡的長網址可以斷行；`<mark>` 統一成螢光筆（轉換器已經把各種顏色統一成 `<mark>`）。
+- 腳註（`[data-footnotes]`）：文末一條分隔線、字小一號；編號顯示成 `[1]`，跳過去的註解短暫加底色。
+- **Expressive Code 改成只用 `github-dark`**（08 號是 `github-dark`／`github-light` 跟著系統深淺色切換）。網站只有淺色版，系統是深色模式時只有程式碼區塊變深色會很突兀；固定成深色，也呼應頁首的 `#1a1a1a`。
+
+### 測試
+
+`tests/site-serving.test.ts` 新增 `layout`：
+
+- 8 種頁面（首頁、`/page/2/`、文章、頁面、分類、標籤、月份彙整、404 頁）都檢查：頁首有連到首頁的站名與標語；導覽列是那 6 個連結、順序正確；目前頁面有標記；側欄在主欄外，依序有分類、年份、標籤（期望值同 11 號，都是線上網站的側欄）；頁尾有 `rel="me"` 的 Mastodon 連結。
+- 文章日期，3 篇，期望值取自 WordPress 資料庫的 `post_date`／`post_modified`：一般情況、台北時區（台北 00:42 更新，UTC 還是前一天）、排程發布。
+- **手機寬度沒有水平捲動**：用 Playwright（Chromium）以 320px 寬（WCAG 1.4.10 reflow 規定的寬度）打開全部 22 篇文章、5 個頁面、每種列表頁與 404 頁，檢查 `scrollWidth <= clientWidth`；失敗時列出超出右邊界的元素。外部請求（YouTube 縮圖、R2 影片）在測試裡擋掉，不依賴網路。還沒寫樣式時這個測試抓到 4 篇（Day 2、Day 7、Day 8、acgn-museum-ssg）：未轉換標記的程式碼區塊與影片把版面撐寬。
+- Playwright 1.64.1 加成 devDependency。瀏覽器要另外安裝：`npx playwright install chromium`（約 120 MB，裝在使用者目錄，不在 repo 裡）。**04 號的 CI 要加一步 `npx playwright install --with-deps chromium`**，否則這個測試會失敗。
+
+### 外觀確認
+
+首頁、文章頁、分類彙整的桌面（1366px）與手機（375px）截圖交給站長確認（不放進 repo）。issue 的「站長確認外觀」等站長看過再勾。
+
+### 發現
+
+- WordPress 頁首有一個隱藏的 `<a rel="me" href="https://g0v.social/@erase2004">Mastodon</a>`，是 Mastodon 驗證個人檔案連結（綠色勾勾）用的，沒有任何 issue 提到。新版放在頁尾，而且改成看得到的連結；站長若想維持隱藏可以再改。
+
 ## 06：圖片搬遷與舊圖片網址轉址（2026-10-24）
 
 ### 重新產生
@@ -639,7 +696,7 @@ npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備�
 ### 搬了哪些圖：769 張、377 MB
 
 - 被已發布的文章與頁面用到的圖：內文裡的 `<img>`、Envira 相簿與對照滑桿 block 裡的 JSON（含 `i0.wp.com` 的 Photon 網址、`-WxH` 縮圖網址、百分比編碼的檔名），以及 AIOSEO 的社群圖片（含前言那篇的精選圖片）。共 **767 張**，跟規劃時從檔案系統算出來的清單逐一比對完全相同。
-- 再加上全站設定用到的 **2 張**：AIOSEO 的預設社群圖片 `night.png`（og:image 的最後 fallback），和佈景主題的 header 圖 `cropped-akiba07-scaled-3.jpg`。spec 指定它們放 `site/`。
+- 再加上全站設定用到的 **2 張**：AIOSEO 的預設社群圖片 `night.png`（og:image 的最後 fallback），和佈景主題的 header 圖 `cropped-akiba07-scaled-3.jpg`。spec 指定它們放 `site/`。15 號的新版型沒有沿用 header 圖（改用月牙圖示），但檔案照 spec 保留，舊網址仍轉到它（每頁都有這張圖，可能在 Google 圖片裡）。
 - **跟 issue 的出入**：issue 寫「共 767 張」、「94 張孤兒圖不搬」，但規劃時這兩張被算在 94 張孤兒圖裡（沒有文章用到）。這裡照 spec 的媒體章節搬了，所以是 769 張。其餘沒搬的：資料庫裡 48 個沒人用的圖片附件；94 張裡另外 44 張根本沒有附件紀錄（Envira 自己產生的 `-320x240_c` 裁切圖與另一張 header 裁切圖）。
 - 網站圖示 `cropped-night.png` 沒搬：spec 說 favicon 放 `public/`，留給 14 或 15 號。
 - 不搬的另外幾類自然排除：只複製 WordPress 實際提供的那個檔案（`_wp_attached_file`），所以 `-WxH` 縮圖、超過 2560px 的相機原圖都不會進來；LiteSpeed 的 webp 與 `.bk` 備份在資料庫裡根本沒有紀錄。用 sharp 檢查過：769 張最長邊都不超過 2560px，沒有縮圖、`.bk`、`-scaled` 檔名。
@@ -663,7 +720,7 @@ npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備�
 | frontmatter 的 `socialImage` | 圖片的相對路徑，schema 改成 `image()`，建置時會檢查檔案存在 |
 
 - `<figure>` 與 Markdown 圖片之間要空一行：CommonMark 的 HTML 區塊到空行才結束，中間的圖片才會被當成 Markdown，交給 Astro 最佳化。測試用 Sätteri 渲染並編譯成 MDX 確認。
-- WordPress 手動調過寬度的 13 個 block（例如 768px）沒有保留寬度，現在是「最寬到原圖寬度、不超過欄寬」。15、18 號看版面再決定。
+- WordPress 手動調過寬度的 13 個 block（例如 768px）沒有保留寬度，現在是「最寬到原圖寬度、不超過欄寬」。18 號逐篇檢查時再決定要不要調。
 - alt 文字頭尾的空白去掉。
 - 09、10 號轉相簿與對照滑桿時，用 `rules/images.ts` 的 `imageSource(url, context)` 取得圖片相對於內容檔的路徑；任何形式的舊網址都可以丟進去，不是要搬的圖會直接報錯。
 
@@ -673,7 +730,7 @@ npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備�
 - 實測：用 Chrome 的 DevTools 裝置模擬（390×844，跟 iPhone 差不多寬）打開 Day 2 那篇，逐一捲到每張圖，看瀏覽器實際選的檔案：
   - DPR 2：每張 2560px 的照片都載入 828w 的 webp。
   - DPR 3：載入 1280w 的 webp。
-  - 桌機 1920px：載入 1920w／2048w，因為 `sizes` 寫的是 `100vw`，但範本的內文欄只有 640px。**15 號做版型時要把 `sizes` 改成實際欄寬**，桌機才不會下載過大的圖。
+  - 桌機 1920px：載入 1920w／2048w，因為 `sizes` 寫的是 `100vw`，但內文欄沒有那麼寬（量的時候是範本的 640px；15 號的新版型是 72rem 的頁面扣掉 17rem 的側欄，不到 880px）。**`sizes` 應該改成實際欄寬**，桌機才不會下載過大的圖；Markdown 圖片不能逐張設定，要用 rehype plugin 或改 Astro 的圖片設定，留給之後的版型調整（15 號已經合併）。
   - 所有請求都是 webp，沒有原圖。
   - 注意：直接用 `--window-size=390,844` 開 headless Chrome 不準，桌面版視窗有最小寬度，選到的圖會偏大，要用裝置模擬。
 - 第一次建置要做 1,278 張 webp，約 2 分半；之後 Astro 從 `node_modules/.astro` 的快取拿，建置回到幾十秒。**04 號 CI 要快取 `node_modules/.astro`**。`tests/site-serving.test.ts` 的建置時限從 180 秒放寬到 600 秒。
@@ -739,5 +796,6 @@ npm run convert-wordpress -- <dump.sql> <uploads 資料夾>     # 換一份備�
 - 12：sitemap 的圖片網址用 `src/lib/images.ts` 的 `imageAt(file)` 與 `imageUrl()`，跟轉址目標是同一個網址。
 - 13：`?attachment_id=ID`（見上面）。
 - 14：`socialImage` 現在是 `image()`；og:image 要決定輸出格式（webp 在社群平台的支援度要查）。`night.png` 在 `src/assets/images/site/night.png`。網站圖示還沒搬。
-- 15：`sizes` 改成實際欄寬；`<figure>`／`<figcaption>` 的樣式；手動調過寬度的圖。
+- 版型（15 號已合併，`figure`／`figcaption` 已有樣式）：圖片的 `sizes` 改成實際欄寬。合併後 15 號的 320px 不水平捲動測試在全部文章上通過。
+- 18：手動調過寬度的圖；含零寬空格的檔名。
 - 04：CI 快取 `node_modules/.astro`，否則每次部署都要多花 2 分半做 webp。

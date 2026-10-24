@@ -3,7 +3,7 @@
 import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig } from 'astro/config';
 import imageRedirects from './src/integrations/image-redirects';
 import mediaRedirects from './src/integrations/media-redirects';
 import redirectsBudget from './src/integrations/redirects-budget';
@@ -36,38 +36,16 @@ export default defineConfig({
 	// Images become webp in several widths (srcset), up to their own width;
 	// the browser picks the one that fits the screen.
 	image: { layout: 'constrained' },
-	// Expressive Code highlights code blocks (and must come before MDX).
+	// Expressive Code highlights code blocks (and must come before MDX). One
+	// dark theme, like the site's dark header, whatever the reader's system
+	// colour scheme: the site itself has only a light one.
 	// redirectsBudget() checks the _redirects the others wrote: keep it last.
 	integrations: [
-		expressiveCode({ defaultLocale: 'zh-TW' }),
+		expressiveCode({ defaultLocale: 'zh-TW', themes: ['github-dark'] }),
 		mdx(),
 		mediaRedirects(),
 		trailingSlashRedirects(),
 		imageRedirects(),
 		redirectsBudget(),
-	],
-	fonts: [
-		{
-			provider: fontProviders.local(),
-			name: 'Atkinson',
-			cssVariable: '--font-atkinson',
-			fallbacks: ['sans-serif'],
-			options: {
-				variants: [
-					{
-						src: ['./src/assets/fonts/atkinson-regular.woff'],
-						weight: 400,
-						style: 'normal',
-						display: 'swap',
-					},
-					{
-						src: ['./src/assets/fonts/atkinson-bold.woff'],
-						weight: 700,
-						style: 'normal',
-						display: 'swap',
-					},
-				],
-			},
-		},
 	],
 });

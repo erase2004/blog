@@ -14,9 +14,34 @@ const { label, items } = Astro.props;
 		{
 			items.map(({ name, path, count }) => (
 				<li>
-					<a href={path}>{name}</a> ({count})
+					<a href={path}>{name}</a> <span class="count">({count})</span>
 				</li>
 			))
 		}
 	</ul>
 </nav>
+
+<style>
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.45rem 0;
+		border-bottom: 1px solid var(--color-rule);
+	}
+	a {
+		text-decoration: none;
+	}
+	a:hover {
+		text-decoration: underline;
+	}
+	.count {
+		color: var(--color-muted);
+		font-variant-numeric: tabular-nums;
+	}
+</style>

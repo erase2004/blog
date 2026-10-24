@@ -31,11 +31,19 @@ const size = (count: number) => Number((SMALLEST_PT + (weight(count) - lightest)
 
 <style>
 	ul {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.2rem 0.85rem;
+		margin: 0;
 		padding: 0;
 		list-style: none;
+		line-height: 1.5;
 	}
-	li {
-		display: inline;
-		margin-inline-end: 0.5em;
+	a {
+		text-decoration: none;
+	}
+	a:hover {
+		text-decoration: underline;
 	}
 </style>
