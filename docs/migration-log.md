@@ -219,3 +219,32 @@ npm run check-urls -- build --prune-pending   # 順便把已經通過的網址�
 - `tests/url-checker/check-urls.test.ts`：在暫存資料夾做一個小型網站（頁面、中文頁面、各種 head 錯誤、靜態與動態 `_redirects` 規則、圖片轉址、外部網址的轉址、404 頁），每一種判斷各一個案例，建置輸出模式與 HTTP 模式各跑一次；待完成清單的每一種規則；`--prune-pending` 的刪除方式。
 - `tests/site-serving.test.ts`：對真正的建置結果，用 commit 進去的待完成清單跑兩種模式，都要通過。這個測試保證清單剛好列出目前還沒做的網址。
 - HTML 解析用 `node-html-parser`，裝的是 9.0.4；最新的 9.0.5 發布才 5 天，先不用。
+
+## 02：帳號與外部服務設定（2026-10-24）
+
+站長在各服務的後台操作，我用 API 和 DNS 查詢逐項驗收。這裡不記任何 token 或金鑰的值。
+
+### GitHub
+
+- 建立公開 repo `erase2004/blog`，開啟 Discussions，建立 `Comments` 分類，安裝 giscus GitHub App。giscus 的 API 讀得到這個 repo 的分類，代表 app 已經裝好。
+- **還沒推送**：站長決定先不推。04 號 CI/CD 要等推上去之後才能開始。
+- 安裝 gh CLI 2.103.2，用 `gh auth login --web` 登入。踩到的坑：Claude Code 的 `!` 指令跑在 bash，PowerShell 的 `& "路徑"` 寫法會出現語法錯誤，要改寫成 `"/c/Program Files/GitHub CLI/gh.exe"`。
+- GitHub Secrets 設了 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`。
+
+### Cloudflare
+
+- API token 驗證為 active，看得到 `aniya.moe` zone，也讀得到 Workers 列表。部署權限要到 04 號實際部署時才能確認。
+- 踩到的坑：
+  - 後台顯示的「API Token」欄位其實是 account ID（它也出現在 R2 的 S3 端點網址裡），真正的 token 是 `cfat_` 開頭那串。
+  - 第一版 token 沒有 R2 權限，呼叫 R2 API 回 authentication error，之後補上「Workers R2 Storage: Edit」。
+- R2：bucket `media`，自訂網域 `media.aniya.moe`，狀態 active。驗收方式：上傳一個測試檔，從 `https://media.aniya.moe/` 讀得到，刪除後回 404。另外還有一組只限這個 bucket 的 S3 API 金鑰，目前用不到。
+
+### Google Search Console
+
+- 原本只有用 GA 驗證的「網址前置字元」資源 `https://aniya.moe/`。
+- 新增「網域」資源 `aniya.moe`，用 DNS TXT record 驗證，這筆 record 要永久保留。理由：GA 驗證靠首頁的追蹤碼，切換時只要追蹤碼暫時不見就會失去驗證；DNS 驗證跟網站內容無關，而且涵蓋 `www`、`media` 子網域與 `http://`。
+- GSC 的數據不是從驗證那天才開始累積，新驗證的資源也看得到之前的歷史數據。
+
+### 備份
+
+- WordPress 備份已另存一份到異地（站長確認）。
