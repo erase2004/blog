@@ -1023,3 +1023,53 @@ import Gallery from '../../components/Gallery.astro';
 - 04：索引在 `astro build` 裡產生，CI 不用多一個步驟。搜尋與手機寬度的測試都需要 Playwright 的 Chromium（15 號已記）。
 - 14：Pinterest 的 `media` 目前只用自訂社群圖片；14 號做好 og:image 的備援（文章第一張圖 → `night.png`）後，把同一張圖傳給 `ShareLinks` 的 `image`。14 號若決定社群圖片不用 webp，這裡也一起改。
 - 19：在預覽網址用 GitHub 帳號實際留言、回覆，確認 discussion 建在 `Comments` 分類、標題是中文路徑。giscus 建議用「Announcement」格式的分類（只有維護者和 giscus 能開新 discussion），站長可以到 repo 的 Discussions 設定確認 `Comments` 的格式。可以再加 `giscus.json` 限制只有 `aniya.moe`（與預覽網址）能嵌入留言，這次沒加（repo 還沒推送，預覽網址的網域也還不確定）。
+
+## 22：回到頂部按鈕（2026-10-24）
+
+站長核可 15 號版型時追加的需求。
+
+### 行為
+
+- 共用版型（`src/layouts/BaseLayout.astro`）在側欄之後、頁尾之前放 `src/components/BackToTop.astro`，所以每一頁都有，Tab 順序上排在側欄最後一個連結之後。
+- 往下捲超過一個畫面高度（`scrollY > innerHeight`）才出現；回到這個高度以內就隱藏。用 `hidden` 屬性切換，隱藏時不會被 Tab 到，螢幕閱讀器也讀不到。
+- 點擊後平滑捲回頂部；系統設定 `prefers-reduced-motion: reduce` 時直接跳回（`behavior: 'instant'`）。
+- **鍵盤焦點**：點下去的同時把焦點移到 `<body>`（暫時加 `tabindex="-1"`，離開時拿掉，`preventScroll` 不打斷平滑捲動），下一個 Tab 就是頁面開頭的「跳到主要內容」。Chromium 在按鈕隱藏時本來就會把焦點丟回 `<body>`，但這個「focus fixup」各瀏覽器的實作不一致（有的會把焦點留在已經隱藏的按鈕上；這裡只在 Chromium 驗證過），所以不能依賴；測試檢查的是「頁面開始捲動的那一刻，焦點已經不在按鈕上」。
+- 沒有 JS 時不顯示：HTML 裡的按鈕本來就帶 `hidden`，由 JS 拿掉。JS 是 Astro 內嵌的一段 module script，壓縮後 497 bytes（gzip 316 bytes），不依賴任何框架。
+
+### 外觀
+
+- 真正的 `<button type="button" aria-label="回到頂部">`，箭頭是 `aria-hidden` 的 SVG。直徑 44px（WCAG 2.5.5 的觸控目標大小），固定在畫面右下角距邊 1rem。
+- 沿用 15 號的配色：底色是外框色 `#1a1a1a`、白色箭頭，對比 17.4:1。寬螢幕上按鈕落在紙面旁的深色外框上，所以加一圈淡白色細框和陰影讓它看得出輪廓。滑過時底色換成連結藍 `#007acc`（白箭頭 4.6:1）。
+- focus 樣式：3px 的 `#007acc` 外框、間隔 3px。對白色紙面 4.6:1、對深色外框 3.8:1，都超過 WCAG 對 focus 指示的 3:1。被按鈕移過去焦點的 `<body>` 不畫 focus 外框（不然整頁會框一圈藍線）。
+- 列印時不印。
+
+### 手機寬度不遮住內容
+
+- 捲到頁尾時，按鈕下面沒有任何文字或連結：頁尾右側原本的 Mastodon 連結改成隱藏（見下面），頁尾只剩左邊的版權文字。
+- 捲動途中，浮動按鈕難免會暫時蓋住它右下角的一小塊內文（截圖裡就是這樣），再捲一點就露出來，這是所有浮動按鈕的特性。
+- **用 Tab 移動時不會被按鈕蓋住**（WCAG 2.2 的 2.4.11）：瀏覽器把獲得焦點的元素捲進畫面時，會貼著畫面底邊停下，剛好停在按鈕底下。實測在 320px 寬 Tab 過整篇文章，有 5 個標籤雲連結被蓋住。在 `html` 加 `scroll-padding-bottom: 4.25rem`（按鈕高度加上距離），瀏覽器就會把它們停在按鈕上方。這條規則寫在元件的 `<style>` 裡（`:global(html)`），拿掉元件就跟著拿掉。
+- 16 號的留言區（giscus）在文章最後面，手機上後面還有整個側欄，所以捲到底時不會在按鈕底下；捲動途中的情況同上。
+
+### 頁尾的 Mastodon 連結改成隱藏
+
+- 站長決定：15 號放在頁尾、看得到的 `<a rel="me" href="https://g0v.social/@erase2004">Mastodon</a>` 改回 WordPress 時的做法，留在 HTML 裡但不顯示。加上 `hidden` 屬性：不顯示、不能 Tab 到、螢幕閱讀器不讀；Mastodon 驗證個人檔案連結時是解析 HTML 找 `rel="me"`，不受影響。頁尾已經沒有看得到的連結，連結的樣式也一起拿掉。15 號的頁尾測試改成檢查這個連結有 `rel="me"` 而且帶 `hidden`。這是獨立的 commit（`fix: hide the Mastodon rel=me link`）。
+
+### 測試
+
+`tests/site-serving.test.ts` 的 `layout`：
+
+- 8 種頁面都有一個 `type="button"`、名稱是「回到頂部」的按鈕。
+- `the 回到頂部 button`：用 Playwright（Chromium）開一篇長文章：
+  - 在頂端與往下捲半個畫面時看不到，捲過 1.5 個畫面看得到，捲回頂端又看不到。以無障礙名稱找按鈕（`getByRole('button', { name: '回到頂部' })`），名稱也一起驗證。
+  - 關掉 JS 時捲到下面也看不到。
+  - 位置在右下角、至少 44px，底色 `rgb(26, 26, 26)`、箭頭 `rgb(255, 255, 255)`，對比用 WCAG 公式算，至少 4.5:1。
+  - 從側欄最後一個連結按 Tab 會到按鈕；focus 外框是實線、至少 2px，對白色與 `#1a1a1a` 都至少 3:1；按 Enter 會回到頂端。
+  - 點擊後的捲動過程有中間位置（平滑）；`reducedMotion: 'reduce'` 時只有一次捲動事件、直接到 0。
+  - 用鍵盤按下後，頁面開始捲動時焦點已經在 `<body>`；回到頂端後按 Tab 是「跳到主要內容」。
+  - 320px 寬：捲到最底時按鈕下沒有文字或連結、沒有水平捲動；從頁首一路 Tab 到按鈕，沒有任何獲得焦點的元素被按鈕蓋住。
+- **Headless Chromium 預設不做平滑捲動**（`behavior: 'smooth'` 會直接跳過去），這組測試的瀏覽器要加 `--enable-smooth-scrolling` 才測得出平滑捲動。另外關掉 JS 的頁面不會執行 `requestAnimationFrame` 與 timer，那個測試只能用同步的 `evaluate`。
+- 確認過測試抓得到問題：把 Mastodon 連結的 `hidden` 暫時拿掉，「捲到最底時按鈕下沒有文字」就失敗並列出 `Mastodon`；拿掉 `scroll-padding-bottom` 時 Tab 測試列出那 5 個標籤連結。
+
+### 外觀確認
+
+手機（375px）與桌機（1366px）各一張文章頁捲到中段、按鈕出現的截圖交給站長（不放進 repo）。
