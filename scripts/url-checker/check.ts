@@ -193,12 +193,28 @@ async function checkUrl(
 		}
 	}
 
-	if (entry.expect === 'page' && requestPath !== '/' && requestPath.endsWith('/')) {
+	const slashlessLocation = locationWithoutTrailingSlash(entry, requestPath);
+	if (slashlessLocation !== null) {
 		const slashless = requestPath.slice(0, -1);
-		const slashlessProblems = redirectProblems(await target.get(slashless), requestPath);
+		const slashlessProblems = redirectProblems(await target.get(slashless), slashlessLocation);
 		problems.push(...slashlessProblems.map((problem) => `${decodeURI(slashless)}: ${problem}`));
 	}
 	return problems;
+}
+
+/**
+ * Where a URL ending with `/` must redirect without its trailing slash (as
+ * on WordPress, which added the slash with a 301): a page to itself, an old
+ * URL that redirects to a given URL of the site (an old slug, a feed, the
+ * author page) to that URL. Null for other URLs. Not attachment pages, whose
+ * location is an image known only after the build or a file on R2: the site
+ * has too few static `_redirects` rules left for a rule for each.
+ */
+function locationWithoutTrailingSlash(entry: ExpectedUrl, requestPath: string): string | null {
+	if (requestPath === '/' || !requestPath.endsWith('/')) return null;
+	if (entry.expect === 'page') return requestPath;
+	if (entry.expect === 'redirect' && entry.location?.startsWith('/')) return entry.location;
+	return null;
 }
 
 /** What the expectation itself asks of a reply, apart from the HTML head. */

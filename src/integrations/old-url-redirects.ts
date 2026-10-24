@@ -6,17 +6,19 @@ import { appendRedirects } from './redirects-file';
 
 /**
  * The feed of each post, page, category and tag, `<URL>feed/`, redirects to
- * `<URL>`: one dynamic rule for all of them (`/feed/` itself does not match).
+ * `<URL>`, with or without its trailing slash: dynamic rules for all of
+ * them (`/feed/` itself does not match).
  */
-const FEED_RULE = '/*/feed/ /:splat/ 301';
+const FEED_RULES = ['/*/feed/ /:splat/ 301', '/*/feed /:splat/ 301'];
 const isFeedOf = (url: string, location: string) => url === `${location}feed/`;
 
 /**
  * Adds `_redirects` rules for the old URLs the mapping table redirects to a
  * given URL of the site: a static `<old URL> <new URL> 301` rule for each
- * (the author page, the sitemaps, the comments feed, old slugs), then the
- * dynamic rule for the feeds. Not URLs with a query string: the Worker
- * answers them (src/worker.ts).
+ * (the author page, the sitemaps, the comments feed, old slugs), and one for
+ * the URL without its trailing slash, which WordPress redirected to the URL
+ * with it; then the dynamic rules for the feeds. Not URLs with a query
+ * string: the Worker answers them (src/worker.ts).
  *
  * Static rules count towards the 2,000 a Worker may have, dynamic ones
  * towards 100, and every rule after the first dynamic one counts as dynamic:
@@ -36,11 +38,14 @@ export default function oldUrlRedirects(): AstroIntegration {
 				);
 				const rules = redirects
 					.filter(({ url, location }) => !url.includes('?') && !isFeedOf(url, location))
-					.map(({ url, location }) => `${encodeURI(url)} ${encodeURI(location)} 301`);
+					.flatMap(({ url, location }) => (url.endsWith('/') ? [url, url.slice(0, -1)] : [url]).map((from) => ({ from, location })))
+					.map(({ from, location }) => `${encodeURI(from)} ${encodeURI(location)} 301`);
 				const feeds = redirects.filter(({ url, location }) => isFeedOf(url, location)).length;
 
-				await appendRedirects(dir, [...rules, FEED_RULE]);
-				logger.info(`added ${rules.length} rules for old URLs, and 1 dynamic rule for ${feeds} feeds, to _redirects`);
+				await appendRedirects(dir, [...rules, ...FEED_RULES]);
+				logger.info(
+					`added ${rules.length} rules for old URLs, and ${FEED_RULES.length} dynamic rules for ${feeds} feeds, to _redirects`,
+				);
 			},
 		},
 	};

@@ -1389,7 +1389,9 @@ describe('the Worker', () => {
 		// Old URLs that _redirects rules answer.
 		'/wp-content/uploads/2022/03/preview-1.png',
 		'/2021/09/30/第一篇文章/feed/',
+		'/2021/09/30/第一篇文章/feed',
 		'/author/erase2004/',
+		'/author/erase2004',
 		// Unknown URLs, which get the 404 page.
 		'/no-such-page/',
 		'/no-such-page',

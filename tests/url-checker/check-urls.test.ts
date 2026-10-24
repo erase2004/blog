@@ -103,8 +103,16 @@ const fixtureSite: Record<string, string> = {
 		'/混 /混/ 301',
 		'/%e6%b7%b7/ /ok/ 301',
 		'/old/ /ok/ 301',
+		'/old /ok/ 301',
 		'/old-elsewhere/ /no-title/ 301',
+		'/old-elsewhere /ok/ 301',
 		'/temporary/ /ok/ 302',
+		'/temporary /ok/ 301',
+		'/slashless-missing/ /ok/ 301',
+		'/slashless-elsewhere/ /ok/ 301',
+		'/slashless-elsewhere /no-title/ 301',
+		'/attachment-page/ /img/new.png 301',
+		'/video-page/ https://media.aniya.moe/videos/a/video.mp4 301',
 		'/wp-content/uploads/old.png /img/new.png 301',
 		'/wp-content/uploads/dangling.png /img/missing.png 301',
 		'/wp-content/uploads/video.mp4 https://media.aniya.moe/videos/a/video.mp4 301',
@@ -113,6 +121,7 @@ const fixtureSite: Record<string, string> = {
 		'/proxied-to-nothing/ /nowhere/ 200',
 		// Dynamic rules come last; Workers try them after all static rules.
 		'/tag/:tag/feed/ /tag/:tag/ 301',
+		'/tag/:tag/feed /tag/:tag/ 301',
 		'/archive/* /ok/ 301',
 	].join('\n'),
 };
@@ -267,6 +276,32 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 				problems: ['expected a redirect to /ok/, got /no-title/'],
 			},
 			{ url: '/temporary/', outcome: 'fail', problems: ['expected HTTP 301, got 302 to /ok/'] },
+		]);
+	});
+
+	// As WordPress answered them: without the slash, a 301 to the URL with it,
+	// which redirected on. Not attachment pages (their location is an image
+	// known after the build, or on R2): the site has no static rules left for
+	// them.
+	it('fails a redirect to a page whose URL without the trailing slash does not redirect to the page too', async () => {
+		const report = await check([
+			{ url: '/old/', expect: 'redirect', location: '/ok/' },
+			{ url: '/slashless-missing/', expect: 'redirect', location: '/ok/' },
+			{ url: '/slashless-elsewhere/', expect: 'redirect', location: '/ok/' },
+			{ url: '/attachment-page/', expect: 'redirect' },
+			{ url: '/video-page/', expect: 'redirect', location: 'https://media.aniya.moe/videos/a/video.mp4' },
+		]);
+
+		expect(report.results).toEqual([
+			{ url: '/old/', outcome: 'pass', problems: [] },
+			{ url: '/slashless-missing/', outcome: 'fail', problems: ['/slashless-missing: expected HTTP 301, got 404'] },
+			{
+				url: '/slashless-elsewhere/',
+				outcome: 'fail',
+				problems: ['/slashless-elsewhere: expected a redirect to /ok/, got /no-title/'],
+			},
+			{ url: '/attachment-page/', outcome: 'pass', problems: [] },
+			{ url: '/video-page/', outcome: 'pass', problems: [] },
 		]);
 	});
 
