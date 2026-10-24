@@ -17,8 +17,9 @@ export default function notFoundPage(): AstroIntegration {
 	return {
 		name: 'not-found-page',
 		hooks: {
-			'astro:build:done': async ({ dir }) => {
+			'astro:build:done': async ({ dir, logger }) => {
 				await appendRedirects(dir, ['/404/ /404/no-such-page/ 200']);
+				logger.info('added the rule that answers /404/ with HTTP 404 to _redirects');
 			},
 		},
 	};
