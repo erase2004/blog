@@ -1,10 +1,10 @@
 ---
 // The sidebar, in the WordPress sidebar's order: search, categories, years,
 // tag cloud. Each widget is a `.widget` section with an h2.
-import CategoryList from './CategoryList.astro';
+import { categoryArchives, yearArchives } from '../lib/archives';
+import ArchiveList from './ArchiveList.astro';
 import Search from './Search.astro';
 import TagCloud from './TagCloud.astro';
-import YearList from './YearList.astro';
 ---
 
 <aside class="sidebar" aria-label="側欄">
@@ -14,11 +14,11 @@ import YearList from './YearList.astro';
 	</section>
 	<section class="widget" id="categories">
 		<h2>分類</h2>
-		<CategoryList />
+		<ArchiveList label="分類" archives={await categoryArchives()} />
 	</section>
 	<section class="widget" id="years">
 		<h2>年份</h2>
-		<YearList />
+		<ArchiveList label="年份" archives={await yearArchives()} />
 	</section>
 	<section class="widget" id="tags">
 		<h2>標籤</h2>

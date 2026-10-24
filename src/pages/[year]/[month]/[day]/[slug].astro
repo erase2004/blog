@@ -72,7 +72,7 @@ const socialImageUrl = new URL((await socialImageFile(image)).src, Astro.site).h
 					))
 				}
 			</ul>
-			<h1>{title}</h1>
+			<h1 class="page-title">{title}</h1>
 			<dl class="post-dates">
 				<div>
 					<dt>發布日期</dt>
@@ -136,8 +136,6 @@ const socialImageUrl = new URL((await socialImageFile(image)).src, Astro.site).h
 	}
 	h1 {
 		margin-bottom: 1rem;
-		font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
-		line-height: 1.35;
 	}
 	.post-dates {
 		display: flex;

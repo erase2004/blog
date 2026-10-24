@@ -6,8 +6,8 @@ export const WORDPRESS_DUMP = 'D:/wordpress-backup/wordpress-2026-10-24-23e0c01.
 /** The uploads directory of the backup, where the images are copied from. Read only; override with a second argument. */
 export const WORDPRESS_UPLOADS = 'D:/wordpress-backup/wp-content/uploads';
 
-/** The site's origin; links to it become site-relative paths. Must equal the WordPress `home` option. */
-export const SITE_ORIGIN = 'https://aniya.moe';
+/** The site's origin (src/consts.ts); links to it become site-relative paths. Must equal the WordPress `home` option. */
+export { SITE_ORIGIN } from '../../src/consts.ts';
 
 /** Where the videos and the PDF are served from: the custom domain of the R2 bucket `media` (ticket 07). */
 export const MEDIA_ORIGIN = 'https://media.aniya.moe';

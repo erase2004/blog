@@ -1,7 +1,7 @@
 // Settings of the URL checker. Paths are relative to the project root.
 
-/** The production origin; every page's canonical URL must be on it. */
-export const SITE_ORIGIN = 'https://aniya.moe';
+/** The production origin (src/consts.ts); every page's canonical URL must be on it. */
+export { SITE_ORIGIN } from '../../src/consts.ts';
 
 /**
  * What the production site must do beyond answering each expected URL,

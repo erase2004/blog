@@ -1,6 +1,13 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 
+/**
+ * The site's origin, where WordPress was: canonical URLs, feeds and the
+ * sitemap are on it (`site` in astro.config.mjs). The URL checker and the
+ * WordPress converter use it too, so this file imports nothing.
+ */
+export const SITE_ORIGIN = 'https://aniya.moe';
+
 export const SITE_TITLE = 'TsukiStudio';
 export const SITE_DESCRIPTION = '生活點滴紀錄';
 

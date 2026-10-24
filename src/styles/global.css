@@ -75,6 +75,16 @@ h6 {
 	line-height: 1.35;
 }
 
+/* The title of a post, a page or the 404 page: its h1. */
+.page-title {
+	font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
+}
+/* Over a heavy rule, as Twenty Sixteen had: pages and the 404 page (a post's header has a rule of its own). */
+.page-title.ruled {
+	padding-bottom: 1rem;
+	border-bottom: 3px solid var(--color-frame);
+}
+
 a {
 	color: var(--color-link);
 	text-decoration-thickness: 1px;

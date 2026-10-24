@@ -66,8 +66,20 @@ export function archivePages(archive: Archive): ArchivePage[] {
  * The route parameter of a page below the archive's own URL: none for the
  * first page, `page/N` for the others.
  */
-export function pageParam(page: ArchivePage): string | undefined {
+function pageParam(page: ArchivePage): string | undefined {
 	return page.number === 1 ? undefined : `page/${page.number}`;
+}
+
+/**
+ * Every page of the category archives, or of the tag archives, as the
+ * routes `/category/[slug]/[...page]` and `/tag/[slug]/[...page]` list them
+ * (getStaticPaths()).
+ */
+export async function termArchiveRoutes(collection: Term['collection']) {
+	const archives = collection === 'categories' ? await categoryArchives() : await tagArchives();
+	return archives.flatMap((archive) =>
+		archivePages(archive).map((page) => ({ params: { slug: archive.id, page: pageParam(page) }, props: { page } })),
+	);
 }
 
 /** The home page `/`: every post. */

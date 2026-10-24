@@ -4,6 +4,7 @@ import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
+import { SITE_ORIGIN } from './src/consts';
 import imageRedirects from './src/integrations/image-redirects';
 import mediaRedirects from './src/integrations/media-redirects';
 import notFoundPage from './src/integrations/not-found-page';
@@ -22,7 +23,7 @@ pluginFramesTexts.addLocale('zh-TW', {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://aniya.moe',
+	site: SITE_ORIGIN,
 	// Every URL ends with "/", as on the WordPress site; each page is written
 	// as <path>/index.html.
 	trailingSlash: 'always',

@@ -80,6 +80,11 @@ export function postUpdated(post: Post): Date {
 	return updated > published ? updated : published;
 }
 
+/** When the latest change to any of the posts was made: the latest postUpdated() among them. */
+export function lastUpdated(posts: Post[]): Date {
+	return new Date(Math.max(...posts.map((post) => postUpdated(post).getTime())));
+}
+
 /**
  * A post's or page's title as WordPress showed it, in the page title, the
  * heading and lists: a hyphen with spaces around it is an en dash

@@ -31,7 +31,7 @@ const title = displayTitle(page.data.title);
 	breadcrumbs={trail.map((step) => ({ name: displayTitle(step.data.title), path: pagePath(step) }))}
 >
 	<article data-pagefind-body>
-		<h1>{title}</h1>
+		<h1 class="page-title ruled">{title}</h1>
 		<div class="prose">
 			<Content />
 		</div>
@@ -41,8 +41,5 @@ const title = displayTitle(page.data.title);
 <style>
 	h1 {
 		margin-bottom: 2rem;
-		padding-bottom: 1rem;
-		border-bottom: 3px solid var(--color-frame);
-		font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
 	}
 </style>

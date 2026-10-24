@@ -3,7 +3,7 @@
 // images of each. Not the date archives (indexable, but never in the
 // sitemap) nor the pages after the first of a list (noindex).
 import { type Archive, categoryArchives, homeArchive, tagArchives } from './archives';
-import { getPages, getPosts, type Page, pagePath, type Post, postPath, postUpdated } from './content';
+import { getPages, getPosts, lastUpdated, type Page, pagePath, type Post, postPath, postUpdated } from './content';
 import { imageAt, imagesIn, imageUrl } from './images';
 import { escapeXml } from './xml';
 
@@ -49,7 +49,7 @@ export async function sitemap(site: URL): Promise<string> {
 
 /** A list of posts changes when one of its posts does. */
 function archiveEntry({ path, posts }: Archive): SitemapEntry {
-	return { path, updated: new Date(Math.max(...posts.map((post) => postUpdated(post).getTime()))), images: [] };
+	return { path, updated: lastUpdated(posts), images: [] };
 }
 
 function postEntry(post: Post): SitemapEntry {

@@ -1,9 +1,9 @@
 ---
 // A page that exists only in test builds (injected by tests/support/build-site.mjs):
 // the sidebar widgets on their own, outside the layout.
-import CategoryList from '../../src/components/CategoryList.astro';
+import ArchiveList from '../../src/components/ArchiveList.astro';
 import TagCloud from '../../src/components/TagCloud.astro';
-import YearList from '../../src/components/YearList.astro';
+import { categoryArchives, yearArchives } from '../../src/lib/archives';
 ---
 
 <!doctype html>
@@ -13,8 +13,8 @@ import YearList from '../../src/components/YearList.astro';
 		<title>widgets</title>
 	</head>
 	<body>
-		<section id="categories"><CategoryList /></section>
-		<section id="years"><YearList /></section>
+		<section id="categories"><ArchiveList label="分類" archives={await categoryArchives()} /></section>
+		<section id="years"><ArchiveList label="年份" archives={await yearArchives()} /></section>
 		<section id="tags"><TagCloud /></section>
 	</body>
 </html>
