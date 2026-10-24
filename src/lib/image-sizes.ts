@@ -1,6 +1,7 @@
 // How wide the images in a post's body are shown, for their `sizes`
 // attribute, so that browsers load an image as wide as the post's column
-// rather than as the screen. Follows the layout in src/styles/global.css
+// rather than as the screen: Markdown images (through contentImageSizes) and
+// the Compare slider's. Follows the layout in src/styles/global.css
 // (`.sheet`): keep the two in step.
 
 /**
