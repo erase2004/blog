@@ -22,6 +22,7 @@ import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
 const buildScript = fileURLToPath(new URL('./support/build-site.mjs', import.meta.url));
 const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta.url));
+const MAPPING_TABLE = fileURLToPath(new URL('../src/data/old-url-map.json', import.meta.url));
 
 // Test-only pages the build script adds next to the site's real pages: a
 // plain page, and one with the sidebar widgets.
@@ -1489,19 +1490,58 @@ describe('converted content', () => {
 
 		// The sliders in the WordPress backup: jetpack/image-compare blocks, plus
 		// the copies of their markup pasted as Custom HTML (wp:html) blocks.
-		it.each([
+		const SLIDERS: [string, number][] = [
 			['/2025/05/17/travel-setonaikai-2025-day2/', 6 + 0],
 			['/2025/05/17/travel-setonaikai-2025-day3/', 7 + 2],
 			['/2025/05/17/travel-setonaikai-2025-day4/', 11 + 2],
 			['/2025/05/17/travel-setonaikai-2025-day5/', 17 + 2],
 			['/2025/05/17/travel-setonaikai-2025-day6/', 12 + 0],
 			['/2025/05/17/travel-setonaikai-2025-day8/', 19 + 2],
-		])('%s has the %i sliders it had on WordPress', (path, sliders) => {
+		];
+
+		it.each(SLIDERS)('%s has the %i sliders it had on WordPress', (path, sliders) => {
 			const html = page(path);
 
 			expect(html.querySelectorAll('main img-comparison-slider')).toHaveLength(sliders);
 			expect(html.querySelectorAll('main img-comparison-slider [slot] img')).toHaveLength(2 * sliders);
 		});
+
+		// An old image URL redirects to the image at full size; the sliders show
+		// that file, not another copy of the photo made just for them.
+		it('show each image at full size as the file its old URLs redirect to', async () => {
+			const { images } = JSON.parse(readFileSync(MAPPING_TABLE, 'utf8')) as { images: { uploads: string[] }[] };
+			const path = (url: string) => new URL(url, server!.url).pathname;
+			const targets = new Set<string>();
+			const olds = images.map(({ uploads }) => uploads[0]!);
+			while (olds.length > 0) {
+				await Promise.all(
+					olds.splice(0, 20).map(async (old) => {
+						const response = await get(old);
+						expect(response.status, old).toBe(301);
+						targets.add(path(response.headers.get('location')!));
+					}),
+				);
+			}
+
+			const shown = new Set<string>();
+			const problems: Record<string, string> = {};
+			for (const [post] of SLIDERS) {
+				for (const img of page(post).querySelectorAll('main img-comparison-slider [slot] img')) {
+					const src = path(img.getAttribute('src')!);
+					const [widest] = img
+						.getAttribute('srcset')!
+						.split(',')
+						.map((candidate) => candidate.trim().split(/\s+/))
+						.sort(([, a], [, b]) => Number.parseInt(b!, 10) - Number.parseInt(a!, 10));
+					shown.add(src);
+					if (path(widest![0]!) !== src) problems[decodeURI(src)] = `the widest in its srcset is ${widest![0]}`;
+					else if (!targets.has(src)) problems[decodeURI(src)] = 'no old URL redirects to it';
+				}
+			}
+
+			expect(problems).toEqual({});
+			expect(shown.size).toBe(151);
+		}, 60_000);
 
 		describe('in a browser', () => {
 			let browser: Browser | undefined;
