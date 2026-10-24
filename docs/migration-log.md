@@ -1224,6 +1224,7 @@ import Gallery from '../../components/Gallery.astro';
   - 所有 `id` 加上每篇不同的前綴（`post-<文章 ID 的 SHA-256 前 8 碼>-`，中文 slug 也只用 ASCII），`aria-describedby` 跟著改。08 號記錄的問題：每篇的腳註都叫 `user-content-fn-1`，閱讀器把好幾篇放在同一頁時 ID 會重複；現在 10 篇之間沒有重複的 ID。
   - node-html-parser 改寫屬性時不會跳脫 `&`，網址裡的 `&` 要自己寫成 `&amp;`（不然 validator 會說是壞掉的 entity）。
 - **保留 WordPress 的 GUID**：RSS 的 `<guid isPermaLink="false">` 與 Atom 的 `<id>` 都是 `https://aniya.moe/?p=<文章 ID>`，跟 WordPress 一樣。閱讀器靠這個判斷是不是新文章，換掉的話訂閱者會看到 10 篇「新」文章。之後新寫、沒有 `wordpressId` 的文章用文章網址。
+- 標題用 14 號的 `displayTitle()`：WordPress 的 feed 標題也經過 `wptexturize`，` - ` 是 en dash（`遊記 – 岡山 / 香川 / 德島八日遊 – Day 8`）。`llms.txt` 的標題也是（AIOSEO 的 `llms.txt` 用的是原本的 ` - `，這裡跟頁面上顯示的一致）。
 - 其他欄位照 WordPress：`pubDate`（`Fri, 23 Jan 2026 10:00:00 +0000` 格式）、`dc:creator`（Tsuki）、分類與標籤名稱（`<category>`，先分類後標籤）、`lastBuildDate`／Atom 的 `<updated>` 是所有文章裡最後一次更新的時間、`language` zh-TW、`atom:link rel="self"`；Atom 的作者 `uri` 是 `/about/`、`content` 有 `xml:base`。`<description>`／`<summary>` 用 meta description（WordPress 是內文開頭加「閱讀全文」）。
 - 沒有照搬的：連結上 MonsterInsights 加的 `utm_*` 參數（spec 排除 MonsterInsights）、留言相關的 `<comments>`、`wfw:commentRss`、`slash:comments`、`thr:` 連結（沒有舊留言，留言改用 giscus）、`sy:update*`、`generator`，以及頻道圖示（網站圖示還沒搬，14 號）。
 - 大小：RSS 約 569 KB、Atom 約 570 KB（WordPress 的 RSS 是 308 KB：它的 Envira 相簿在 feed 裡只放第一張圖）。
@@ -1263,6 +1264,6 @@ import Gallery from '../../components/Gallery.astro';
 ### 留給其他 issue 的發現
 
 - 13：`/feed`、`/feed/atom` 的無斜線 301 已經有了。單篇、分類、標籤、頁面的 `…/feed/` 動態規則與 `/comments/feed/`、子 sitemap 的轉址還是 13 號的；`_redirects` 現在 1,776 條靜態規則，剩 224 條空間。
-- 14：og:image 的「文章第一張圖」可以用 `imagesIn(post)[0]`（原始檔裡第一個引用的圖片；MDX 的滑桿圖片 import 在檔案開頭，所以對 MDX 來說不一定是畫面上的第一張，要再確認）。feed 的頻道圖示（WordPress 用 `cropped-night-32x32.png`）等網站圖示搬好再加。作者名稱「Tsuki」目前寫在 `src/lib/feeds.ts`，14 號的 JSON-LD Person 若需要可以搬到 `consts.ts` 共用。
+- 14（已合併）：14 號的 `firstImage()` 跟這裡的 `imagesIn()` 用同一種方法找原始檔裡的圖片，合併後 `firstImage()` 改成取 `imagesIn()` 的第一張，只留一份比對規則（採用 14 號較嚴格的寫法：相對路徑、要有圖片副檔名、先 `decodeURI`）；差別只在原始檔提到不存在的圖片時，現在是跳過而不是建置失敗。feed 的頻道圖示（WordPress 用 `cropped-night-32x32.png`）還沒加，網站圖示 14 號已經搬好，之後可以補。作者名稱「Tsuki」寫在 `src/lib/feeds.ts`。14 號建議把 feed 連結放進 `BaseHead.astro`；這裡放在 `BaseLayout.astro` 裡緊接著 `<BaseHead>` 的那一行，輸出位置一樣（`BaseHead` 只有 `BaseLayout` 在用），就沒有再搬。
 - 18：頁面的 meta description 有幾個是截斷的內文（例如 `/about/` 是「我的故事 聯絡方式」），也原樣出現在 `llms.txt`。
 - 19：在預覽網址確認 `_headers` 的 Content-Type 與 `X-Robots-Tag`，並用網址（不是貼內容）再跑一次 W3C Feed Validator。
