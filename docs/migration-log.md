@@ -548,3 +548,9 @@ npm run verify-media                   # 每個網址回 200、Content-Type 與�
 
 - `archives`：分類、標籤（含 `book☆walker`、日文 slug）、年、月、日彙整、`/2025/page/2/`、首頁與 `/page/N/` 列出的文章與順序；分頁的 `noindex, nofollow`；標題。期望值都是線上 WordPress 同一個網址列出的內容。
 - `sidebar widgets`：三個元件放在只有測試建置才有的 `/widgets/` 頁（`tests/fixtures/widgets-page.astro`），期望值是線上網站側欄的分類數、年份數與標籤雲字級。`tests/support/build-site.mjs` 多了第三個參數 `<widgetsPath>`。
+
+### 07 補記：實際上傳到 R2（2026-10-24）
+
+- 由 orchestrator 用 `npm run upload-media` 上傳，token 只放在執行當下的環境變數裡，沒有寫進任何檔案。
+- 9 個檔案全部上傳完成。再跑一次 `--dry-run` 顯示「0 個要上傳、9 個已在 R2」，確認重複執行不會重傳。
+- `npm run verify-media`：9 個全部通過。每個檔案都回 200，Content-Type 與大小正確；從中段要 1 KiB 的 range request 回 206，Content-Range 正確，影片可以拖曳進度條。
