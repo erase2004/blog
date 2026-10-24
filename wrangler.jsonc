@@ -1,0 +1,11 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "aniya-moe",
+	"compatibility_date": "2026-10-19",
+	// Static assets only: Cloudflare serves the Astro build output directly.
+	"assets": {
+		"directory": "./dist",
+		// Unknown URLs get dist/404.html with HTTP status 404.
+		"not_found_handling": "404-page"
+	}
+}

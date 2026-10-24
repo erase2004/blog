@@ -1,0 +1,11 @@
+---
+import { SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title={`找不到頁面 - ${SITE_TITLE}`} description="找不到這個頁面。">
+	<meta slot="head" name="robots" content="noindex" />
+	<h1>找不到頁面</h1>
+	<p>這個網址沒有內容，可能已經移動或刪除。</p>
+	<p><a href="/">回到首頁</a></p>
+</BaseLayout>
