@@ -77,12 +77,15 @@ describe('expected URLs from the sitemap snapshot', () => {
 });
 
 describe('expected URLs that never existed', () => {
-	it('include one that must answer 404', () => {
+	it("are one that must answer 404, and the 404 page's own URL, which must not be a page of its own", () => {
 		const notFound = loadExpectedUrls({ sitemapDir: snapshotDir }).filter(
 			(expected) => expected.expect === 'not-found',
 		);
 
-		expect(notFound).toHaveLength(1);
+		expect(notFound).toEqual([
+			{ url: '/url-checker/no-such-page/', expect: 'not-found' },
+			{ url: '/404/', expect: 'not-found' },
+		]);
 	});
 });
 

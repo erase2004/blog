@@ -149,6 +149,15 @@ describe('unknown URLs', () => {
 		expect(response.status).toBe(404);
 		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
 	});
+
+	// Workers static assets would serve dist/404.html at /404/ with HTTP 200,
+	// as a page of its own; /404 and /404.html redirect to /404/.
+	it.each(['/404/', '/404', '/404.html'])("the 404 page's own URL %s ends in HTTP 404 too", async (path) => {
+		const response = await fetch(new URL(path, server!.url));
+
+		expect(response.status).toBe(404);
+		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
+	});
 });
 
 describe('images', () => {
