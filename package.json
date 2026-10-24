@@ -13,6 +13,7 @@
     "build": "astro build",
     "preview": "astro build && wrangler dev",
     "astro": "astro",
+    "check-urls": "node scripts/check-urls.ts",
     "test": "vitest run"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "sharp": "^0.35.0"
   },
   "devDependencies": {
+    "node-html-parser": "^9.0.4",
     "vitest": "^5.0.5",
     "wrangler": "^4.152.0"
   },
