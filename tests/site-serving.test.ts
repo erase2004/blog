@@ -18,11 +18,11 @@ import {
 } from 'playwright';
 import sharp from 'sharp';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { oldUrlMap } from '../src/lib/old-url-map';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
 const buildScript = fileURLToPath(new URL('./support/build-site.mjs', import.meta.url));
 const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta.url));
-const MAPPING_TABLE = fileURLToPath(new URL('../src/data/old-url-map.json', import.meta.url));
 
 // Test-only pages the build script adds next to the site's real pages: a
 // plain page, and one with the sidebar widgets.
@@ -1511,10 +1511,9 @@ describe('converted content', () => {
 		// An old image URL redirects to the image at full size; the sliders show
 		// that file, not another copy of the photo made just for them.
 		it('show each image at full size as the file its old URLs redirect to', async () => {
-			const { images } = JSON.parse(readFileSync(MAPPING_TABLE, 'utf8')) as { images: { uploads: string[] }[] };
 			const path = (url: string) => new URL(url, server!.url).pathname;
 			const targets = new Set<string>();
-			const olds = images.map(({ uploads }) => uploads[0]!);
+			const olds = oldUrlMap.images.map(({ uploads }) => uploads[0]!);
 			while (olds.length > 0) {
 				await Promise.all(
 					olds.splice(0, 20).map(async (old) => {

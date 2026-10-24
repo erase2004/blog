@@ -4,17 +4,17 @@
 // Built as a page so that it can use Astro's images; the image-redirects
 // integration moves it into _redirects.
 import type { APIRoute } from 'astro';
-import table from '../data/old-url-map.json';
 import { imageAt, imageUrl } from '../lib/images';
+import { oldUrlMap, oldUrlsOf } from '../lib/old-url-map';
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
 	const rules: string[] = [];
-	for (const { file, uploads, attachmentPage } of table.images) {
-		const url = await imageUrl(await imageAt(file));
+	for (const image of oldUrlMap.images) {
+		const url = await imageUrl(await imageAt(image.file));
 		// Query strings (/?attachment_id=) are the Worker's to answer.
-		for (const old of [...uploads, attachmentPage].filter((path) => !path.includes('?'))) {
+		for (const old of oldUrlsOf(image).filter((path) => !path.includes('?'))) {
 			rules.push(`${encodeURI(old)} ${url} 301`);
 		}
 	}

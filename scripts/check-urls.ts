@@ -10,13 +10,10 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { oldUrlMap } from '../src/lib/old-url-map.ts';
 import { checkUrls, formatReport, prunePendingList } from './url-checker/check.ts';
 import { loadExpectedUrls } from './url-checker/expected-urls.ts';
-import {
-	MAPPING_TABLE_FILE,
-	PENDING_LIST_FILE,
-	SITEMAP_SNAPSHOT_DIR,
-} from './url-checker/settings.ts';
+import { PENDING_LIST_FILE, SITEMAP_SNAPSHOT_DIR } from './url-checker/settings.ts';
 import { buildOutput, httpSite, type Target } from './url-checker/targets.ts';
 
 const USAGE = 'usage: node scripts/check-urls.ts (build [<dir>] | http <base-url>) [--prune-pending]';
@@ -51,10 +48,7 @@ if (mode === 'build') {
 const pendingListFile = join(root, PENDING_LIST_FILE);
 const pendingList = readFileSync(pendingListFile, 'utf8');
 const report = await checkUrls({
-	expected: loadExpectedUrls({
-		sitemapDir: join(root, SITEMAP_SNAPSHOT_DIR),
-		mappingTableFile: join(root, MAPPING_TABLE_FILE),
-	}),
+	expected: loadExpectedUrls({ sitemapDir: join(root, SITEMAP_SNAPSHOT_DIR), mappingTable: oldUrlMap }),
 	target,
 	pendingList,
 });

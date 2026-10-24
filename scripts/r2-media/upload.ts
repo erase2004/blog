@@ -6,7 +6,7 @@
 import { createHash } from 'node:crypto';
 import { createReadStream, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { MediaFile } from './media-table.ts';
+import type { MediaFile } from '../../src/lib/old-url-map.ts';
 
 export type UploadOptions = {
 	files: MediaFile[];

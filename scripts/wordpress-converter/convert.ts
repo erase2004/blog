@@ -3,7 +3,6 @@
 // tag data, the old-URL mapping table, and the list of images to copy from
 // the uploads directory. Same tables in, same files out.
 import { SITE_TIMEZONE } from '../../src/consts.ts';
-import { MAPPING_TABLE_FILE } from '../url-checker/settings.ts';
 import { convertContent, shortcodeNames } from './content.ts';
 import { contentDirectory, fileName, PAGES_DIR, pagePath, POSTS_DIR } from './content-files.ts';
 import { type FrontmatterValue, frontmatter, localParts } from './frontmatter.ts';
@@ -18,6 +17,8 @@ import { loadWordPress, type Post, type WordPressSite } from './wordpress.ts';
 export { PAGES_DIR, POSTS_DIR };
 export const CATEGORIES_FILE = 'src/data/categories.json';
 export const TAGS_FILE = 'src/data/tags.json';
+/** The old-URL mapping table, which src/lib/old-url-map.ts reads for the site, the Worker and the scripts. */
+export const MAPPING_TABLE_FILE = 'src/data/old-url-map.json';
 
 export type ConvertedEntry = {
 	post: Post;

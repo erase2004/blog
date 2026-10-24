@@ -2,7 +2,7 @@
 // URL answers 200 with the file's type and size, and a range request from
 // the middle of the file (what a <video> sends when seeking) answers 206
 // with that range.
-import type { MediaFile } from './media-table.ts';
+import type { MediaFile } from '../../src/lib/old-url-map.ts';
 
 export type VerifyResult = { url: string; problems: string[] };
 

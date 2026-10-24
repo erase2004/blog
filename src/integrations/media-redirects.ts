@@ -1,7 +1,5 @@
 import type { AstroIntegration } from 'astro';
-import { fileURLToPath } from 'node:url';
-import { oldUrls, readMediaTable } from '../../scripts/r2-media/media-table.ts';
-import { MAPPING_TABLE_FILE } from '../../scripts/url-checker/settings.ts';
+import { mediaFiles, oldUrlsOf } from '../lib/old-url-map';
 import { appendRedirects } from './redirects-file';
 
 /**
@@ -12,17 +10,12 @@ import { appendRedirects } from './redirects-file';
  * one count as dynamic, so dynamic rules must be added after these.
  */
 export default function mediaRedirects(): AstroIntegration {
-	let root: URL;
 	return {
 		name: 'media-redirects',
 		hooks: {
-			'astro:config:done': ({ config }) => {
-				root = config.root;
-			},
 			'astro:build:done': async ({ dir, logger }) => {
-				const files = readMediaTable(fileURLToPath(new URL(MAPPING_TABLE_FILE, root)));
-				const rules = files.flatMap((file) =>
-					oldUrls(file).map((old) => `${encodeURI(old)} ${encodeURI(file.url)} 301`),
+				const rules = mediaFiles().flatMap((file) =>
+					oldUrlsOf(file).map((old) => `${encodeURI(old)} ${encodeURI(file.url)} 301`),
 				);
 
 				await appendRedirects(dir, rules);

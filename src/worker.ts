@@ -12,7 +12,7 @@
 // An ID WordPress never gave out gets the 404 page, as on WordPress.
 // Anything else at `/` is the home page. The IDs come from the old-URL
 // mapping table.
-import { content, images, media, unusedImages } from './data/old-url-map.json';
+import { attachmentFiles, permalinks } from './lib/old-url-map';
 
 type Env = {
 	/** The site's static assets (wrangler.jsonc, `assets.binding`). */
@@ -20,13 +20,10 @@ type Env = {
 };
 
 /** Post and page URLs, by WordPress ID. */
-const permalinks = new Map(content.map(({ wordpressId, url }) => [String(wordpressId), url]));
+const permalinkById = permalinks();
 
 /** The URL WordPress served each attachment's file at, by attachment ID. */
-const attachmentFiles = new Map([
-	...[...images, ...unusedImages].map(({ wordpressId, uploads }) => [String(wordpressId), uploads[0]!] as const),
-	...media.map(({ wordpressId, upload }) => [String(wordpressId), upload] as const),
-]);
+const attachmentFileById = attachmentFiles();
 
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
@@ -41,12 +38,12 @@ export default {
 
 		const postId = url.searchParams.get('p') ?? url.searchParams.get('page_id');
 		if (postId !== null) {
-			const permalink = permalinks.get(postId);
+			const permalink = permalinkById.get(postId);
 			return permalink ? Response.redirect(new URL(permalink, url).href, 301) : notFound();
 		}
 		const attachmentId = url.searchParams.get('attachment_id');
 		if (attachmentId !== null) {
-			const file = attachmentFiles.get(attachmentId);
+			const file = attachmentFileById.get(attachmentId);
 			return file ? assets(file) : notFound();
 		}
 		return env.ASSETS.fetch(request);

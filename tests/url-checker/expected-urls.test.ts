@@ -1,28 +1,12 @@
 // The URL checker's expected list: every URL the WordPress site had, with what
 // the new site must answer for it.
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { loadExpectedUrls } from '../../scripts/url-checker/expected-urls';
 
 const snapshotDir = fileURLToPath(
 	new URL('../fixtures/wordpress-sitemap-2026-10-24/', import.meta.url),
 );
-
-const tempDirs: string[] = [];
-afterEach(() => {
-	for (const dir of tempDirs.splice(0)) rmSync(dir, { recursive: true, force: true });
-});
-
-function mappingTable(content: unknown): string {
-	const dir = mkdtempSync(join(tmpdir(), 'url-checker-table-'));
-	tempDirs.push(dir);
-	const file = join(dir, 'old-url-map.json');
-	writeFileSync(file, JSON.stringify(content));
-	return file;
-}
 
 describe('expected URLs from the sitemap snapshot', () => {
 	it('include the 88 indexed pages, as UTF-8 paths', () => {
@@ -90,8 +74,8 @@ describe('expected URLs that never existed', () => {
 });
 
 describe('expected URLs from the old-URL mapping table', () => {
-	it('are added to the snapshot URLs when the table exists', () => {
-		const table = mappingTable({
+	it('are added to the snapshot URLs', () => {
+		const mappingTable = {
 			urls: [
 				{ url: '/?p=1854', expect: 'redirect', location: '/2026/01/23/acgn-museum-ssg/' },
 				{ url: '/2021/09/', expect: 'page' },
@@ -99,9 +83,9 @@ describe('expected URLs from the old-URL mapping table', () => {
 				{ url: '/wp-admin/', expect: 'not-found' },
 				{ url: '/2021/09/30/%e7%ac%ac%e4%b8%80%e7%af%87%e6%96%87%e7%ab%a0/feed/', expect: 'redirect' },
 			],
-		});
+		};
 
-		const expected = loadExpectedUrls({ sitemapDir: snapshotDir, mappingTableFile: table });
+		const expected = loadExpectedUrls({ sitemapDir: snapshotDir, mappingTable });
 
 		expect(expected).toEqual(
 			expect.arrayContaining([
@@ -116,7 +100,7 @@ describe('expected URLs from the old-URL mapping table', () => {
 	});
 
 	it('keep a location on another site as a full URL, and one on this site as a path', () => {
-		const table = mappingTable({
+		const mappingTable = {
 			urls: [
 				{
 					url: '/wp-content/uploads/2025/05/a.mp4',
@@ -125,9 +109,9 @@ describe('expected URLs from the old-URL mapping table', () => {
 				},
 				{ url: '/?p=1', expect: 'redirect', location: 'https://aniya.moe/2021/09/30/%E7%AC%AC/' },
 			],
-		});
+		};
 
-		const expected = loadExpectedUrls({ sitemapDir: snapshotDir, mappingTableFile: table });
+		const expected = loadExpectedUrls({ sitemapDir: snapshotDir, mappingTable });
 
 		expect(expected).toEqual(
 			expect.arrayContaining([
@@ -141,21 +125,17 @@ describe('expected URLs from the old-URL mapping table', () => {
 		);
 	});
 
-	it('are left out until the table exists', () => {
-		const withoutTable = loadExpectedUrls({ sitemapDir: snapshotDir });
+	it('must each say what the site answers, and give a location only for a redirect', () => {
+		const load = (entry: object) => () => loadExpectedUrls({ sitemapDir: snapshotDir, mappingTable: { urls: [entry] } });
 
-		const expected = loadExpectedUrls({
-			sitemapDir: snapshotDir,
-			mappingTableFile: join(tmpdir(), 'no-such-dir', 'old-url-map.json'),
-		});
-
-		expect(expected).toEqual(withoutTable);
+		expect(load({ url: '/a/', expect: 'moved' })).toThrow('urls[0]: needs "url" and "expect"');
+		expect(load({ url: '/a/', expect: 'page', location: '/b/' })).toThrow('urls[0]: "location" is a string, and only for "redirect"');
 	});
 
 	it('must not contradict the sitemap snapshot', () => {
-		const table = mappingTable({ urls: [{ url: '/about/', expect: 'redirect', location: '/' }] });
+		const mappingTable = { urls: [{ url: '/about/', expect: 'redirect', location: '/' }] };
 
-		expect(() => loadExpectedUrls({ sitemapDir: snapshotDir, mappingTableFile: table })).toThrow(
+		expect(() => loadExpectedUrls({ sitemapDir: snapshotDir, mappingTable })).toThrow(
 			'/about/',
 		);
 	});

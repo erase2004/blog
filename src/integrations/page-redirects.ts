@@ -1,7 +1,5 @@
 import type { AstroIntegration } from 'astro';
-import { fileURLToPath } from 'node:url';
-import { fromMappingTable } from '../../scripts/url-checker/expected-urls.ts';
-import { MAPPING_TABLE_FILE } from '../../scripts/url-checker/settings.ts';
+import { expectedUrls } from '../lib/old-url-map';
 import { appendRedirects } from './redirects-file';
 
 /**
@@ -29,15 +27,11 @@ const isFeedOf = (url: string, location: string) => url === `${location}feed/`;
  * keep this integration after the others that write `_redirects`.
  */
 export default function pageRedirects(): AstroIntegration {
-	let root: URL;
 	return {
 		name: 'page-redirects',
 		hooks: {
-			'astro:config:done': ({ config }) => {
-				root = config.root;
-			},
 			'astro:build:done': async ({ dir, logger }) => {
-				const redirects = fromMappingTable(fileURLToPath(new URL(MAPPING_TABLE_FILE, root))).flatMap((entry) =>
+				const redirects = expectedUrls().flatMap((entry) =>
 					entry.expect === 'redirect' && entry.location?.startsWith('/') ? [{ url: entry.url, location: entry.location }] : [],
 				);
 				const rules = redirects
