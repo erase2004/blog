@@ -1,0 +1,31 @@
+{
+  "name": "aniya-moe",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "npm@11.19.1",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "astro": "astro",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.1",
+    "astro": "^7.4.2",
+    "sharp": "^0.35.0"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.5",
+    "wrangler": "^4.152.0"
+  },
+  "allowScripts": {
+    "esbuild": false,
+    "workerd": false
+  }
+}

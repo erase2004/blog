@@ -1,0 +1,15 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "aniya-moe",
+	"compatibility_date": "2026-10-19",
+	// Static assets only: Cloudflare serves the Astro build output directly.
+	"assets": {
+		"directory": "./dist",
+		// /foo and /foo/index.html redirect to /foo/, but with HTTP 307 (seen in
+		// wrangler dev; to be confirmed on the preview URL). The 301s for pages
+		// come from the _redirects rules written at build time.
+		"html_handling": "force-trailing-slash",
+		// Unknown URLs get dist/404.html with HTTP status 404.
+		"not_found_handling": "404-page"
+	}
+}
