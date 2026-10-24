@@ -414,3 +414,59 @@ npm run convert-wordpress -- <其他 dump.sql>   # 換一份備份
 - `tests/wordpress-converter/convert-wordpress.test.ts`：用一個小型的 WordPress 資料（真實資料列刪減而成）轉換整個網站：frontmatter、時區、AIOSEO、頁面階層與描述（期望值是線上網站的實際描述）、分類與標籤資料檔、對應表的每一類舊網址、資料列順序不影響輸出。
 - `tests/site-serving.test.ts`（03 號）：對真正的建置結果跑網址檢查，22 篇文章與 5 個頁面在建置輸出與 HTTP 兩種模式都通過，待完成清單剛好列出還沒做的網址。
 - 加了 `satteri` 作為 devDependency，版本跟 Astro 用的同一個（0.10.5，npm 只裝一份），讓測試用跟網站一樣的引擎渲染 Markdown。
+
+## 11：彙整頁（2026-10-24）
+
+### 產生的網址
+
+| 路由 | 網址 | 數量 |
+|---|---|---|
+| `src/pages/index.astro` | `/`（最新 10 篇） | 1 |
+| `src/pages/page/[page].astro` | `/page/2/`、`/page/3/` | 2 |
+| `src/pages/category/[category]/[...page].astro` | `/category/<slug>/`（技術、旅遊、閒聊） | 3 |
+| `src/pages/tag/[tag]/[...page].astro` | `/tag/<slug>/` | 57 |
+| `src/pages/[year]/[...archive].astro` | `/YYYY/`、`/YYYY/MM/`、`/YYYY/MM/DD/`，加上 `/2025/page/2/` | 4 + 9 + 14 + 1 |
+
+- 全部由 `src/lib/archives.ts` 產生：每個彙整（首頁、分類、標籤、年、月、日）是一串新到舊的文章，`archivePages()` 每 10 篇切一頁，第 2 頁以後在 `<彙整網址>page/N/`。分類與標籤走同一段程式，現在沒有超過 10 篇的（旅遊剛好 10 篇），所以沒有分頁；之後旅遊再多一篇，`/category/旅遊/page/2/` 會自動出現。
+- 「未分類」沒有文章，不產生，繼續回 404。`/page/4/`、`/2025/page/3/` 也是 404。
+- 幾個路由的樣式互相重疊（`[year]/[...archive]`、`[year]/[month]/[day]/[slug]`、`[...page]`）。Astro 7 只有在兩個路由產生**同一個網址**時才算衝突，所以沒問題；`astro dev` 也確認過每種網址都找得到對的頁面。
+- 建置後總共 119 頁，`_redirects` 的補斜線規則變成 117 條（01 號估計約 116 條）。
+
+### 跟 WordPress 一樣的地方（2026-10-24 對照線上網站）
+
+- 標題照 AIOSEO 的範本：`技術 - TsukiStudio`、`BOOK☆WALKER - TsukiStudio`、`2025 - TsukiStudio`、`5 月, 2025 - TsukiStudio`（月份彙整就是這個怪格式）、`2025 年 5 月 17 日 - TsukiStudio`；第 2 頁以後加上 ` - Page N`（AIOSEO 的 `pagedFormat`），例如 `TsukiStudio - 生活點滴紀錄 - Page 3`。
+- 第 2 頁以後是 `noindex, nofollow`：AIOSEO 的 `noindexPaginated`、`nofollowPaginated` 都開著，所以除了首頁分頁，`/2025/page/2/` 也是。spec 只寫了 `noindex`，這裡照「跟搬遷前一樣」連 `nofollow` 一起保留。第一頁（包括日期彙整）沒有 `noindex`，維持可索引。
+- `<link rel="prev">`、`<link rel="next">` 照舊輸出。
+- 列表依發布時間新到舊；2025-05-17 同一天的遊記照發布時間排，順序跟 WordPress 一樣。
+
+### 跟 WordPress 不一樣的地方
+
+- **canonical**：WordPress 的分頁 canonical 指向第一頁（`/page/2/` → `/`、`/2025/page/2/` → `/2025/`）。spec 規定每頁都指向自己，網址檢查也這樣檢查，所以指向自己。這些頁面本來就是 noindex，影響不大。
+- **meta description**：WordPress 的分類、標籤、日期彙整都沒有 description（AIOSEO 的範本是空的，或是分類描述，而分類都沒寫描述）。網址檢查要求每頁都有，所以補上「分類「技術」的文章」「2025 年 5 月的文章」這類句子，第 2 頁以後跟 WordPress 的首頁分頁一樣加上 ` - Page N`。首頁沿用 `生活點滴紀錄`。
+- 首頁標題順便改成 WordPress 的 `TsukiStudio - 生活點滴紀錄`（本來是 14 號的項目，首頁改成文章列表時一起做了）。
+- 列表裡每篇文章顯示標題、日期、摘要（沒有手動摘要的用 AIOSEO 描述）；WordPress 顯示的是 `<!--more-->` 之前的內文。版面由 15 號重做。
+
+### 側欄元件（給 15 號放進側欄）
+
+- `src/components/CategoryList.astro`：有文章的分類，依名稱排序，附文章數，例如「技術 (9)」。
+- `src/components/YearList.astro`：有文章的年份，新到舊，附文章數，例如「2025 (11)」。
+- `src/components/TagCloud.astro`：有文章的標籤，依名稱排序，文章越多字越大。
+- 名稱的排序照 WordPress 的 `strnatcasecmp`：英文字母不分大小寫，其他字元照 code point，所以日文在中文前面。
+- 標籤雲的字級照 WordPress（`wp_generate_tag_cloud()`，小工具設定 10pt–16pt）：`round(log10(文章數 + 1) * 100)` 線性對應到 10pt–16pt，跟線上網站的字級差不到 0.01pt。WordPress 的小工具只顯示 30 個標籤（文章數最多的 30 個；同樣是 1 篇的標籤選哪幾個，取決於 MySQL 回傳的順序，沒辦法重現），這裡 57 個全部顯示。
+- 元件裡沒有標題（WordPress 是「Category」「ARCHIVES」），樣式只有標籤雲排成一行，標題與外觀交給 15 號。
+
+### 發現
+
+- spec 說 2025-05-17 有 8 篇遊記，其實是 9 篇（前言加 Day 1–8），這一天的彙整頁有 9 篇。
+- 12 號做 sitemap 時要排除日期彙整與分頁：`src/lib/archives.ts` 的 `categoryArchives()`、`tagArchives()` 可以直接拿來列分類與標籤。
+
+### 待完成清單
+
+日期彙整 28 頁（含 `/2025/page/2/`）、分類 3 頁、標籤 57 頁、`/page/2/`、`/page/3/` 通過，從清單移除 90 筆：1,007 筆 → 917 筆。`/page/` 這一組整個清空，順手刪掉多出來的空行。
+
+### 測試
+
+`tests/site-serving.test.ts`（對建置結果開 `wrangler dev`，用 HTTP 請求檢查）：
+
+- `archives`：分類、標籤（含 `book☆walker`、日文 slug）、年、月、日彙整、`/2025/page/2/`、首頁與 `/page/N/` 列出的文章與順序；分頁的 `noindex, nofollow`；標題。期望值都是線上 WordPress 同一個網址列出的內容。
+- `sidebar widgets`：三個元件放在只有測試建置才有的 `/widgets/` 頁（`tests/fixtures/widgets-page.astro`），期望值是線上網站側欄的分類數、年份數與標籤雲字級。`tests/support/build-site.mjs` 多了第三個參數 `<widgetsPath>`。
