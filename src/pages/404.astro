@@ -34,6 +34,20 @@ const latest = (await getPosts()).slice(0, 5);
 	</section>
 
 	<p class="home"><a href="/">回到首頁</a></p>
+
+	<script is:inline>
+		// A GA4 event with the URL that was asked for and the page that linked
+		// to it, for finding old URLs that still need a redirect. gtag() is
+		// only there on aniya.moe (src/components/BaseHead.astro).
+		// page_location and page_referrer are GA4's own parameters: they keep
+		// whole URLs (other values are cut at 100 characters) and are
+		// dimensions of its reports without setting anything up.
+		if (typeof gtag === 'function') {
+			const parameters = { page_location: location.href };
+			if (document.referrer) parameters.page_referrer = document.referrer;
+			gtag('event', 'page_not_found', parameters);
+		}
+	</script>
 </BaseLayout>
 
 <style>

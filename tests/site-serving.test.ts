@@ -1613,7 +1613,11 @@ describe('SEO head', () => {
 						(window as unknown as { dataLayer?: IArguments[] }).dataLayer?.map((command) => Array.from(command)),
 					);
 				},
-				close: () => context.close(),
+				async close() {
+					// Images may still be loading through route.fetch().
+					await context.unrouteAll({ behavior: 'ignoreErrors' });
+					await context.close();
+				},
 			};
 		}
 
@@ -1628,6 +1632,35 @@ describe('SEO head', () => {
 
 				expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
 				expect(site.outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
+				expect(site.errors).toEqual([]);
+			} finally {
+				await site.close();
+			}
+		}, 60_000);
+
+		// For finding old URLs that still need a redirect (ticket 21).
+		it('the 404 page tells GA4 which URL was asked for, and the page linking to it: a page_not_found event', async () => {
+			const site = await siteAt('https://aniya.moe');
+			try {
+				const events = async (path: string, referer?: string) =>
+					(await site.open(path, { referer }))?.filter(([name]) => name === 'event');
+
+				// The URLs as the browser has them, percent-encoded.
+				expect(await events('/2021/11/30/不存在的文章/?from=link', 'https://aniya.moe/2021/11/30/電子紙閱讀器使用心得/')).toEqual([
+					[
+						'event',
+						'page_not_found',
+						{
+							page_location: encodeURI('https://aniya.moe/2021/11/30/不存在的文章/?from=link'),
+							page_referrer: encodeURI('https://aniya.moe/2021/11/30/電子紙閱讀器使用心得/'),
+						},
+					],
+				]);
+				// Typed in, or from a bookmark: no referrer.
+				expect(await events('/no-such-page/')).toEqual([
+					['event', 'page_not_found', { page_location: 'https://aniya.moe/no-such-page/' }],
+				]);
+				expect(await events('/2021/11/30/電子紙閱讀器使用心得/')).toEqual([]);
 				expect(site.errors).toEqual([]);
 			} finally {
 				await site.close();
