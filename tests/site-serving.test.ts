@@ -827,18 +827,31 @@ describe('layout', () => {
 			await settle(page);
 		}
 
-		/** Clicks the button; where the page was, and where it scrolls through until it is back at the top. */
+		/**
+		 * Clicks the button; where the page was, and where it scrolls through
+		 * until it is back at the top. Followed from the click on: before it,
+		 * the page may still move a little (as images load, say).
+		 */
 		async function clickAndFollowTheScroll(page: Page) {
-			const from = await page.evaluate(() => {
-				const positions: number[] = [];
-				Object.assign(window, { positions });
-				addEventListener('scroll', () => positions.push(window.scrollY));
-				return window.scrollY;
+			type Followed = { from: number; positions: number[] };
+			await page.evaluate(() => {
+				const followed: Followed = { from: Number.NaN, positions: [] };
+				Object.assign(window, { followed });
+				// Capturing, so before the button's own click handler starts the scroll.
+				addEventListener(
+					'click',
+					() => {
+						followed.from = window.scrollY;
+						addEventListener('scroll', () => followed.positions.push(window.scrollY));
+					},
+					{ capture: true, once: true },
+				);
 			});
 			await page.getByRole('button', { name: '回到頂部' }).click();
 			await page.waitForFunction(() => window.scrollY === 0, undefined, { timeout: 5_000 });
-			const positions = await page.evaluate(() => (window as unknown as { positions: number[] }).positions);
-			return { from, positions };
+			// A jump is at the top at once, but its scroll event comes with the next frame.
+			await settle(page);
+			return page.evaluate(() => (window as unknown as { followed: Followed }).followed);
 		}
 
 		/** Whether the element `locator` finds has the keyboard focus. */
