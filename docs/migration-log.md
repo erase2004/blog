@@ -1198,6 +1198,76 @@ import Gallery from '../../components/Gallery.astro';
 - 19：canonical、og:url、JSON-LD 裡的中文網址是大寫百分比編碼，WordPress 是小寫（Google 已索引的是小寫）。兩者是同一個網址，但小寫的請求在本機會先 307 到大寫，跟 01、03 號記的是同一個問題，在預覽網址確認。og:image 是 `https://aniya.moe/_astro/…`，**切換 DNS 之前在預覽網址用 Facebook 分享偵錯工具之類的工具看不到圖**（指向的正式網域還是 WordPress）；切換後再用 Facebook 的分享偵錯工具重新抓幾篇，確認卡片的圖。
 - 20／21：GA4 屬性沿用，切換後在 GA4 的即時報表確認有資料進來；預覽網址的造訪也會進同一個屬性。
 
+## 12：Feed、sitemap、robots.txt、llms.txt（2026-10-24）
+
+### 產生的檔案
+
+| 網址 | 來源 | Content-Type |
+|---|---|---|
+| `/feed/` | `src/pages/feed/index.html.ts` → `src/lib/feeds.ts` 的 `rssFeed()` | `application/rss+xml; charset=utf-8` |
+| `/feed/atom/` | `src/pages/feed/atom/index.html.ts` → `atomFeed()` | `application/atom+xml; charset=utf-8` |
+| `/sitemap.xml` | `src/pages/sitemap.xml.ts` → `src/lib/sitemap.ts` | 依副檔名（`application/xml`） |
+| `/robots.txt` | `src/pages/robots.txt.ts` | 依副檔名（`text/plain`） |
+| `/llms.txt` | `src/pages/llms.txt.ts` | 依副檔名（`text/plain`） |
+
+- **feed 為什麼寫成 `index.html`**：Workers static assets 只會用 `<路徑>/index.html` 回應有結尾斜線的網址，沒有辦法讓 `/feed/` 對應到 `feed.xml`（`_redirects` 的 200 改寫，網址檢查與 Workers 都不支援）。所以 endpoint 檔名取成 `index.html.ts`，輸出 `dist/feed/index.html`，再用 `public/_headers` 把這兩個網址的 Content-Type 改成 RSS／Atom。看過 asset worker 的原始碼（`attachCustomHeaders()` 用 `headers.set()`），`_headers` 會蓋掉依副檔名決定的 Content-Type；`wrangler dev` 實測也是。正式環境在 19 號的預覽網址再確認一次。
+- 跟 WordPress 一樣（2026-10-24 對照線上網站）：feed 回 `X-Robots-Tag: noindex, follow`（也寫在 `_headers`）；`/feed`、`/feed/atom` 301 到有斜線的網址。後者原本會是 `html_handling` 的 307：endpoint 不在 Astro 交給 `astro:build:done` 的頁面清單裡，所以把 01 號的 `trailing-slash-redirects.ts` 改成直接掃建置結果裡所有 `<路徑>/index.html`。補斜線規則 117 → 119 條，`_redirects` 共 1,776 條靜態規則。
+
+### 全文 feed
+
+- 最新 10 篇（WordPress 的 `posts_per_rss`），全文。用 Astro 的 container API（`experimental_AstroContainer`）在建置時把文章的 `Content` 渲染成 HTML：MDX 要載入 MDX 的 container renderer，而且要跟文章頁一樣傳 `components: { img: MarkdownImage }`（09 號的發現），不然 feed 裡的圖會是另一組檔案。測試逐篇比對 feed 與文章頁的文字和圖片檔案。
+- `src/lib/feed-html.ts` 的 `feedHtml()` 把渲染結果整理成閱讀器能直接顯示的 HTML（閱讀器不跑網站的 JS、不載入網站的 CSS，常常一頁顯示好幾篇）：
+  - 拿掉 `<script>`、`<style>`、`<link>`、`<button>`、`<template>`（Expressive Code 在第一個程式碼區塊放了 CSS 與 JS，還有複製按鈕）。
+  - 拿掉所有 `data-*` 屬性（PhotoSwipe、Astro 的 scoped CSS 用的，占 feed 大小的四分之一）與 `style` 屬性（只是在設網站 CSS 的變數，例如相簿的 `--ratio`、程式碼的顏色）。
+  - 自訂元素（web component，例如 10 號的 `<img-comparison-slider>`）沒有 JS 就沒有作用，換成它裡面的內容：對照滑桿變成上下兩張圖加圖說。相簿是一串連到原圖寬度 webp 的縮圖。YouTube 是連到影片的縮圖。
+  - 所有連結與圖片網址（`href`、`src`、`srcset`、`poster`）改成絕對網址。**腳註連結也是**：`#user-content-fn-1` 變成 `https://aniya.moe/<文章網址>#user-content-fn-1`，連到文章頁上的那個腳註。WordPress 的腳註是只有 `#…` 的連結，但閱讀器解析這種連結的方式不一（RSS 沒有 base URL，有的用 feed 網址、有的用文章網址、有的不處理），W3C Feed Validator 也會警告；連到文章頁的絕對網址在每個閱讀器都有效。代價是有支援「同一篇內跳轉」的閱讀器，現在會開到網站上。
+  - 所有 `id` 加上每篇不同的前綴（`post-<文章 ID 的 SHA-256 前 8 碼>-`，中文 slug 也只用 ASCII），`aria-describedby` 跟著改。08 號記錄的問題：每篇的腳註都叫 `user-content-fn-1`，閱讀器把好幾篇放在同一頁時 ID 會重複；現在 10 篇之間沒有重複的 ID。
+  - node-html-parser 改寫屬性時不會跳脫 `&`，網址裡的 `&` 要自己寫成 `&amp;`（不然 validator 會說是壞掉的 entity）。
+- **保留 WordPress 的 GUID**：RSS 的 `<guid isPermaLink="false">` 與 Atom 的 `<id>` 都是 `https://aniya.moe/?p=<文章 ID>`，跟 WordPress 一樣。閱讀器靠這個判斷是不是新文章，換掉的話訂閱者會看到 10 篇「新」文章。之後新寫、沒有 `wordpressId` 的文章用文章網址。
+- 標題用 14 號的 `displayTitle()`：WordPress 的 feed 標題也經過 `wptexturize`，` - ` 是 en dash（`遊記 – 岡山 / 香川 / 德島八日遊 – Day 8`）。`llms.txt` 的標題也是（AIOSEO 的 `llms.txt` 用的是原本的 ` - `，這裡跟頁面上顯示的一致）。
+- 其他欄位照 WordPress：`pubDate`（`Fri, 23 Jan 2026 10:00:00 +0000` 格式）、`dc:creator`（Tsuki）、分類與標籤名稱（`<category>`，先分類後標籤）、`lastBuildDate`／Atom 的 `<updated>` 是所有文章裡最後一次更新的時間、`language` zh-TW、`atom:link rel="self"`；Atom 的作者 `uri` 是 `/about/`、`content` 有 `xml:base`。`<description>`／`<summary>` 用 meta description（WordPress 是內文開頭加「閱讀全文」）。
+- 沒有照搬的：連結上 MonsterInsights 加的 `utm_*` 參數（spec 排除 MonsterInsights）、留言相關的 `<comments>`、`wfw:commentRss`、`slash:comments`、`thr:` 連結（沒有舊留言，留言改用 giscus）、`sy:update*`、`generator`，以及頻道圖示（網站圖示還沒搬，14 號）。
+- 大小：RSS 約 569 KB、Atom 約 570 KB（WordPress 的 RSS 是 308 KB：它的 Envira 相簿在 feed 裡只放第一張圖）。
+- **驗證**：建置結果直接貼給 W3C Feed Validator（`validator.w3.org/feed/check.cgi`，`rawdata`），RSS 與 Atom 都是 valid、0 個錯誤，唯一的警告是 `SelfDoesntMatchLocation`（貼原始內容驗證時 `rel="self"` 本來就對不上，部署後用網址驗證就不會有）。
+
+### sitemap
+
+- 一份 `urlset`，不再是 sitemap index：首頁、22 篇文章、5 個頁面、3 個分類、57 個標籤，共 88 個網址，跟 WordPress 的 5 個子 sitemap 加起來完全相同；不列日期彙整與分頁。網址用 `new URL()` 的大寫百分比編碼，跟 canonical 一樣（WordPress 的 sitemap 是未編碼的 UTF-8）。
+- `lastmod`：文章是 `postUpdated()`、頁面是 `updated`；首頁、分類、標籤是裡面最後更新的那篇（WordPress 的分類與標籤寫 1970-01-01）。不寫 `changefreq`、`priority`（Google 不看）。
+- **圖片**：`src/lib/images.ts` 的 `imagesIn(entry)` 從文章原始檔找出它引用的圖片：Markdown 圖片、MDX 的 `import` 與 `import()`（09 號相簿的寫法）都是相對於檔案的 `../../assets/images/<slug>/<檔名>`，解析到統一圖片目錄裡真的有的檔案（程式碼區塊裡剛好出現的路徑不算）。網址用 `imageUrl()`，就是舊圖片網址轉址過去的那張。不從渲染結果找，是因為相簿顯示的是縮圖，對不回原圖。
+- 跟快照比對（測試把快照的每個舊圖片網址照 `_redirects` 轉成新網址，逐頁比對）：**771 筆，WordPress 是 772 筆**，每篇文章的圖片完全一致（包括同時列在兩篇的 11 張）。少的那 1 筆是前言的 `highlight.jpg`：它是前言的精選圖片（全站唯一的 `_thumbnail_id`），Twenty Sixteen 會把精選圖片顯示在文章上方，AIOSEO 因此列進 sitemap；新版型不顯示精選圖片，它現在只是前言的 `socialImage`（og:image），所以不列。其他 AIOSEO 自訂社群圖片本來就不在 WordPress 的 sitemap 裡（例如 ACGN 那篇的 `heroimage.png`）。舊網址照樣轉到新圖片。
+
+### robots.txt 與 llms.txt
+
+- `robots.txt`：`User-agent: *`、`Allow: /`、`Sitemap: https://aniya.moe/sitemap.xml`。WordPress 的 `Disallow: /wp-admin/` 與 `Allow: /wp-admin/admin-ajax.php` 拿掉（那些網址現在本來就是 404）。
+- `llms.txt`：WordPress 上其實有一份（AIOSEO 每天產生，2026-10-24 在線上網站看到：`# TsukiStudio`、標語、Sitemaps、文章 22、頁面 5、分類 3、標籤 57）。新的照 llmstxt.org 的格式：H1 站名、`>` 標語、`## Sitemaps`、`## 文章`、`## 頁面`、`## 分類`、`## 標籤`，每項是 `- [標題](網址): 說明`（文章與頁面附 meta description）。因為是舊網站就有的網址，轉換器加了 `url-map/llms-txt.ts`，對應表多一筆 `/llms.txt` → `file`，網址檢查會檢查它。
+
+### head 裡的 feed 連結
+
+- `src/components/FeedLinks.astro`：RSS（標題沿用 WordPress 的「訂閱《TsukiStudio》» 資訊提供」）與 Atom 的 `<link rel="alternate">`。放在 `BaseLayout.astro` 的 `<BaseHead>` 後面一行，沒有動 `BaseHead.astro`（14 號平行在改）。WordPress 另外有留言 feed 的連結，留言 feed 已經不存在（13 號轉址），不放。
+
+### 待完成清單
+
+`/feed/`、`/feed/atom/`、`/sitemap.xml`、`/robots.txt` 通過，從清單移除：156 筆 → 152 筆（空行照 06 號的做法留著）。新加的 `/llms.txt` 直接通過，沒有進清單。
+
+### 測試
+
+- `tests/site-serving.test.ts`（共用同一次建置）：
+  - `feeds`：RSS 2.0 與 Atom 的 Content-Type、頻道資訊、最新 10 篇與順序、WordPress 的 GUID／日期／分類（期望值取自 2026-10-24 線上的 feed）；每篇全文的文字與文章頁相同、圖片檔案與文章頁相同；所有網址都是絕對網址而且站內的都回 200；10 篇之間沒有重複的 ID，腳註連結連到文章頁上存在的腳註；沒有 script／style／link／button 與 `data-*`；Atom 的內文與 RSS 相同；`X-Robots-Tag` 與無斜線 301；七種頁面的 head 都有兩個 feed 連結。
+  - 只有測試建置才有的 `/converted/feed-item/`（`tests/fixtures/converted-feed-item.ts`）：把轉換器的 MDX fixture 照 feed 的方式渲染，確認 YouTube、程式碼區塊、腳註、對照滑桿在 feed 裡是純 HTML。
+  - `sitemap`：網址跟快照的 88 個相同、沒有日期彙整與分頁；每頁的圖片等於快照的圖片轉址後的新網址（扣掉前言的精選圖片）。
+  - `robots.txt`、`llms.txt`：內容與每個連結都回 200。
+- `tests/feed-html.test.ts`：網站文章還沒有、但要處理的寫法：自訂元素換成內容、網址裡的 `&`、inline style。
+- `tests/wordpress-converter/convert-wordpress.test.ts`：對應表有 `/llms.txt`。
+- 套件：`node-html-parser` 從 devDependencies 移到 dependencies（建置網站時要用）；新增 devDependency `fast-xml-parser`（測試用獨立的 XML parser 解析 feed 與 sitemap，也檢查是不是 well-formed）。
+
+### 留給其他 issue 的發現
+
+- 13：`/feed`、`/feed/atom` 的無斜線 301 已經有了。單篇、分類、標籤、頁面的 `…/feed/` 動態規則與 `/comments/feed/`、子 sitemap 的轉址還是 13 號的；`_redirects` 現在 1,776 條靜態規則，剩 224 條空間。
+- 14（已合併）：14 號的 `firstImage()` 跟這裡的 `imagesIn()` 用同一種方法找原始檔裡的圖片，合併後 `firstImage()` 改成取 `imagesIn()` 的第一張，只留一份比對規則（採用 14 號較嚴格的寫法：相對路徑、要有圖片副檔名、先 `decodeURI`）；差別只在原始檔提到不存在的圖片時，現在是跳過而不是建置失敗。feed 的頻道圖示（WordPress 用 `cropped-night-32x32.png`）還沒加，網站圖示 14 號已經搬好，之後可以補。作者名稱「Tsuki」寫在 `src/lib/feeds.ts`。14 號建議把 feed 連結放進 `BaseHead.astro`；這裡放在 `BaseLayout.astro` 裡緊接著 `<BaseHead>` 的那一行，輸出位置一樣（`BaseHead` 只有 `BaseLayout` 在用），就沒有再搬。
+- 18：頁面的 meta description 有幾個是截斷的內文（例如 `/about/` 是「我的故事 聯絡方式」），也原樣出現在 `llms.txt`。
+- 19：在預覽網址確認 `_headers` 的 Content-Type 與 `X-Robots-Tag`，並用網址（不是貼內容）再跑一次 W3C Feed Validator。
+
 ## 17：404 頁面（2026-10-24）
 
 ### 頁面內容
@@ -1220,8 +1290,8 @@ import Gallery from '../../components/Gallery.astro';
 - Workers 的設定沒有辦法排除它：`not_found_handling` 一定找 `404.html` 這個檔名，用 `.assetsignore` 排除的話 404 頁也一起沒了；`_redirects` 也不能指定 404 狀態碼（只有 200、301、302、303、307、308）。
 - 做法：`_redirects` 的 **proxy（200）規則**。`_redirects` 比 `html_handling` 先套用；狀態碼 200 的規則不轉址，而是改用另一個路徑去找檔案。`src/integrations/not-found-page.ts` 加一條 `/404/ /404/no-such-page/ 200`：`/404/no-such-page/` 沒有檔案，於是照 `not_found_handling` 回 `404.html`、HTTP 404，跟其他不存在的網址一樣。
   - 流程對照過 wrangler 內建的 asset worker 原始碼（`node_modules/miniflare/dist/src/workers/assets/assets.worker.js` 的 `handleRedirects`、`getResponseOrAssetIntent`），`wrangler dev` 實測：`/404/` 直接回 404 與 404 頁；`/404`、`/404.html` 先 307 到 `/404/`，最後也是 404。
-  - 純靜態檔案的請求，不經過 Worker（13 號的 Worker 只在首頁執行），不佔免費額度。多一條 static 規則：`_redirects` 現在是 1,775 條 static、0 條 dynamic。
-  - **19 號要在預覽網址確認**：照官方文件，Workers static assets 的 `_redirects` 支援 proxy 到同一個網站的相對路徑，但本機的 workerd 可能跟正式環境不同。網址檢查的預期清單有 `/404/`（見下面），在預覽網址跑 HTTP 模式就會檢查到。
+  - 純靜態檔案的請求，不經過 Worker（13 號的 Worker 只在首頁執行），不佔免費額度。多一條 static 規則：跟 12 號合併後 `_redirects` 是 1,777 條 static、0 條 dynamic。
+  - **19 號要在預覽網址確認**：官方文件（developers.cloudflare.com/workers/static-assets/redirects/，2026-10-24 讀）列出 Workers static assets 的 `_redirects` 支援 Proxying（200，只能指向同一個網站的相對路徑），不支援的是其他狀態碼的改寫（例如 `404`）；但本機的 workerd 可能跟正式環境不同。12 號日誌說「`_redirects` 的 200 改寫，網址檢查與 Workers 都不支援」，照文件 Workers 是支援的，網址檢查的建置模式現在也支援；12 號 feed 的做法不受影響。網址檢查的預期清單有 `/404/`（見下面），在預覽網址跑 HTTP 模式就會檢查到。
 
 ### GA4
 
