@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This sitemap was 動態地 generated on 2026 年 10 月 24 日 at 下午 2:59 by All in One SEO v4.8.9 - the original SEO plugin for WordPress. -->
+
+<?xml-stylesheet type="text/xsl" href="https://aniya.moe/default-sitemap.xsl?sitemap=root"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<sitemap>
+		<loc><![CDATA[https://aniya.moe/addl-sitemap.xml]]></loc>
+		<lastmod><![CDATA[2026-01-23T10:01:26+00:00]]></lastmod>
+	</sitemap>
+	<sitemap>
+		<loc><![CDATA[https://aniya.moe/post-sitemap.xml]]></loc>
+		<lastmod><![CDATA[2026-01-23T10:01:26+00:00]]></lastmod>
+	</sitemap>
+	<sitemap>
+		<loc><![CDATA[https://aniya.moe/page-sitemap.xml]]></loc>
+		<lastmod><![CDATA[2021-10-21T06:55:42+00:00]]></lastmod>
+	</sitemap>
+	<sitemap>
+		<loc><![CDATA[https://aniya.moe/category-sitemap.xml]]></loc>
+		<lastmod><![CDATA[2026-01-23T10:01:26+00:00]]></lastmod>
+	</sitemap>
+	<sitemap>
+		<loc><![CDATA[https://aniya.moe/post_tag-sitemap.xml]]></loc>
+		<lastmod><![CDATA[2026-01-23T10:01:26+00:00]]></lastmod>
+	</sitemap>
+</sitemapindex>
