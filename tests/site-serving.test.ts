@@ -1073,6 +1073,14 @@ describe('feeds', () => {
 		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
 
+	// As WordPress answered them (aniya.moe, 2026-10-24).
+	it.each(['/feed/', '/feed/atom/'])('%s is kept out of search results, and without its trailing slash 301-redirects to it', async (path) => {
+		expect((await get(path)).headers.get('x-robots-tag')).toBe('noindex, follow');
+		const slashless = await get(path.slice(0, -1));
+		expect(slashless.status).toBe(301);
+		expect(new URL(slashless.headers.get('location')!, server!.url).pathname).toBe(path);
+	});
+
 	it.each(['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'])(
 		'%s links to both feeds in its head, for browsers and feed readers to find',
 		async (path) => {
