@@ -7,6 +7,7 @@ export { content } from './content.ts';
 export { dateArchives } from './date-archives.ts';
 export { feeds } from './feeds.ts';
 export { homePagination } from './home-pagination.ts';
+export { media } from './media.ts';
 export { oldSlugs } from './old-slugs.ts';
 export { queryIds } from './query-ids.ts';
 export { sitemaps } from './sitemaps.ts';
