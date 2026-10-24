@@ -1,7 +1,7 @@
 // Builds the site and serves it with `wrangler dev`, the same way Cloudflare
 // Workers static assets will serve it, then checks what readers and crawlers
 // get back over HTTP.
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
 const buildScript = fileURLToPath(new URL('./support/build-site.mjs', import.meta.url));
+const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta.url));
 
 // A test-only page the build script adds next to the site's real pages.
 const PROBE_PATH = '/probe/';
@@ -73,4 +74,23 @@ describe('unknown URLs', () => {
 		expect(response.status).toBe(404);
 		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
 	});
+});
+
+describe('the URL checker', () => {
+	// The committed pending list must name exactly the expected URLs this
+	// build does not answer correctly yet, in both modes.
+	function runUrlChecker(...args: string[]) {
+		const { status, stdout, stderr } = spawnSync(process.execPath, [urlChecker, ...args], {
+			encoding: 'utf8',
+		});
+		return { status, output: stdout + stderr };
+	}
+
+	it('passes on the build output', () => {
+		expect(runUrlChecker('build', outDir)).toMatchObject({ status: 0 });
+	}, 60_000);
+
+	it('passes over HTTP', () => {
+		expect(runUrlChecker('http', server!.url)).toMatchObject({ status: 0 });
+	}, 120_000);
 });

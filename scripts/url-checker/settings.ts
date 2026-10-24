@@ -1,0 +1,36 @@
+// Settings of the URL checker. Paths are relative to the project root.
+
+/** The production origin; every page's canonical URL must be on it. */
+export const SITE_ORIGIN = 'https://aniya.moe';
+
+/** Sitemap snapshot taken from WordPress before the move. Never changes. */
+export const SITEMAP_SNAPSHOT_DIR = 'tests/fixtures/wordpress-sitemap-2026-10-24';
+
+/**
+ * The old-URL mapping table (created by ticket 05). Read only once it exists;
+ * see `fromMappingTable()` in expected-urls.ts for the part the checker reads.
+ */
+export const MAPPING_TABLE_FILE = 'src/data/old-url-map.json';
+
+/** Expected URLs that are allowed to fail for now, one per line. */
+export const PENDING_LIST_FILE = 'scripts/url-checker/pending.txt';
+
+/** A URL that never existed on either site; it must answer 404. */
+export const NOT_FOUND_PROBE_URL = '/url-checker/no-such-page/';
+
+/**
+ * What a request for a non-ASCII path written with lowercase percent-encoding
+ * (`/category/%e6%8a%80%e8%a1%93/`, the form WordPress used in canonicals and
+ * links) must get. OPEN QUESTION, to be settled on the preview URL in ticket 19:
+ * locally, Workers static assets answer these with a 307 to the uppercase
+ * form.
+ *
+ * - `'as-expected-or-recase-redirect'`: what the URL's expectation asks for
+ *   (e.g. 200 for a page), or a redirect to the same path in a different
+ *   percent-encoding case.
+ * - `'as-expected'`: exactly what the URL's expectation asks for.
+ */
+export const LOWERCASE_PERCENT_ENCODED_PATHS: LowercasePercentEncodedPaths =
+	'as-expected-or-recase-redirect';
+
+export type LowercasePercentEncodedPaths = 'as-expected-or-recase-redirect' | 'as-expected';
