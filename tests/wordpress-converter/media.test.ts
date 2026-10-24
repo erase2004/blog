@@ -187,4 +187,21 @@ describe('the old-URL mapping table', () => {
 			]),
 		);
 	});
+
+	it('redirects /?attachment_id=ID of the files to R2, as WordPress redirected it to the attachment page', () => {
+		expect(urlsOf()).toEqual(
+			expect.arrayContaining([
+				{
+					url: '/?attachment_id=1859',
+					expect: 'redirect',
+					location: 'https://media.aniya.moe/videos/acgn-museum-ssg/round-switch-01.mp4',
+				},
+				{
+					url: '/?attachment_id=459',
+					expect: 'redirect',
+					location: 'https://media.aniya.moe/files/travel-setonaikai-2025-prologue/瀨戶內國際藝術祭-2025-3.pdf',
+				},
+			]),
+		);
+	});
 });

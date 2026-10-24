@@ -1,7 +1,16 @@
-// WordPress's own sitemap index redirects to the new sitemap (ticket 13).
-// AIOSEO's sub-sitemaps come from the sitemap snapshot, not from here.
+// Sitemaps: the new site's sitemap is at the URL of AIOSEO's sitemap index,
+// `/sitemap.xml` (ticket 12). The sitemaps that index listed, and
+// WordPress's own sitemap index, redirect to it (ticket 13).
 import type { UrlSource } from '../mapping-table.ts';
 
+const SITEMAP = '/sitemap.xml';
+
+/** The sitemaps AIOSEO's index listed (sitemap snapshot, 2026-10-24): one per post type and taxonomy, and its additional pages. */
+const AIOSEO_SITEMAPS = ['addl', 'post', 'page', 'category', 'post_tag'].map((name) => `/${name}-sitemap.xml`);
+
 export const sitemaps: UrlSource = () => ({
-	urls: [{ url: '/wp-sitemap.xml', expect: 'redirect', location: '/sitemap.xml' }],
+	urls: [
+		{ url: SITEMAP, expect: 'file' },
+		...['/wp-sitemap.xml', ...AIOSEO_SITEMAPS].map((url) => ({ url, expect: 'redirect' as const, location: SITEMAP })),
+	],
 });

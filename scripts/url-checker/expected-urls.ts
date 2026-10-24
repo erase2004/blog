@@ -96,7 +96,7 @@ function fromSitemapSnapshot(sitemapDir: string): ExpectedUrl[] {
  * sections later tickets add) hold the facts behind these URLs and are
  * ignored here; see scripts/wordpress-converter/mapping-table.ts.
  */
-function fromMappingTable(file: string): ExpectedUrl[] {
+export function fromMappingTable(file: string): ExpectedUrl[] {
 	const table = JSON.parse(readFileSync(file, 'utf8')) as { urls?: unknown };
 	if (!Array.isArray(table.urls)) {
 		throw new Error(`${file}: expected a "urls" array`);
