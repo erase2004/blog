@@ -4,6 +4,23 @@
 export const SITE_ORIGIN = 'https://aniya.moe';
 
 /**
+ * What the production site must do beyond answering each expected URL,
+ * checked only in HTTP mode against SITE_ORIGIN (preview URLs and local
+ * servers have neither):
+ *
+ * - `www` redirects to it (a Cloudflare Redirect Rule): each of these paths
+ *   must 301 to the same path and query string on SITE_ORIGIN;
+ * - every response keeps browsers on HTTPS with a Strict-Transport-Security
+ *   header fit for the HSTS preload list, which aniya.moe is on: max-age of
+ *   at least a year, includeSubDomains and preload (hstspreload.org).
+ */
+export const PRODUCTION = {
+	wwwOrigin: 'https://www.aniya.moe',
+	wwwPaths: ['/', '/2021/09/30/第一篇文章/', '/?p=30'],
+	hstsMinMaxAge: 31_536_000,
+};
+
+/**
  * Every page's `<title>`, as on WordPress: `<name> - TsukiStudio`, or the
  * home page's `TsukiStudio - 生活點滴紀錄`; the pages after the first of a
  * list add ` - Page N`.

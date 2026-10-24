@@ -2,6 +2,7 @@
 // over HTTP. Both answer a request path with a Reply.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { PRODUCTION, SITE_ORIGIN } from './settings.ts';
 
 export type Reply = {
 	/** The absolute URL that was requested. */
@@ -10,6 +11,8 @@ export type Reply = {
 	location: string | null;
 	/** The body, for HTML responses; null otherwise. */
 	body: string | null;
+	/** The Strict-Transport-Security header; null if none, or not over HTTP. */
+	hsts: string | null;
 };
 
 export interface Target {
@@ -19,25 +22,50 @@ export interface Target {
 	cannotCheck?(requestPath: string): string | null;
 	/** `requestPath` is sent exactly as given, e.g. `/%e4%b8%ad/`. */
 	get(requestPath: string): Promise<Reply>;
+	/** Only for the production site: what it must do besides (see PRODUCTION in settings.ts). */
+	production?: Production;
 }
 
-export function httpSite(baseUrl: string): Target {
+export type Production = {
+	/** The site's origin, e.g. `https://aniya.moe`. */
+	origin: string;
+	/** The origin that must redirect each of its URLs to the same URL on the site, e.g. `https://www.aniya.moe`. */
+	wwwOrigin: string;
+};
+
+/**
+ * A live site. The production site (SITE_ORIGIN) gets the production checks
+ * too; `asProduction` gives them to another one, e.g. a local server standing
+ * in for it in tests.
+ */
+export function httpSite(baseUrl: string, { asProduction }: { asProduction?: { wwwOrigin: string } } = {}): Target {
+	const origin = new URL(baseUrl).origin;
+	const wwwOrigin = asProduction?.wwwOrigin ?? (origin === SITE_ORIGIN ? PRODUCTION.wwwOrigin : undefined);
 	return {
-		name: baseUrl,
-		async get(requestPath) {
-			const url = new URL(requestPath, baseUrl);
-			const response = await fetch(url, {
-				redirect: 'manual',
-				signal: AbortSignal.timeout(30_000),
-			});
-			let body: string | null = null;
-			if (response.headers.get('content-type')?.includes('html')) {
-				body = await response.text();
-			} else {
-				await response.body?.cancel();
-			}
-			return { url, status: response.status, location: response.headers.get('location'), body };
-		},
+		name: wwwOrigin === undefined ? baseUrl : `${baseUrl} (the production site: also ${wwwOrigin} and HSTS)`,
+		get: (requestPath) => fetchReply(new URL(requestPath, baseUrl)),
+		production: wwwOrigin === undefined ? undefined : { origin, wwwOrigin },
+	};
+}
+
+/** What a live site answers for `url`, redirects not followed. */
+export async function fetchReply(url: URL): Promise<Reply> {
+	const response = await fetch(url, {
+		redirect: 'manual',
+		signal: AbortSignal.timeout(30_000),
+	});
+	let body: string | null = null;
+	if (response.headers.get('content-type')?.includes('html')) {
+		body = await response.text();
+	} else {
+		await response.body?.cancel();
+	}
+	return {
+		url,
+		status: response.status,
+		location: response.headers.get('location'),
+		body,
+		hsts: response.headers.get('strict-transport-security'),
 	};
 }
 
@@ -78,6 +106,7 @@ export function buildOutput(dir: string): Target {
 				status,
 				location,
 				body: file?.endsWith('.html') ? readFileSync(join(dir, file), 'utf8') : null,
+				hsts: null,
 			});
 
 			const rule = matchRedirect(redirects, url.pathname);

@@ -6,10 +6,11 @@ import {
 	LOWERCASE_PERCENT_ENCODED_PATHS,
 	type LowercasePercentEncodedPaths,
 	NOT_FOUND_PAGE_TITLE,
+	PRODUCTION,
 	SITE_ORIGIN,
 	TITLE_FORMAT,
 } from './settings.ts';
-import type { Reply, Target } from './targets.ts';
+import { fetchReply, type Production, type Reply, type Target } from './targets.ts';
 
 const CONCURRENT_URLS = 8;
 
@@ -66,6 +67,9 @@ export async function checkUrls({
 		}
 	};
 	await Promise.all(Array.from({ length: CONCURRENT_URLS }, worker));
+	if (target.production) {
+		results.push(...(await wwwResults(target.production)));
+	}
 
 	const entries = pendingEntries(pendingList);
 	const pending = new Set(entries.map(({ url }) => url));
@@ -73,8 +77,8 @@ export async function checkUrls({
 	const nowPassing = results
 		.filter(({ url, outcome }) => outcome === 'pass' && pending.has(url))
 		.map(({ url }) => url);
-	const expectedUrls = new Set(expected.map(({ url }) => url));
-	const notExpected = [...pending].filter((url) => !expectedUrls.has(url));
+	const checkedUrls = new Set(results.map(({ url }) => url));
+	const notExpected = [...pending].filter((url) => !checkedUrls.has(url));
 	const pendingListProblems = orderProblems(entries);
 	return {
 		target: target.name,
@@ -174,6 +178,9 @@ async function checkUrl(
 	if (problems.length === 0 && entry.expect === 'page') {
 		problems.push(...(await headProblems(entry, reply, target)));
 	}
+	if (target.production) {
+		problems.push(...hstsProblems(reply));
+	}
 
 	// Non-ASCII paths as WordPress wrote them in canonicals and links.
 	const lowercase = requestPath.replace(/%[0-9A-F]{2}/g, (escape) => escape.toLowerCase());
@@ -234,6 +241,37 @@ async function redirectToAnyPageProblems(reply: Reply, target: Target): Promise<
 	}
 	const { status } = await target.get(location.pathname + location.search);
 	return status === 200 ? [] : [`redirects to ${reply.location}, which answers HTTP ${status}`];
+}
+
+/**
+ * The production site's www URLs (PRODUCTION.wwwPaths on its www origin),
+ * each of which must 301 to the same URL on the site. Reported under their
+ * full URL, e.g. `https://www.aniya.moe/`.
+ */
+async function wwwResults({ origin, wwwOrigin }: Production): Promise<UrlResult[]> {
+	return Promise.all(
+		PRODUCTION.wwwPaths.map(async (path) => {
+			const requestPath = toRequestPath(path);
+			const problems = await fetchReply(new URL(requestPath, wwwOrigin)).then(
+				(reply) => redirectProblems(reply, new URL(requestPath, origin).href),
+				(error: Error) => [`request failed: ${error.message}`],
+			);
+			return { url: `${wwwOrigin}${path}`, outcome: problems.length === 0 ? 'pass' : 'fail', problems };
+		}),
+	);
+}
+
+/** A Strict-Transport-Security header the HSTS preload list takes (see PRODUCTION in settings.ts). */
+function hstsProblems(reply: Reply): string[] {
+	const directives = (reply.hsts ?? '').split(';').map((directive) => directive.trim().toLowerCase());
+	const maxAge = Number(directives.find((directive) => directive.startsWith('max-age='))?.slice('max-age='.length));
+	if (maxAge >= PRODUCTION.hstsMinMaxAge && directives.includes('includesubdomains') && directives.includes('preload')) {
+		return [];
+	}
+	return [
+		`expected Strict-Transport-Security with max-age of at least ${PRODUCTION.hstsMinMaxAge}, includeSubDomains ` +
+			`and preload; got ${reply.hsts === null ? 'none' : `"${reply.hsts}"`}`,
+	];
 }
 
 /** A redirect to the requested path itself, only with its percent-escapes in another case. */
