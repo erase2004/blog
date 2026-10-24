@@ -9,11 +9,12 @@ import MarkdownImage from '../components/MarkdownImage.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getPosts, type Post, postDescription, postPath, postUpdated } from './content';
 import { feedHtml } from './feed-html';
+import { cdata, escapeXml } from './xml';
 
 /** WordPress's `posts_per_rss`. */
 const FEED_POSTS = 10;
 
-/** The WordPress site's only author (user erase2004), as its feeds named her. */
+/** The WordPress site's only author (user erase2004), by the name its feeds gave. */
 const AUTHOR = 'Tsuki';
 
 /** A post, as both feeds give it. */
@@ -151,14 +152,4 @@ function rfc822(date: Date): string {
 /** Atom's date format, as WordPress wrote it: `2026-01-23T10:01:26Z`. */
 function rfc3339(date: Date): string {
 	return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
-}
-
-function escapeXml(text: string): string {
-	const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' };
-	return text.replace(/[<>&'"]/g, (character) => entities[character]!);
-}
-
-/** Text as a CDATA section: HTML stays readable, and shorter than with every `<` escaped. */
-function cdata(text: string): string {
-	return `<![CDATA[${text.replaceAll(']]>', ']]]]><![CDATA[>')}]]>`;
 }

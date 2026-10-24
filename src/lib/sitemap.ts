@@ -5,6 +5,7 @@
 import { type Archive, categoryArchives, homeArchive, tagArchives } from './archives';
 import { getPages, getPosts, type Page, pagePath, type Post, postPath, postUpdated } from './content';
 import { imageAt, imagesIn, imageUrl } from './images';
+import { escapeXml } from './xml';
 
 interface SitemapEntry {
 	path: string;
@@ -57,9 +58,4 @@ function postEntry(post: Post): SitemapEntry {
 
 function pageEntry(page: Page): SitemapEntry {
 	return { path: pagePath(page), updated: page.data.updated, images: imagesIn(page) };
-}
-
-function escapeXml(text: string): string {
-	const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' };
-	return text.replace(/[<>&'"]/g, (character) => entities[character]!);
 }
