@@ -12,11 +12,12 @@ wordpressId: 219
 
 這是作為學期三最後的畢業專案，專案會是唯一一次採取團隊開發，且盡可能採用Scrum的方式進行。開發時間為14天左右，中間會有3次的sprint check-in作業繳交，作為小組開發狀況向AC團隊那邊回報的管道。在開發過程中，團隊須依照課程所給予的User Story，討論出團隊自己功能驗收的Acceptance Criteria，並且，前端開發人員依照課程所給予的頁面設計搞去刻劃出網頁頁面，後端開發人員依照課程已經給予的test case，去規劃並撰寫出後端API服務，在期限內完成指定規格與功能的交付。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":220,"width":768,"height":640,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/01-1024x853.png" alt="推特專案成果預覽" class="wp-image-220" width="768" height="640"/><figcaption>推特專案成果預覽</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![推特專案成果預覽](../../assets/images/alpha-camp推特專案開發紀錄/01.png)
+
+<figcaption>推特專案成果預覽</figcaption>
+</figure>
 
 [專案最終成品 Demo](https://erase2004.github.io/ac-twitter/#/signin)
 
@@ -48,17 +49,19 @@ wordpressId: 219
 
 會議結束後，團隊成員各自在Slack群組上做一個簡短的自我介紹，讓助教能夠瞭解團隊成員的背景，此外，我也安排團隊和助教kick-off meeting的時間，讓團隊和助教間能夠藉由線上會議的形式，更加認識彼此，以利後續的合作。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":224,"width":768,"height":230,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large is-resized"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-11_12-58-38-1024x307.png" alt="團隊成員各自回報能夠投入開發的時間" class="wp-image-224" width="768" height="230"/><figcaption>團隊成員各自回報能夠投入開發的時間</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":225,"sizeSlug":"full","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-11_13-16-14.png" alt="團隊角色分工" class="wp-image-225"/><figcaption>團隊角色分工</figcaption></figure></div>
-<!-- /wp:image -->
-```
+![團隊成員各自回報能夠投入開發的時間](../../assets/images/alpha-camp推特專案開發紀錄/Snipaste_2022-03-11_12-58-38.png)
+
+<figcaption>團隊成員各自回報能夠投入開發的時間</figcaption>
+</figure>
+
+<figure>
+
+![團隊角色分工](../../assets/images/alpha-camp推特專案開發紀錄/Snipaste_2022-03-11_13-16-14.png)
+
+<figcaption>團隊角色分工</figcaption>
+</figure>
 
 ---
 
@@ -102,11 +105,12 @@ wordpressId: 219
 
 收到AC團隊對於提早交付內容的審核結果，我們得到AC團隊在安裝前端專案過程中遇到EBUSY的問題，因此需要進一步調整的問題，團隊成員在自己的電腦上測試，並在網路上搜尋關於這個問題的解法後，團隊得到這個應該是客戶端電腦自身問題的結論，基於呈現出我們還是有努力過的樣子，我們將找到的解決方法記錄在Github Repository的README上，同時，我也增加新的Action，設定Action在有新的PR時，對PR進行編譯，測試該PR在不同系統與Node.js版本下上是否會出現問題。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":312,"sizeSlug":"full","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2022/04/32.png" alt="EBUSY錯誤訊息" class="wp-image-312"/><figcaption>EBUSY錯誤訊息</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
+
+![EBUSY錯誤訊息](../../assets/images/alpha-camp推特專案開發紀錄/32.png)
+
+<figcaption>EBUSY錯誤訊息</figcaption>
+</figure>
 
 ---
 

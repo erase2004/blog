@@ -5,7 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { convertContent, createRegistry } from '../../scripts/wordpress-converter/content';
 import type { Rule } from '../../scripts/wordpress-converter/rule';
 import * as rules from '../../scripts/wordpress-converter/rules/index';
+import { loadWordPress } from '../../scripts/wordpress-converter/wordpress';
 import { compileMdx, renderMarkdown } from '../support/render-markdown';
+import { addAttachments, attachment, post, wordpressTables } from './fixtures';
 
 const markdownOf = (html: string) => convertContent(html).markdown;
 
@@ -282,12 +284,140 @@ ${paragraphBlock('第一行<br>第二行<br>')}`;
 	});
 });
 
-describe('blocks left for later tickets', () => {
-	// One of each kind the backup has; converted by tickets 06–10.
-	const blocks = {
-		'core/image': `<!-- wp:image {"id":422,"sizeSlug":"full","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_15-59-21.png" alt="" class="wp-image-422"/><figcaption class="wp-element-caption">在 CDN 項目中的設定</figcaption></figure>
+describe('images', () => {
+	// A post of the backup with this content, and the attachments it uses.
+	function convertInPost(html: string, ...attachments: ReturnType<typeof attachment>[]) {
+		const tables = addAttachments(wordpressTables(), ...attachments);
+		tables.wp_posts!.push(
+			post({
+				ID: 419,
+				post_date: '2025-03-25 20:30:00',
+				post_date_gmt: '2025-03-25 12:30:00',
+				post_modified_gmt: '2025-03-25 12:30:00',
+				post_name: 'next-js-app-route-and-cloud-cdn-cache',
+				post_content: html,
+			}),
+		);
+		const site = loadWordPress(tables);
+		return convertContent(html, { entry: site.post(419), site });
+	}
+	const cdnSettings = attachment({
+		id: 422,
+		parent: 419,
+		slug: 'snipaste_2025-03-25_15-59-21',
+		file: '2025/03/Snipaste_2025-03-25_15-59-21.png',
+		mime: 'image/png',
+		sizes: ['Snipaste_2025-03-25_15-59-21-257x300.png', 'Snipaste_2025-03-25_15-59-21-150x150.png'],
+	});
+
+	it('become Markdown images of the original file in the post’s image folder, with their caption', () => {
+		const { markdown, unconverted } = convertInPost(
+			`<!-- wp:image {"id":422,"sizeSlug":"medium","linkDestination":"none","align":"center"} -->
+<figure class="wp-block-image aligncenter size-medium"><img src="https://aniya.moe/wp-content/uploads/2025/03/Snipaste_2025-03-25_15-59-21-257x300.png" alt="CDN 的設定畫面" class="wp-image-422"/><figcaption class="wp-element-caption">在 <a href="https://cloud.google.com/cdn">CDN</a> 項目中的設定</figcaption></figure>
 <!-- /wp:image -->`,
+			cdnSettings,
+		);
+
+		expect(markdown).toBe(`<figure>
+
+![CDN 的設定畫面](../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_15-59-21.png)
+
+<figcaption>在 <a href="https://cloud.google.com/cdn">CDN</a> 項目中的設定</figcaption>
+</figure>
+`);
+		expect(unconverted).toEqual([]);
+		expect(renderMarkdown(markdown)).toBe(
+			'<figure>\n<p><img src="../../assets/images/next-js-app-route-and-cloud-cdn-cache/Snipaste_2025-03-25_15-59-21.png" alt="CDN 的設定畫面"></p>\n' +
+				'<figcaption>在 <a href="https://cloud.google.com/cdn">CDN</a> 項目中的設定</figcaption>\n</figure>',
+		);
+		expect(() => compileMdx(markdown)).not.toThrow();
+	});
+
+	it('keep the id the text links to (`#image-1`) on their figure', () => {
+		const { markdown } = convertInPost(
+			`<!-- wp:image {"align":"center","id":155,"sizeSlug":"large","linkDestination":"none"} -->
+<div id="image-1" class="wp-block-image"><figure class="aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2021/11/01-1024x768.jpg" alt="於今年11月10日購入的HyRead Gaze Note和原廠電磁筆。" class="wp-image-155" title=""/><figcaption>圖1， 於今年11月10日購入的HyRead Gaze Note和原廠電磁筆。 </figcaption></figure></div>
+<!-- /wp:image -->`,
+			attachment({ id: 155, parent: 419, slug: '01', file: '2021/11/01.jpg', sizes: ['01-1024x768.jpg'] }),
+		);
+
+		expect(markdown).toBe(`<figure id="image-1">
+
+![於今年11月10日購入的HyRead Gaze Note和原廠電磁筆。](../../assets/images/next-js-app-route-and-cloud-cdn-cache/01.jpg)
+
+<figcaption>圖1， 於今年11月10日購入的HyRead Gaze Note和原廠電磁筆。</figcaption>
+</figure>
+`);
+		expect(renderMarkdown(markdown)).toMatch(/^<figure id="image-1">\n<p><img /);
+	});
+
+	it('point at the file WordPress served, named without -scaled, whatever URL the content has', () => {
+		const scaled = attachment({
+			id: 571,
+			parent: 419,
+			slug: '20250421_081608666',
+			file: '2025/05/20250421_081608666-scaled.jpg',
+			original: '20250421_081608666.jpg',
+			sizes: ['20250421_081608666-1024x768.jpg'],
+		});
+		const momotaro = attachment({
+			id: 500,
+			parent: 419,
+			slug: '%e5%b2%a1%e5%b1%b1%e9%a7%85%e5%89%8d%e6%a1%83%e5%a4%aa%e9%83%8e%e5%83%8f-%e7%a5%9e%e6%8e%a8',
+			file: '2025/05/岡山駅前桃太郎像-神推.jpg',
+			sizes: ['岡山駅前桃太郎像-神推-1024x576.jpg'],
+		});
+		const image = (src: string) =>
+			`<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt="[店家] *外面*"/></figure>\n<!-- /wp:image -->`;
+
+		const { markdown } = convertInPost(
+			[
+				image('https://aniya.moe/wp-content/uploads/2025/05/20250421_081608666-scaled.jpg'),
+				image('https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/20250421_081608666-1024x768.jpg?resize=1024%2C768&ssl=1'),
+				image('https://aniya.moe/wp-content/uploads/2025/05/20250421_081608666.jpg'),
+				image(
+					'https://aniya.moe/wp-content/uploads/2025/05/%E5%B2%A1%E5%B1%B1%E9%A7%85%E5%89%8D%E6%A1%83%E5%A4%AA%E9%83%8E%E5%83%8F-%E7%A5%9E%E6%8E%A8-1024x576.jpg',
+				),
+			].join('\n\n'),
+			scaled,
+			momotaro,
+		);
+
+		const folder = '../../assets/images/next-js-app-route-and-cloud-cdn-cache';
+		expect(markdown).toBe(
+			`${[
+				`![\\[店家\\] \\*外面\\*](${folder}/20250421_081608666.jpg)`,
+				`![\\[店家\\] \\*外面\\*](${folder}/20250421_081608666.jpg)`,
+				`![\\[店家\\] \\*外面\\*](${folder}/20250421_081608666.jpg)`,
+				`![\\[店家\\] \\*外面\\*](${folder}/岡山駅前桃太郎像-神推.jpg)`,
+			].join('\n\n')}\n`,
+		);
+		expect(renderMarkdown(markdown)).toContain(`alt="[店家] *外面*"`);
+	});
+
+	it('inside text become inline Markdown images', () => {
+		const { markdown, unconverted } = convertInPost(
+			paragraphBlock(
+				'蓋章<img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">完成',
+			),
+			attachment({
+				id: 496,
+				parent: 419,
+				slug: '25251efc7b05ba337e25294a5a690e92_w48_h46',
+				file: '2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg',
+			}),
+		);
+
+		expect(markdown).toBe(
+			'蓋章![](../../assets/images/next-js-app-route-and-cloud-cdn-cache/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg)完成\n',
+		);
+		expect(unconverted).toEqual([]);
+	});
+});
+
+describe('blocks left for later tickets', () => {
+	// One of each kind the backup has; converted by tickets 09 and 10.
+	const blocks = {
 		'core/gallery': `<!-- wp:gallery {"linkTo":"none","align":"center"} -->
 <figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":500,"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/岡山駅前桃太郎像-神推-1024x576.jpg" alt="桃太郎像" class="wp-image-500"/></figure>
@@ -327,21 +457,6 @@ describe('blocks left for later tickets', () => {
 		const block = '<!-- wp:quote -->\n<blockquote><p>```</p></blockquote>\n<!-- /wp:quote -->';
 
 		expect(markdownOf(block)).toBe(`\`\`\`\`html title="wp-unconverted: core/quote"\n${block}\n\`\`\`\`\n`);
-	});
-});
-
-describe('text left for later tickets', () => {
-	// Images inside text (ticket 06).
-	const pieces = {
-		img: '<img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">',
-	};
-
-	it.each(Object.entries(pieces))('keeps %s as it was, visibly marked', (kind, piece) => {
-		const { markdown, unconverted } = convertContent(paragraphBlock(`問題${piece}。`));
-
-		expect(markdown).toBe(`問題\`wp-unconverted: ${piece}\`。\n`);
-		expect(unconverted).toEqual([{ kind, source: piece }]);
-		expect(() => compileMdx(markdown)).not.toThrow();
 	});
 });
 

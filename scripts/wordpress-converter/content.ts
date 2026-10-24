@@ -8,6 +8,7 @@ import { codeBlock, emphasis, escapeText, finishInline, HARD_BREAK, inlineCode }
 import { type Context, type DocumentParts, type Rule, type Shortcode, UNCONVERTED } from './rule.ts';
 import * as registered from './rules/index.ts';
 import { SITE_ORIGIN } from './settings.ts';
+import { siteRelative } from './site-urls.ts';
 import type { Post, WordPressSite } from './wordpress.ts';
 
 export type ConvertedContent = {
@@ -149,18 +150,4 @@ function shortcodeAttributes(text: string): Record<string, string> {
 		attributes[name!.toLowerCase()] = double ?? single ?? bare ?? '';
 	}
 	return attributes;
-}
-
-/** `https://aniya.moe/about/` → `/about/`, with the path decoded to UTF-8; other URLs stay as they are. */
-export function siteRelative(href: string, siteOrigin: string): string {
-	const host = new URL(siteOrigin).host.replace(/^www\./, '');
-	const match = new RegExp(`^(?:https?:)?//(?:www\\.)?${host.replaceAll('.', '\\.')}(?=[/?#]|$)(.*)$`, 'i').exec(href);
-	if (!match) return href;
-	const rest = match[1] || '/';
-	const [, path = '', suffix = ''] = /^([^?#]*)(.*)$/.exec(rest.startsWith('/') ? rest : `/${rest}`)!;
-	try {
-		return decodeURI(path) + suffix;
-	} catch {
-		return path + suffix;
-	}
 }

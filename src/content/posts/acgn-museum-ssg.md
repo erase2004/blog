@@ -6,7 +6,7 @@ updated: 2026-01-23T18:01:26+08:00
 categories: ["技術"]
 tags: ["astro", "ssg", "website-optimization"]
 description: "記錄一個大型網站從 SSR 轉為 SSG 的完整過程，涵蓋架構選型、資料處理策略、效能最佳化與 7 萬頁 build 調校實戰經驗。"
-socialImage: "/wp-content/uploads/2026/01/heroimage.png"
+socialImage: "../../assets/images/acgn-museum-ssg/heroimage.png"
 draft: false
 wordpressId: 1854
 ---
@@ -205,11 +205,12 @@ wordpressId: 1854
 
 由於網頁是用 SSG 的方式產生，所有的內容必須在 build 時就輸出成檔案，預設行為是 component 和傳入 component 的 props 會寫入到同一個 HTML 檔案上，當傳入 props 的資料量很大時，會使輸出的檔案大小變大，最終導致網頁在使用者端的載入速度表現 (FCP) 變差。改善方式也很簡單，將 props 中相同結構的資料清單抽出來，用獨立的檔案存放，讓 component 在網頁上被渲染後，再發一個請求去抓這檔案來做呈現，如此一來，build 輸出的檔案大小便可縮小，也能讓使用者更快看到網頁畫面。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1868,"sizeSlug":"full","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2026/01/fcp-01.png" alt="改善後的金管會紀錄頁的 performance 表現，網頁的載入時間被縮短，使用者可以更快看到網頁的初始畫面" class="wp-image-1868"/><figcaption class="wp-element-caption">改善後的金管會紀錄頁的 performance 表現，網頁的載入時間被縮短，使用者可以更快看到網頁的初始畫面</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![改善後的金管會紀錄頁的 performance 表現，網頁的載入時間被縮短，使用者可以更快看到網頁的初始畫面](../../assets/images/acgn-museum-ssg/fcp-01.png)
+
+<figcaption>改善後的金管會紀錄頁的 performance 表現，網頁的載入時間被縮短，使用者可以更快看到網頁的初始畫面</figcaption>
+</figure>
 
 <figure>
 <video controls loop muted preload="metadata" src="https://media.aniya.moe/videos/acgn-museum-ssg/fcp-01.mp4"></video>

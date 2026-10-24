@@ -1,19 +1,21 @@
 // Converts the WordPress site, as read from its backup, into the files of the
 // new site: one content file per published post and page, the category and
-// tag data, and the old-URL mapping table. Same tables in, same files out.
+// tag data, the old-URL mapping table, and the list of images to copy from
+// the uploads directory. Same tables in, same files out.
 import { SITE_TIMEZONE } from '../../src/consts.ts';
 import { MAPPING_TABLE_FILE } from '../url-checker/settings.ts';
 import { convertContent, shortcodeNames } from './content.ts';
+import { contentDirectory, fileName, PAGES_DIR, pagePath, POSTS_DIR } from './content-files.ts';
 import { type FrontmatterValue, frontmatter, localParts } from './frontmatter.ts';
 import { decodeEntities } from './html.ts';
 import { mappingTable } from './mapping-table.ts';
+import { mediaLibrary, relativeImagePath } from './media-library.ts';
 import { descriptionFromContent, seoSettings } from './seo.ts';
 import { SITE_ORIGIN } from './settings.ts';
 import type { Tables } from './sql-dump.ts';
 import { loadWordPress, type Post, type WordPressSite } from './wordpress.ts';
 
-export const POSTS_DIR = 'src/content/posts';
-export const PAGES_DIR = 'src/content/pages';
+export { PAGES_DIR, POSTS_DIR };
 export const CATEGORIES_FILE = 'src/data/categories.json';
 export const TAGS_FILE = 'src/data/tags.json';
 
@@ -30,6 +32,8 @@ export type ConversionOutput = {
 	files: Record<string, string>;
 	/** What was left as wp-unconverted markers, by file. */
 	unconverted: { file: string; kind: string }[];
+	/** The images to copy: `upload` relative to the uploads directory, `file` relative to the project root. */
+	images: { upload: string; file: string }[];
 };
 
 export function convertWordPress(tables: Tables, { source = 'the WordPress backup' } = {}): ConversionOutput {
@@ -47,9 +51,7 @@ export function convertWordPress(tables: Tables, { source = 'the WordPress backu
 		const url = isPost ? postUrl(post) : `/${pagePath(post, site).join('/')}/`;
 		const converted = convertContent(post.content, { entry: post, site });
 		const extension = converted.mdx ? 'mdx' : 'md';
-		const file = isPost
-			? `${POSTS_DIR}/${fileName(post.slug)}.${extension}`
-			: `${PAGES_DIR}/${pagePath(post, site).map(fileName).join('/')}.${extension}`;
+		const file = `${contentDirectory(post, site)}/${fileName(post.slug)}.${extension}`;
 		const fields = isPost ? postFrontmatter(post, site) : pageFrontmatter(post, site);
 		files[file] = `${frontmatter(fields, SITE_TIMEZONE)}\n${converted.markdown}`;
 		unconverted.push(...converted.unconverted.map(({ kind }) => ({ file, kind })));
@@ -64,7 +66,8 @@ export function convertWordPress(tables: Tables, { source = 'the WordPress backu
 		files[file] = `[\n${terms.map((term) => `\t${JSON.stringify(term)}`).join(',\n')}\n]\n`;
 	}
 	files[MAPPING_TABLE_FILE] = mappingTable({ site, entries }, source);
-	return { files, unconverted };
+	const images = mediaLibrary(site).images.map(({ file, path }) => ({ upload: file, file: path }));
+	return { files, unconverted, images };
 }
 
 function postFrontmatter(post: Post, site: WordPressSite): [string, FrontmatterValue][] {
@@ -83,7 +86,7 @@ function postFrontmatter(post: Post, site: WordPressSite): [string, FrontmatterV
 		['tags', slugs('post_tag')],
 		['excerpt', decodeEntities(post.excerpt).trim() || undefined],
 		['description', description],
-		['socialImage', socialImage],
+		['socialImage', socialImage && relativeImagePath(socialImage, post, site)],
 		['draft', false],
 		['wordpressId', post.id],
 	];
@@ -101,18 +104,6 @@ function pageFrontmatter(post: Post, site: WordPressSite): [string, FrontmatterV
 		['description', description ?? descriptionFromContent(post.content, shortcodeNames())],
 		['wordpressId', post.id],
 	];
-}
-
-/** The slugs from the top-level page down to this page. */
-function pagePath(page: Post, site: WordPressSite): string[] {
-	const parent = page.parent === 0 ? undefined : site.post(page.parent);
-	return parent ? [...pagePath(parent, site), page.slug] : [page.slug];
-}
-
-/** A slug as a file name; fails for characters Windows does not allow in file names. */
-function fileName(slug: string): string {
-	if (/[<>:"/\\|?*]/.test(slug)) throw new Error(`The slug ${slug} cannot be a file name`);
-	return slug;
 }
 
 /** The converter relies on these WordPress settings; a backup with others needs the converter changed. */

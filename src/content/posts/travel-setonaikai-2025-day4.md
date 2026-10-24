@@ -6,7 +6,7 @@ updated: 2025-05-20T21:18:54+08:00
 categories: ["旅遊"]
 tags: ["summer-pockets", "ざつ旅", "女木島", "瀨戶內國際藝術祭", "男木島", "聖地巡禮", "高松"]
 description: "今天的內容主要記錄旅遊第四天，從高松開始開始，在高松港搭乘渡輪前往女木島和男木島，最後回到高松，在這些地方跑瀨戶藝景點、觀光，以及聖地巡禮的收穫。"
-socialImage: "/wp-content/uploads/2025/05/MixCollage-16-May-2025-05-01-PM-1795-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day4/MixCollage-16-May-2025-05-01-PM-1795.jpg"
 draft: false
 wordpressId: 767
 ---
@@ -71,11 +71,12 @@ wordpressId: 767
 
 出了大洞窟後，往上爬坡一段路，來到[鷲ヶ峰展望台](https://maps.app.goo.gl/ry2N7jC6oVuocmzC9)，在這裡看了四周的景色，拍了照片後，我順著階梯往下走，回到大洞窟的售票處前，稍作休息一下，接著，我繼續往下走，回到公車亭，由於距離下一班公車還有很多時間，我決定自行走下山。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":806,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_091024266-1024x768.jpg" alt="從展望台往高松港的方向看過去" class="wp-image-806"/><figcaption class="wp-element-caption">從展望台往高松港的方向看過去，前方的村落是女木島中心部</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![從展望台往高松港的方向看過去](../../assets/images/travel-setonaikai-2025-day4/20250423_091024266.jpg)
+
+<figcaption>從展望台往高松港的方向看過去，前方的村落是女木島中心部</figcaption>
+</figure>
 
 我從公車亭旁的山路往下走，這條山路的階梯高度落差不小，加上昨晚的下雨，使得階梯有些溼滑，又周遭都是樹林和野草，我小心翼翼得踩著階梯往下，一方面避免滑倒，一方面避免踩到蛇之類。走了一陣子後，終於回到柏油道路，心情稍微放鬆，我順著道路，往山下小跑步，途中與往山上前進的公車相遇，我站到路旁讓公車通過，公車通過後，我繼續往山下小跑步，最後，在[住吉神社](https://maps.app.goo.gl/5cLUJk3viHTC7so77)附近，我從一條小路往上走，來到作品「[段々の風](https://setouchi-artfest.jp/artworks/detail/e8ec17bf-3ebe-4306-8754-10d25d6bcfd9)」前，欣賞完該作品後，我在女木島中心部繼續參觀其他作品。
 
@@ -91,19 +92,21 @@ wordpressId: 767
 
 繼續往前走，來到「[女木島名画座](https://setouchi-artfest.jp/artworks/detail/e89dfb13-bcf0-4b7b-aa7e-9d65ce15e058)」，這是一間復古美國風格的電影院，坐在電影院的椅子上觀看前方播放中電影時，時空彷彿穿越到 1990 年代。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":812,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_101139309-1024x768.jpg" alt="女木島名画座" class="wp-image-812"/><figcaption class="wp-element-caption">女木島名画座</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![女木島名画座](../../assets/images/travel-setonaikai-2025-day4/20250423_101139309.jpg)
+
+<figcaption>女木島名画座</figcaption>
+</figure>
 
 往前走一小段路，來到女木小學校，這裡有一些作品，我對當中[大竹伸朗](https://setouchi-artfest.jp/artists/detail/c2cd3799-bad9-47e6-ba9b-a0f70ef2c2dc)的作品[「女根／めこん](https://setouchi-artfest.jp/artworks/detail/a70422c8-ff0f-492c-8f41-ec06e0eea1a4)」印象深刻，這作品的構造，似乎是在暗示男性與女性性器官的結合。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":814,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_102324503-768x1024.jpg" alt="女根／めこん" class="wp-image-814"/><figcaption class="wp-element-caption">女根／めこん</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![女根／めこん](../../assets/images/travel-setonaikai-2025-day4/20250423_102324503.jpg)
+
+<figcaption>女根／めこん</figcaption>
+</figure>
 
 再往前走一段路，來到作品「[ナビゲーションルーム](https://setouchi-artfest.jp/artworks/detail/cb9aa4dd-0d2a-4e8c-b5cb-b2658249d652)」，該作品的中間部份是一堆自己轉動的物體，右邊是兩個重疊的金屬框，用來表示月亮的盈缺，左邊是一個大型的八音盒與其紙帶，紙帶上整齊得刻著許多大小相同的孔洞，雖然八音盒會播放音樂，但紙帶是靜止的，不會隨著音樂移動。
 
@@ -127,11 +130,12 @@ wordpressId: 767
 
 回到女木港時，由於距離前往男木島的船班還有一大段時間，又差不多接近中午時刻，我想起先前經過的餐廳—[鬼の台所 福](https://maps.app.goo.gl/dWJpGAFMg9Po7T6E9)，於是我前往該店解決午餐，午餐我點了ホルモン焼うどん和炸章魚來吃，ホルモン焼うどん的味道十分濃郁。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":828,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_112921151-1024x768.jpg" alt="ホルモン焼うどん與炸章魚" class="wp-image-828"/><figcaption class="wp-element-caption">ホルモン焼うどん與炸章魚</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![ホルモン焼うどん與炸章魚](../../assets/images/travel-setonaikai-2025-day4/20250423_112921151.jpg)
+
+<figcaption>ホルモン焼うどん與炸章魚</figcaption>
+</figure>
 
 午餐後，我回到遊客服務中心，在裡面的用餐區點了哈密瓜刨冰來吃。接著，在遊客中心附近拍照、打發時間，等待船班的到來。
 
@@ -175,31 +179,34 @@ wordpressId: 767
 
 前往「[ドリームランド](https://setouchi-artfest.jp/artworks/detail/9c568dec-675b-473d-b2de-503b5eb14411)」時，會先遇到[ドリームカフェ](https://maps.app.goo.gl/RS5PFsU4CK6SwW4x5)，起初，我以為兩者是一體的，後來才注意到作品是在餐廳後面的房子裡，於是才穿過餐廳，到達該作品。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":868,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_131627572-1024x768.jpg" alt="從「ドリームランド」前往「アキノリウム」的路上，遇到一隻在路中央的貓" class="wp-image-868"/><figcaption class="wp-element-caption">從「ドリームランド」前往「アキノリウム」的路上，遇到一隻在路中央的貓</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![從「ドリームランド」前往「アキノリウム」的路上，遇到一隻在路中央的貓](../../assets/images/travel-setonaikai-2025-day4/20250423_131627572.jpg)
+
+<figcaption>從「ドリームランド」前往「アキノリウム」的路上，遇到一隻在路中央的貓</figcaption>
+</figure>
 
 接著是「[アキノリウム](https://setouchi-artfest.jp/artworks/detail/b4521edb-f7ba-49bf-a8ea-72e07e314c49)」，這個作品有兩個樓層，一樓是燈光照到機關，機關的影子打在布幕上，二樓則是會自己動作並發出聲音的機關，這些機關都是用竹子做的。
 
 「[部屋の中の部屋](https://setouchi-artfest.jp/artworks/detail/09a6817b-9f0b-4aae-9618-539f45a85f49)」是一間室內垂直逆時針 90 度擺放的和室，置身其中，產生人在橫躺的錯覺。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":869,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_134502219-768x1024.jpg" alt="作品「部屋の中の部屋」" class="wp-image-869"/><figcaption class="wp-element-caption">作品「部屋の中の部屋」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「部屋の中の部屋」](../../assets/images/travel-setonaikai-2025-day4/20250423_134502219.jpg)
+
+<figcaption>作品「部屋の中の部屋」</figcaption>
+</figure>
 
 在「部屋の中の部屋」斜對面有「[漆の家](https://setouchi-artfest.jp/artworks/detail/4bb98a19-4465-418d-9dd4-55ec59d0c456)」，這裡是日本漆藝的小型火力展示，展示了使用漆藝裝飾的房間、家具、餐具和裝飾，也展示實際的工作室，充分讓人體會漆藝的巧與美。
 
 往[豐玉姬神社](https://maps.app.goo.gl/Wdh6DTWH33z9vns3A)的正門走，會來到作品「[男木島パビリオン](https://setouchi-artfest.jp/artworks/detail/6a16fe74-f8ea-4b4e-8470-69b922286411)」，這是在一間小屋面向男木港方向的三片落地窗上的作畫，三片落地窗並排錯開，而旁邊的牆上有重疊起來的照片，我向工作人員詢問是否能將三者重疊在一起，得到否定的答案。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":870,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_135318013-1024x768.jpg" alt="作品「男木島パビリオン」中間的落地窗" class="wp-image-870"/><figcaption class="wp-element-caption">作品「男木島パビリオン」中間的落地窗</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「男木島パビリオン」中間的落地窗](../../assets/images/travel-setonaikai-2025-day4/20250423_135318013.jpg)
+
+<figcaption>作品「男木島パビリオン」中間的落地窗</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":871,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_24.jpg?ssl=1","alt":"","width":1341,"height":1920},"imageAfter":{"id":1222,"url":"https://aniya.moe/wp-content/uploads/2025/05/pi_20250423_135020-1.jpg","alt":"","width":1080,"height":1546},"caption":"Summer Pockets 中，站在鳥居前的水織静久"} -->
@@ -247,11 +254,12 @@ wordpressId: 767
 
 拍完照，往男木港的方向折返回去，途中經過在學校體育館外牆上的作品「[青空を夢見て](https://setouchi-artfest.jp/artworks/detail/58cb6e19-0346-4087-ae23-daff1394191d)」，以及在[老人憩の家](https://maps.app.goo.gl/YtJdytyZ3x96z9QD8)展出的作品「[私たちの島](https://setouchi-artfest.jp/artworks/detail/6d608389-4897-41e8-8fd9-17bd28dae879)」，在「私たちの島」這個作品中，作者使用不同層次的藍色布，堆疊出整座島立體的樣子。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":889,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_143930081-1024x768.jpg" alt="作品「私たちの島」" class="wp-image-889"/><figcaption class="wp-element-caption">作品「私たちの島」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![作品「私たちの島」](../../assets/images/travel-setonaikai-2025-day4/20250423_143930081.jpg)
+
+<figcaption>作品「私たちの島」</figcaption>
+</figure>
 
 ```html title="wp-unconverted: jetpack/image-compare"
 <!-- wp:jetpack/image-compare {"imageBefore":{"id":1244,"url":"https://aniya.moe/wp-content/uploads/2025/05/puru-1536x864-1.jpg","alt":"","width":1536,"height":864},"imageAfter":{"id":891,"url":"https://i0.wp.com/aniya.moe/wp-content/uploads/2025/05/pi_20250423_143638.jpg?ssl=1","alt":"","width":1920,"height":1080},"caption":"Summer Pockets 中，女主角—鳴瀬しろは—游泳的地方，圍牆上有告示，禁止對學生拍照。"} -->
@@ -269,11 +277,12 @@ wordpressId: 767
 
 我在自助商店購買聖地巡禮導覽手冊「[とりしろっぷ ～Summer Pockets 舞台案内～](https://www.melonbooks.co.jp/detail/detail.php?product_id=2697465)」，稍作停留一會，接著往剩下的作品繼續前進。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":897,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_163254549-768x1024.jpg" alt="今年初出版的「とりしろっぷ ～Summer Pockets 舞台案内～」" class="wp-image-897"/><figcaption class="wp-element-caption">今年初出版的「とりしろっぷ ～Summer Pockets 舞台案内～」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![今年初出版的「とりしろっぷ ～Summer Pockets 舞台案内～」](../../assets/images/travel-setonaikai-2025-day4/20250423_163254549.jpg)
+
+<figcaption>今年初出版的「とりしろっぷ ～Summer Pockets 舞台案内～」</figcaption>
+</figure>
 
 在作品「[生成するドローイング ― 日本家屋のために2.0](https://setouchi-artfest.jp/artworks/detail/d05acf0d-57e3-4806-8b42-dd9b55dc6759)」中，作者重複利用相同組成的區塊，填滿整個房子的牆壁，有的是用花草圖案，有的是用貝殼的紋路。
 
@@ -303,17 +312,19 @@ wordpressId: 767
 
 回到高松後，我加緊腳步前往高速巴士車站，在服務櫃台下班前，完成預約第七天旅行所要用到的交通套票[^2]。完成預約後，我在高松站的[便當店](https://maps.app.goo.gl/y78ZYhsnVRaZfmP88)購買便當作為晚餐，接著，直接回到旅館房間享用晚餐，結束今天的行程。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1165,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250425_215543344-1024x768.jpg" alt="往返高松與大塚國際美術館的高速巴士的交通套票" class="wp-image-1165"/><figcaption class="wp-element-caption">往返高松與大塚國際美術館的高速巴士的交通套票</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":923,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250423_181105038-1024x768.jpg" alt="便當「瀬戸の凪」" class="wp-image-923"/><figcaption class="wp-element-caption">便當「瀬戸の凪」</figcaption></figure>
-<!-- /wp:image -->
-```
+![往返高松與大塚國際美術館的高速巴士的交通套票](../../assets/images/travel-setonaikai-2025-day4/20250425_215543344.jpg)
+
+<figcaption>往返高松與大塚國際美術館的高速巴士的交通套票</figcaption>
+</figure>
+
+<figure>
+
+![便當「瀬戸の凪」](../../assets/images/travel-setonaikai-2025-day4/20250423_181105038.jpg)
+
+<figcaption>便當「瀬戸の凪」</figcaption>
+</figure>
 
 ---
 

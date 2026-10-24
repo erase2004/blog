@@ -6,7 +6,7 @@ updated: 2025-05-16T20:20:31+08:00
 categories: ["旅遊"]
 tags: ["德島", "高松", "鳴門"]
 description: "旅遊第七天，早上，我在高松搭高速巴士前往德島大毛島，進行陸路「跳島」，藉由步行在那一帶進行旅行。下午時，雖然發生意外，但還是成功搭到高速巴士，返回高松。"
-socialImage: "/wp-content/uploads/2025/05/MixCollage-16-May-2025-12-09-PM-7337-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day7/MixCollage-16-May-2025-12-09-PM-7337.jpg"
 draft: false
 wordpressId: 1331
 ---

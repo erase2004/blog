@@ -6,7 +6,7 @@ updated: 2025-05-20T21:22:48+08:00
 categories: ["旅遊"]
 tags: ["summer-pockets", "岡山", "男木島", "聖地巡禮", "高松"]
 description: "旅遊最後一天，早上，我在高松搭乘渡輪前往男木島，在島上進行最後的聖地巡禮。中午回到高松，搭乘電車與轉乘公車到達岡山機場，搭飛機飛回台灣，結束旅行。"
-socialImage: "/wp-content/uploads/2025/05/MixCollage-16-May-2025-04-52-PM-7510-scaled.jpg"
+socialImage: "../../assets/images/travel-setonaikai-2025-day8/MixCollage-16-May-2025-04-52-PM-7510.jpg"
 draft: false
 wordpressId: 1590
 ---
@@ -15,11 +15,12 @@ wordpressId: 1590
 
 今天早上，在旅館完成退房手續，將行李寄放在旅館後，走到高松港搭乘渡輪前往男木島，前往高松港的途中，在超商購買早餐。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1594,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250427_074218645-1024x768.jpg" alt="搭乘渡輪前往男木島" class="wp-image-1594"/><figcaption class="wp-element-caption">搭乘渡輪前往男木島</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![搭乘渡輪前往男木島](../../assets/images/travel-setonaikai-2025-day8/20250427_074218645.jpg)
+
+<figcaption>搭乘渡輪前往男木島</figcaption>
+</figure>
 
 ```html title="wp-unconverted: envira/envira-gallery"
 <!-- wp:envira/envira-gallery {"galleryId":1595,"title":"男木港 \u0026#8211; 20250427","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084030303-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084030303-scaled.jpg","alt":"","caption":"","thumb":"","id":1597,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084021441-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084021441-scaled.jpg","alt":"","caption":"","thumb":"","id":1596,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084044656-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084044656-scaled.jpg","alt":"","caption":"","thumb":"","id":1598,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084108932-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084108932-scaled.jpg","alt":"","caption":"","thumb":"","id":1599,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084138775-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084138775-scaled.jpg","alt":"","caption":"","thumb":"","id":1600,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084145909-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084145909-scaled.jpg","alt":"","caption":"","thumb":"","id":1601,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084155145-scaled.jpg","title":"男木港與男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084155145-scaled.jpg","alt":"","caption":"","thumb":"","id":1602,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084335425-scaled.jpg","title":"男木島聚落","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_084335425-scaled.jpg","alt":"","caption":"","thumb":"","id":1603,"height":106.20300751879698,"width":141.3}]} -->
@@ -100,11 +101,12 @@ wordpressId: 1590
 
 回到聚落後，距離船班還剩下不少時間，決定再拍一次先前拍過的景點，首先是豐玉姬神社，然後是歩く方舟，最後是男木港一帶。結束後，搭乘渡輪返回高松港。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1644,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250427_100047875-1024x768.jpg" alt="從豐玉姬神社鳥瞰整個男木島聚落" class="wp-image-1644"/><figcaption class="wp-element-caption">從豐玉姬神社鳥瞰整個男木島聚落</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![從豐玉姬神社鳥瞰整個男木島聚落](../../assets/images/travel-setonaikai-2025-day8/20250427_100047875.jpg)
+
+<figcaption>從豐玉姬神社鳥瞰整個男木島聚落</figcaption>
+</figure>
 
 ```html title="wp-unconverted: envira/envira-gallery"
 <!-- wp:envira/envira-gallery {"galleryId":1645,"title":"歩く方舟 \u0026#8211; 20250427","columns":"0","margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101450950-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101450950-scaled.jpg","alt":"","caption":"","thumb":"","id":1646,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101453654-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101453654-scaled.jpg","alt":"","caption":"","thumb":"","id":1647,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101838046-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101838046-scaled.jpg","alt":"","caption":"","thumb":"","id":1648,"height":106.20300751879698,"width":141.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101841087-scaled.jpg","title":"歩く方舟","link":"https://aniya.moe/wp-content/uploads/2025/05/20250427_101841087-scaled.jpg","alt":"","caption":"","thumb":"","id":1649,"height":106.20300751879698,"width":141.3}]} -->
@@ -216,13 +218,14 @@ wordpressId: 1590
 
 到了岡山站後，在站內與站外的特產店逛了一下，然後前往西口外的公車站搭乘接駁巴士，前往岡山機場。巴士行駛過程，車內十分安靜，與第一天的情況截然不同。
 
-抵達岡山機場後，我逛了一下機場。另外，由於擔心傷口的敷料可能沒有貼牢，嘗試在機場內尋找膠帶但未果，機場內的超商雖然有賣一些日用品，但沒有膠帶，而有急救箱告示的派出所，也沒有膠帶。`wp-unconverted: <img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">`
+抵達岡山機場後，我逛了一下機場。另外，由於擔心傷口的敷料可能沒有貼牢，嘗試在機場內尋找膠帶但未果，機場內的超商雖然有賣一些日用品，但沒有膠帶，而有急救箱告示的派出所，也沒有膠帶。![](../../assets/images/travel-setonaikai-2025-day1/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg)
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1699,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250427_160255114-1024x768.jpg" alt="機場外的桃太郎像" class="wp-image-1699"/><figcaption class="wp-element-caption">機場外的桃太郎像</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![機場外的桃太郎像](../../assets/images/travel-setonaikai-2025-day8/20250427_160255114.jpg)
+
+<figcaption>機場外的桃太郎像</figcaption>
+</figure>
 
 在機場內找個地方整理好行李後，我加入等待辦理報到手續的隊伍。岡山機場的報到流程是先通過 X 光機的檢查，然後才可以去後面的櫃台報到，有遇到旅客被 X 光機掃出異物的情況，也有遇到旅客通過 X 光機檢查，但在櫃台時，被磅秤測出超重的情形。在排隊過程中，注意到一團看起來是老師帶著學生們的旅遊團，從一位同學背包側掛牌上資訊，得知是來自景美高中的團。
 
@@ -234,23 +237,26 @@ wordpressId: 1590
 
 ---
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1723,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250516_220754654-1-980x1024.jpg" alt="有留下來的交通票據" class="wp-image-1723"/><figcaption class="wp-element-caption">有留下來的交通票據</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1724,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250516_221003427-1024x908.jpg" alt="門票" class="wp-image-1724"/><figcaption class="wp-element-caption">門票</figcaption></figure>
-<!-- /wp:image -->
-```
+![有留下來的交通票據](../../assets/images/travel-setonaikai-2025-day8/20250516_220754654-1.jpg)
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1725,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
-<figure class="wp-block-image aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/20250516_221836289-938x1024.jpg" alt="活動紀錄" class="wp-image-1725"/><figcaption class="wp-element-caption">活動紀錄</figcaption></figure>
-<!-- /wp:image -->
-```
+<figcaption>有留下來的交通票據</figcaption>
+</figure>
+
+<figure>
+
+![門票](../../assets/images/travel-setonaikai-2025-day8/20250516_221003427.jpg)
+
+<figcaption>門票</figcaption>
+</figure>
+
+<figure>
+
+![活動紀錄](../../assets/images/travel-setonaikai-2025-day8/20250516_221836289.jpg)
+
+<figcaption>活動紀錄</figcaption>
+</figure>
 
 <sup>*各個島嶼的蓋章紀錄*</sup>
 

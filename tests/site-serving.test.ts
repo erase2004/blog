@@ -33,7 +33,9 @@ beforeAll(async () => {
 		{ stdio: 'inherit' },
 	);
 	server = await startWranglerDev({ assetsDir: outDir });
-}, 180_000);
+	// Making the webp images of 769 photos takes minutes the first time;
+	// later builds take them from Astro's cache (node_modules/.astro).
+}, 600_000);
 
 afterAll(async () => {
 	await server?.stop();
@@ -84,6 +86,52 @@ describe('unknown URLs', () => {
 
 		expect(response.status).toBe(404);
 		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
+	});
+});
+
+describe('images', () => {
+	const POST = '/2022/03/25/vue-router-named-views/';
+
+	/** The image a browser loads for a srcset/sizes image on a screen this wide, at this pixel density (HTML's selection, simplified). */
+	function chosenImage(img: ReturnType<typeof parse>, screenWidth: number, density: number): string {
+		const candidates = img
+			.getAttribute('srcset')!
+			.split(',')
+			.map((candidate) => candidate.trim().split(/\s+/))
+			.map(([url, descriptor]) => ({ url: url!, width: Number.parseInt(descriptor!, 10) }))
+			.sort((a, b) => a.width - b.width);
+		// `(min-width: Wpx) Wpx, 100vw`: on a narrower screen the image is as wide as the screen.
+		const [, maxWidth] = /\(min-width: (\d+)px\)/.exec(img.getAttribute('sizes')!)!;
+		const slotWidth = Math.min(screenWidth, Number(maxWidth));
+		return (candidates.find(({ width }) => width >= slotWidth * density) ?? candidates.at(-1)!).url;
+	}
+
+	it('in posts are webp in several widths, so that a phone loads one as wide as its screen', async () => {
+		const img = parse(await (await get(POST)).text()).querySelector('img[alt="頁面預覽"]')!;
+		const onPhone = chosenImage(img, 390, 2);
+		const onDesktop = chosenImage(img, 1920, 1);
+
+		// The original is a 1280 × 960 PNG.
+		expect(img.getAttribute('width')).toBe('1280');
+		expect(onPhone).not.toBe(onDesktop);
+		for (const url of [onPhone, onDesktop]) {
+			const response = await get(url);
+			expect(response.status).toBe(200);
+			expect(response.headers.get('content-type')).toBe('image/webp');
+		}
+		const phoneImage = await (await get(onPhone)).arrayBuffer();
+		const desktopImage = await (await get(onDesktop)).arrayBuffer();
+		expect(phoneImage.byteLength).toBeLessThan(desktopImage.byteLength / 2);
+	});
+
+	it('at their old URLs redirect to the image the post shows', async () => {
+		const img = parse(await (await get(POST)).text()).querySelector('img[alt="頁面預覽"]')!;
+
+		for (const old of ['/wp-content/uploads/2022/03/preview-1.png', `${POST}preview-1/`]) {
+			const response = await get(old);
+			expect(response.status).toBe(301);
+			expect(new URL(response.headers.get('location')!, server!.url).pathname).toBe(img.getAttribute('src'));
+		}
 	});
 });
 

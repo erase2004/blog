@@ -12,17 +12,19 @@ wordpressId: 234
 
 參考範例：[https://github.com/erase2004/vue-router-demo](https://github.com/erase2004/vue-router-demo)
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":251,"sizeSlug":"large","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-large"><img src="https://aniya.moe/wp-content/uploads/2022/03/preivew-1024x768.png" alt="頁面預覽" class="wp-image-251"/><figcaption>頁面預覽</figcaption></figure></div>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"align":"center","id":236,"sizeSlug":"full","linkDestination":"none"} -->
-<div class="wp-block-image"><figure class="aligncenter size-full"><img src="https://aniya.moe/wp-content/uploads/2022/03/Untitled-Diagram.drawio.png" alt="頁面結構" class="wp-image-236"/><figcaption>頁面結構</figcaption></figure></div>
-<!-- /wp:image -->
-```
+![頁面預覽](../../assets/images/vue-router-nested-routes/preivew.png)
+
+<figcaption>頁面預覽</figcaption>
+</figure>
+
+<figure>
+
+![頁面結構](../../assets/images/vue-router-nested-routes/Untitled-Diagram.drawio.png)
+
+<figcaption>頁面結構</figcaption>
+</figure>
 
 網頁結構出現 router-view 下層還有 router-view 情況時，就是 Nested Routes 的情況。以範例來講，網頁最上層有 Homepage、Multi View #1 \~ Multi View #4、Nested Route 的頁面，而 Nested Route 頁面底下又有 Tab #1 \~ Tab #3 的分頁，在 App.vue 裡會使用一個 router-view 來作為最上層頁面切換顯示使用，而在 NestedRoute.vue 裡也會放上一個 router-view 來作為 Nested Route 底下分頁的切換使用，這麼做的好處是可以使頁面有更好的結構，NestedRoute.vue 裡放 Tab #1 \~ Tab #3 共同的顯示部份， Tab #1 \~ Tab #3 彼此不同的顯示內容，獨立成各自的 view 元件去管理，然後 Nested Route 在藉由 router-view 來載入對應元件作顯示。
 

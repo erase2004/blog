@@ -1,7 +1,7 @@
 import type { AstroIntegration } from 'astro';
 import { existsSync } from 'node:fs';
-import { appendFile, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { appendRedirects } from './redirects-file';
 
 /**
  * Adds a `/<page> /<page>/ 301` rule to `_redirects` for every built page.
@@ -23,12 +23,9 @@ export default function trailingSlashRedirects(): AstroIntegration {
 					.map(({ pathname }) => pathname)
 					.filter((pathname) => pathname !== '' && pathname.endsWith('/'))
 					.filter((pathname) => existsSync(fileURLToPath(new URL(`${pathname}index.html`, dir))))
-					.map((pathname) => `/${pathname.slice(0, -1)} /${pathname} 301\n`);
+					.map((pathname) => `/${pathname.slice(0, -1)} /${pathname} 301`);
 
-				const file = fileURLToPath(new URL('_redirects', dir));
-				const existing = await readFile(file, 'utf8').catch(() => '');
-				const separator = existing === '' || existing.endsWith('\n') ? '' : '\n';
-				await appendFile(file, separator + rules.join(''));
+				await appendRedirects(dir, rules);
 				logger.info(`added ${rules.length} trailing-slash rules to _redirects`);
 			},
 		},

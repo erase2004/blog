@@ -6,7 +6,7 @@ updated: 2025-12-05T20:02:43+08:00
 categories: ["旅遊", "閒聊"]
 tags: ["こえび隊", "小蝦隊", "瀨戶內國際藝術祭"]
 description: "我在瀨戶內藝術祭夏會期\ufeff擔任小蝦隊志工近一月，體驗藝術祭工作與日本生活。任務包括展覽導覽與餐廳服務，需應對入場管控與客人需求。透過與不同志工及在地居民互動，我更理解藝術祭對地方的影響，也增進對瀨戶內地區文化的認識，激發日後更深入探索的興趣。"
-socialImage: "/wp-content/uploads/2025/12/photo-15-scaled.jpg"
+socialImage: "../../assets/images/2025-koebitai/photo-15.jpg"
 draft: false
 wordpressId: 1797
 ---
@@ -67,11 +67,12 @@ wordpressId: 1797
 
 事務局會依照當時的志工人數、志工的個別能力、需求和情況等進行安排，例如：日文溝通上有困難的志工，會與另一位志工搭檔合作。任務安排後，如果當天情況允許，其實還是可以與工作人員和其他志工協調做調整，我這次就有遇到志工臨時身體狀況不佳，與他交換任務內容的情況。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1841,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-17-1024x518.png" alt="e-mail 訂閱並加入小蝦隊後，事務局會寄信告知後天的活動安排" class="wp-image-1841"/><figcaption class="wp-element-caption">e-mail 訂閱並加入小蝦隊後，事務局會寄信告知後天的活動安排</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![e-mail 訂閱並加入小蝦隊後，事務局會寄信告知後天的活動安排](../../assets/images/2025-koebitai/photo-17.png)
+
+<figcaption>e-mail 訂閱並加入小蝦隊後，事務局會寄信告知後天的活動安排</figcaption>
+</figure>
 
 ### 接待導覽
 
@@ -81,33 +82,37 @@ wordpressId: 1797
 
 在入場管控，比較有挑戰的是「音（おと）と遠（とお）」，下圖為實際環境的示意圖，這個作品的接待處和作品本身在道路轉角的兩側，又接待處與其中一邊的道路間有樹木阻擋視線，導致從右側走過來的遊客，如果沒注意到，就會跳過接待處，直接走進去參觀作品，因此，在管控上，需要多加留意，避免這樣的情況發生。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1812,"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="https://aniya.moe/wp-content/uploads/2025/12/map-01.jpg" alt="「音（おと）と遠（とお）」與其接待處環境的示意圖，綠色為樹木，圖中的建物也是作品的一部分" class="wp-image-1812"/><figcaption class="wp-element-caption">「音（おと）と遠（とお）」與其接待處環境的示意圖，綠色為樹木，圖中的建物也是作品的一部分</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1814,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-01-1024x768.jpg" alt="「音（おと）と遠（とお）」的接待處全景" class="wp-image-1814"/><figcaption class="wp-element-caption">「音（おと）と遠（とお）」的接待處全景</figcaption></figure>
-<!-- /wp:image -->
-```
+![「音（おと）と遠（とお）」與其接待處環境的示意圖，綠色為樹木，圖中的建物也是作品的一部分](../../assets/images/2025-koebitai/map-01.jpg)
+
+<figcaption>「音（おと）と遠（とお）」與其接待處環境的示意圖，綠色為樹木，圖中的建物也是作品的一部分</figcaption>
+</figure>
+
+<figure>
+
+![「音（おと）と遠（とお）」的接待處全景](../../assets/images/2025-koebitai/photo-01.jpg)
+
+<figcaption>「音（おと）と遠（とお）」的接待處全景</figcaption>
+</figure>
 
 另外，由於「小さなお店プロジェクト」的位置在海水浴場旁，看到不少遊客穿著泳衣、泳褲在街上行走，當島嶼的負責人員來到作品要進行中午休息的交班時，我順便向他提問：如果遊客穿著泳衣、泳褲要進場，請問該如何處理？當時得到的回應是：不能拒絕對方入場，但建議對方至少先擦乾身體，大概是這個方向的答案，幸好最後是沒有遇到這樣子的情況。
 
 在作品導覽和注意事項提醒上，比較複雜的是「黄金の海に消えた船」，它除了有基本的參觀費之外，遊客還可以額外花錢搭作品內的小船，並且，在這作品會和一位藝術家相關人員合作，他會負責小船的收費，而小蝦隊志工會負責入場費的收費，需要向遊客告知搭乘小船收費需要額外付費，且收費的處理是由另一位工作人員所負責，另外，該作品有販售相關的轉蛋以及美術書，也要向遊客傳達這些資訊。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1816,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-02-1024x768.jpg" alt="「黄金の海に消えた船」的入口與接待櫃台，櫃台上貼有乘船須另外付費的多國語言的告示" class="wp-image-1816"/><figcaption class="wp-element-caption">「黄金の海に消えた船」的入口與接待櫃台，櫃台上貼有乘船須另外付費的多國語言的告示</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1817,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-03-768x1024.jpg" alt="「黄金の海に消えた船」開場前的準備，量測水池的酸鹼值是否在合理範圍" class="wp-image-1817"/><figcaption class="wp-element-caption">「黄金の海に消えた船」開場前的準備，量測水池的酸鹼值是否在合理範圍</figcaption></figure>
-<!-- /wp:image -->
-```
+![「黄金の海に消えた船」的入口與接待櫃台，櫃台上貼有乘船須另外付費的多國語言的告示](../../assets/images/2025-koebitai/photo-02.jpg)
+
+<figcaption>「黄金の海に消えた船」的入口與接待櫃台，櫃台上貼有乘船須另外付費的多國語言的告示</figcaption>
+</figure>
+
+<figure>
+
+![「黄金の海に消えた船」開場前的準備，量測水池的酸鹼值是否在合理範圍](../../assets/images/2025-koebitai/photo-03.jpg)
+
+<figcaption>「黄金の海に消えた船」開場前的準備，量測水池的酸鹼值是否在合理範圍</figcaption>
+</figure>
 
 在鑑賞護照相關的事物上，主要都集中在「小さなお店プロジェクト」這作品群上，由於女木島和男木島是在同一條船班路線上，兩座島可以規劃成一日遊，且兩座小島上作品的入場費總花費高出護照費用不少，加上該作品群的位置靠近女木島港，本身有不少作品，入場費也比較接近護照的費用，使得有不少遊客在這一站購買護照。
 
@@ -115,17 +120,19 @@ wordpressId: 1797
 
 在接待處的環境上，有提供基本的防中暑措施，包含遮陽、遮雨、電風扇、降溫噴霧以及麥茶，也有提供防蟲噴霧。有的作品的接待處是在室外，有的則在室內，比較涼爽的有「女木島名画座」和「黄金の海に消えた船」，兩者都在冷氣房內，後者溫度甚至還要更低；而比較困擾的有「女木島人口増加大計画 ～あなぐまち入居者募集中～」，此處在天氣為晴天大風時，風會把附近的沙土給吹進接待處，整天待下來，志工滿身都是泥沙。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1819,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-04-768x1024.jpg" alt="「部屋の中の部屋」的接待處，椅子後面是工業扇，旁邊的箱子裡有降溫噴霧、防蟲噴霧等用品，桌子旁籃子裡的雨傘供旅客使用" class="wp-image-1819"/><figcaption class="wp-element-caption">「部屋の中の部屋」的接待處，椅子後面是工業扇，旁邊的箱子裡有降溫噴霧、防蟲噴霧等用品，桌子旁籃子裡的雨傘供旅客使用</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1820,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-05-1024x768.jpg" alt="「女木島人口増加大計画 ～あなぐまち入居者募集中～」的入口與接待處，拍攝位置的後方道路上充滿沙土，當大風吹起時，很容易把沙土吹往接待處，另外，這裡有蚊蟲的滋擾，需要多加使用防蟲噴霧" class="wp-image-1820"/><figcaption class="wp-element-caption">「女木島人口増加大計画 ～あなぐまち入居者募集中～」的入口與接待處，拍攝位置的後方道路上充滿沙土，當大風吹起時，很容易把沙土吹往接待處，另外，這裡有蚊蟲的滋擾，需要多加使用防蟲噴霧</figcaption></figure>
-<!-- /wp:image -->
-```
+![「部屋の中の部屋」的接待處，椅子後面是工業扇，旁邊的箱子裡有降溫噴霧、防蟲噴霧等用品，桌子旁籃子裡的雨傘供旅客使用](../../assets/images/2025-koebitai/photo-04.jpg)
+
+<figcaption>「部屋の中の部屋」的接待處，椅子後面是工業扇，旁邊的箱子裡有降溫噴霧、防蟲噴霧等用品，桌子旁籃子裡的雨傘供旅客使用</figcaption>
+</figure>
+
+<figure>
+
+![「女木島人口増加大計画 ～あなぐまち入居者募集中～」的入口與接待處，拍攝位置的後方道路上充滿沙土，當大風吹起時，很容易把沙土吹往接待處，另外，這裡有蚊蟲的滋擾，需要多加使用防蟲噴霧](../../assets/images/2025-koebitai/photo-05.jpg)
+
+<figcaption>「女木島人口増加大計画 ～あなぐまち入居者募集中～」的入口與接待處，拍攝位置的後方道路上充滿沙土，當大風吹起時，很容易把沙土吹往接待處，另外，這裡有蚊蟲的滋擾，需要多加使用防蟲噴霧</figcaption>
+</figure>
 
 ### 餐廳外場
 
@@ -161,31 +168,35 @@ wordpressId: 1797
 
 休息結束後，接著就回到島廚房內，與大家一起用餐，餐點內容會由島廚房的廚師們來準備，食材皆是豐島所生產的，菜單不會與客人所吃的相同，另外，如果有特殊飲食需求，如：素食，也可以提前向廚師們告知，他們會特別準備。用餐時，吃到一道小菜，覺得它的味道很熟悉，向廚師詢問後，得知是麻芛，由於自己是台中人，對於如何料理該食材略知一二，於是向廚師介紹了麻芛湯的製作方式，期待下次能在島廚房看到麻芛湯的出現。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1821,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-06-1024x768.jpg" alt="右上角小缽裡面裝的就是用麻芛做成小菜，另外，由於廚房多做了一份餐點，最後由我解決多出來的那一份餐點" class="wp-image-1821"/><figcaption class="wp-element-caption">右上角小缽裡面裝的就是用麻芛做成小菜，另外，由於廚房多做了一份餐點，最後由我解決多出來的那一份餐點</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1822,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-07-1024x768.jpg" alt="島廚房每一天員工餐的內容都不一樣" class="wp-image-1822"/><figcaption class="wp-element-caption">島廚房每一天員工餐的內容都不一樣</figcaption></figure>
-<!-- /wp:image -->
-```
+![右上角小缽裡面裝的就是用麻芛做成小菜，另外，由於廚房多做了一份餐點，最後由我解決多出來的那一份餐點](../../assets/images/2025-koebitai/photo-06.jpg)
+
+<figcaption>右上角小缽裡面裝的就是用麻芛做成小菜，另外，由於廚房多做了一份餐點，最後由我解決多出來的那一份餐點</figcaption>
+</figure>
+
+<figure>
+
+![島廚房每一天員工餐的內容都不一樣](../../assets/images/2025-koebitai/photo-07.jpg)
+
+<figcaption>島廚房每一天員工餐的內容都不一樣</figcaption>
+</figure>
 
 島廚房的活動內容比藝術作品的接待導覽還要繁忙，活動中沒有空閒去深度瞭解島廚房這項作品，不過就個人感受上，它帶給我不一樣的樂趣，一是環境的快速變動，如何持續改善流程，提高效率，節省力氣，邊做邊思考邊調整讓人感到興奮；另一個是結束之後，可以享用廚師們利用在地的食材，所製作的獨特料理，好好品味島嶼的美味。而在藝術作品接待導覽上，會有比較多的空閒時間，可以利用空檔去好好觀賞作品與周遭的環境，而且在面對遊客時，會有比較多的餘裕，可以和彼此交談，瞭解一下彼此。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1838,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-15-1024x768.jpg" alt="在「線の記憶」活動時，利用休息的空檔，到附近拍攝出現在官方導覽書封面的作品「海を夢見る人々の場所」" class="wp-image-1838"/><figcaption class="wp-element-caption">在「線の記憶」活動時，利用休息的空檔，到附近拍攝出現在官方導覽書封面的作品「海を夢見る人々の場所」</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1839,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-16-1024x768.jpg" alt="從「ゆめうつつ～ミライのワタシ」這作品外的陽台空間，可以眺望男木島港，藉此粗略掌握有多少遊客來到島上" class="wp-image-1839"/><figcaption class="wp-element-caption">從「ゆめうつつ～ミライのワタシ」這作品外的陽台空間，可以眺望男木島港，藉此粗略掌握有多少遊客來到島上</figcaption></figure>
-<!-- /wp:image -->
-```
+![在「線の記憶」活動時，利用休息的空檔，到附近拍攝出現在官方導覽書封面的作品「海を夢見る人々の場所」](../../assets/images/2025-koebitai/photo-15.jpg)
+
+<figcaption>在「線の記憶」活動時，利用休息的空檔，到附近拍攝出現在官方導覽書封面的作品「海を夢見る人々の場所」</figcaption>
+</figure>
+
+<figure>
+
+![從「ゆめうつつ～ミライのワタシ」這作品外的陽台空間，可以眺望男木島港，藉此粗略掌握有多少遊客來到島上](../../assets/images/2025-koebitai/photo-16.jpg)
+
+<figcaption>從「ゆめうつつ～ミライのワタシ」這作品外的陽台空間，可以眺望男木島港，藉此粗略掌握有多少遊客來到島上</figcaption>
+</figure>
 
 更多關於任務的內容，可以參考官方網站上的資訊，需要額外注意的是，作品的接待處通常不會有冰箱，為了避免到中午輪班休息前，食物就壞掉出現問題，在準備午餐時，請考慮可以在常溫下保存 6 小時左右的食物，或者使用保冰袋處理，另外，中午交班休息的時間通常只有 30 分鐘，要買島上店家販售的食物來解決，時間上未必足夠，建議是在前往島嶼前就準備好，我自己通常是帶超商買的飯糰和蔬果汁。
 
@@ -198,17 +209,19 @@ wordpressId: 1797
 
 在進行志工活動的過程中，會接觸到許多遊客、志工和在地居民，遊客大多很友善，如果在不同作品或地方又相遇時，也會和彼此打招呼；面對一起合作的志工，在活動中空閒時，彼此也會交流一下，瞭解彼此。在「線の記憶」這作品服務時，搭檔是一位高松市在地，年紀與我差不多，已經當父親的居民，他本來要帶小孩一起來，但天氣狀況不佳只好作罷，另外，我也是從他那邊得知，如果要找蔬食的餐廳的話，可以選擇[お野菜食堂 SOHSOH(ソウソウ)](https://maps.app.goo.gl/UAppje2i6upjw8YFA)的資訊；而在「あなたの最初の色（私の頭の中の解―私の胃の中の溶液）」這作品，搭檔是一位高松在地的老爺爺，得知他是從 2013 年就開始當小蝦隊志工，然後在小蝦隊志工團廣告上的照片，是他在 2016 年活動時被拍攝的。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1824,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-08-768x1024.jpg" alt="在「あなたの最初の色（私の頭の中の解―私の胃の中の溶液）」作品的搭檔的老先生，老先生空閒時，在附近進行環境清潔的背影" class="wp-image-1824"/><figcaption class="wp-element-caption">在「あなたの最初の色（私の頭の中の解―私の胃の中の溶液）」作品的搭檔的老先生，老先生空閒時，在附近進行環境清潔的背影</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1825,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-09-1024x768.jpg" alt="小蝦隊宣傳廣告上，左上角第一張圖，是該名老先生在 2016 年活動的照片" class="wp-image-1825"/><figcaption class="wp-element-caption">小蝦隊宣傳廣告上，左上角第一張圖，是該名老先生在 2016 年活動的照片</figcaption></figure>
-<!-- /wp:image -->
-```
+![在「あなたの最初の色（私の頭の中の解―私の胃の中の溶液）」作品的搭檔的老先生，老先生空閒時，在附近進行環境清潔的背影](../../assets/images/2025-koebitai/photo-08.jpg)
+
+<figcaption>在「あなたの最初の色（私の頭の中の解―私の胃の中の溶液）」作品的搭檔的老先生，老先生空閒時，在附近進行環境清潔的背影</figcaption>
+</figure>
+
+<figure>
+
+![小蝦隊宣傳廣告上，左上角第一張圖，是該名老先生在 2016 年活動的照片](../../assets/images/2025-koebitai/photo-09.jpg)
+
+<figcaption>小蝦隊宣傳廣告上，左上角第一張圖，是該名老先生在 2016 年活動的照片</figcaption>
+</figure>
 
 在地居民部份，順道一提，這裡會用在地居民而非島民，主要是在小豆島的開場前準備時，島嶼的負責人有特別提到，不能稱呼在地居民為「島民」，而是要用「小豆島町民」，看起來以前似乎有發生什麼問題的樣子，不過就實際在作品服務時，確認對方是否為在地居民時，對方會用島民作為肯定的回覆，或許是我看起來是外國人，他們反而不特別拘泥這件事？
 
@@ -220,17 +233,19 @@ wordpressId: 1797
 
 最後，與志工、工作人員或者在地居民的交流，使我更加瞭解這個區域的過去，例如：以前高松港的範圍其實是更接近高松 JR 站、高松港旅客大樓仍保留當初宇高聯絡船鐵路的遺跡等，我也訂了下一次來這旅遊的目標，希望能夠到豐島非法廢棄物事件的發生地點[^7]參觀，以更近的距離去瞭解豐島產廢事件。
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1826,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-10-768x1024.jpg" alt="搭乘渡論，準備前往女木島活動的小蝦隊志工們" class="wp-image-1826"/><figcaption class="wp-element-caption">搭乘渡論，準備前往女木島活動的小蝦隊志工們</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1827,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-11-1024x768.jpg" alt="お盆休み後，志工人數大幅減少，非常缺人的情景" class="wp-image-1827"/><figcaption class="wp-element-caption">お盆休み後，志工人數大幅減少，非常缺人的情景</figcaption></figure>
-<!-- /wp:image -->
-```
+![搭乘渡論，準備前往女木島活動的小蝦隊志工們](../../assets/images/2025-koebitai/photo-10.jpg)
+
+<figcaption>搭乘渡論，準備前往女木島活動的小蝦隊志工們</figcaption>
+</figure>
+
+<figure>
+
+![お盆休み後，志工人數大幅減少，非常缺人的情景](../../assets/images/2025-koebitai/photo-11.jpg)
+
+<figcaption>お盆休み後，志工人數大幅減少，非常缺人的情景</figcaption>
+</figure>
 
 ```html title="wp-unconverted: envira/envira-gallery"
 <!-- wp:envira/envira-gallery {"galleryId":1832,"title":"島上的生物們","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-12-scaled.jpg","title":"在顧攤時，闖進來並躺在入口處的島貓","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-12-scaled.jpg","alt":"","caption":"","thumb":"","id":1828,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-13-scaled.jpg","title":"在路上遇到的雞","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-13-scaled.jpg","alt":"","caption":"","thumb":"","id":1829,"height":145.6140350877193,"width":193.7},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/12/photo-14-scaled.jpg","title":"島廚房附近發現蜈蚣","link":"https://aniya.moe/wp-content/uploads/2025/12/photo-14-scaled.jpg","alt":"","caption":"","thumb":"","id":1830,"height":145.6140350877193,"width":193.7}]} -->
@@ -238,11 +253,12 @@ wordpressId: 1797
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/image"
-<!-- wp:image {"id":1845,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/12/photo-18-1024x768.jpg" alt="期間遇上高松祭，當天活動結束後，與志工朋友一起觀賞煙火大會，照片中左下角的是當天停泊在高松港的飛鳥 II 渡輪" class="wp-image-1845"/><figcaption class="wp-element-caption">期間遇上<a href="https://www.city.takamatsu.kagawa.jp/smph/kanko/takamatsumatsuri/matsuri.html" target="_blank" rel="noopener" title="">高松祭</a>，當天活動結束後，與志工朋友一起觀賞煙火大會，照片中左下角的是當天停泊在高松港的飛鳥 II 渡輪</figcaption></figure>
-<!-- /wp:image -->
-```
+<figure>
+
+![期間遇上高松祭，當天活動結束後，與志工朋友一起觀賞煙火大會，照片中左下角的是當天停泊在高松港的飛鳥 II 渡輪](../../assets/images/2025-koebitai/photo-18.jpg)
+
+<figcaption>期間遇上<a href="https://www.city.takamatsu.kagawa.jp/smph/kanko/takamatsumatsuri/matsuri.html">高松祭</a>，當天活動結束後，與志工朋友一起觀賞煙火大會，照片中左下角的是當天停泊在高松港的飛鳥 II 渡輪</figcaption>
+</figure>
 
 ---
 
