@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
-import { type Browser, chromium } from 'playwright';
+import { type Browser, chromium, type Page } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { startWranglerDev, type WranglerDev } from './support/wrangler-dev';
 
@@ -440,6 +440,14 @@ describe('layout', () => {
 		expect(linksUnder('標籤')).toHaveLength(57);
 	});
 
+	// As in the WordPress sidebar, the search box comes first.
+	it.each(PAGES)('%s has the search box first in the sidebar', async (path) => {
+		const first = (await html(path)).querySelector('aside section');
+
+		expect(first?.querySelector('h2')?.text.trim()).toBe('搜尋');
+		expect(first?.querySelector('pagefind-searchbox')).not.toBeNull();
+	});
+
 	it.each(PAGES)('%s has the site footer, with the rel="me" link that verifies the Mastodon account', async (path) => {
 		const footer = (await html(path)).querySelectorAll('footer').find((element) => !element.closest('main'));
 
@@ -552,6 +560,220 @@ describe('layout', () => {
 
 			expect(overflowing).toEqual({});
 		}, 120_000);
+	});
+});
+
+describe('search', () => {
+	let browser: Browser | undefined;
+
+	beforeAll(async () => {
+		browser = await chromium.launch();
+	}, 60_000);
+
+	afterAll(async () => {
+		await browser?.close();
+	});
+
+	/** Opens the home page in the browser, with nothing from other sites, and runs `use` on it. */
+	async function onHomePage<T>(use: (page: Page) => Promise<T>): Promise<T> {
+		const context = await browser!.newContext();
+		await context.route((url) => url.origin !== server!.url, (route) => route.abort());
+		const page = await context.newPage();
+		page.setDefaultTimeout(10_000);
+		try {
+			await page.goto(new URL('/', server!.url).href);
+			return await use(page);
+		} finally {
+			await context.close();
+		}
+	}
+
+	describe('index', () => {
+		/** Every page the index finds for `query`, best match first, as UTF-8 paths (Pagefind's own search API). */
+		function search(query: string): Promise<string[]> {
+			return onHomePage((page) =>
+				page.evaluate(async (query) => {
+					// Not `import()` itself: Vitest would rewrite it before the browser gets it.
+					const pagefind = await new Function('return import("/pagefind/pagefind.js")')();
+					const { results } = await pagefind.search(query);
+					const found: { url: string }[] = await Promise.all(results.map((result: any) => result.data()));
+					return found.map(({ url }) => decodeURI(url));
+				}, query),
+			);
+		}
+
+		it('is in Traditional Chinese', async () => {
+			const entry = await (await get('/pagefind/pagefind-entry.json')).json();
+
+			// Language tags are case-insensitive.
+			expect(Object.keys(entry.languages).map((language) => language.toLowerCase())).toEqual(['zh-tw']);
+		});
+
+		it('finds a post by a Chinese word in its text, first', async () => {
+			// 電磁筆 is only in the text of this post, between other Chinese words.
+			// Posts with parts of it (筆記型電腦, 筆直) come after.
+			expect((await search('電磁筆'))[0]).toBe('/2021/11/30/電子紙閱讀器使用心得/');
+		}, 30_000);
+
+		it('has the text of posts and pages only, not the listings or related posts that repeat their titles', async () => {
+			// Only in the 9 travel posts, starting with their titles; listings and
+			// other posts' related posts show those titles too.
+			expect((await search('遊記')).sort()).toEqual([
+				'/2025/05/17/travel-setonaikai-2025-day1/',
+				'/2025/05/17/travel-setonaikai-2025-day2/',
+				'/2025/05/17/travel-setonaikai-2025-day3/',
+				'/2025/05/17/travel-setonaikai-2025-day4/',
+				'/2025/05/17/travel-setonaikai-2025-day5/',
+				'/2025/05/17/travel-setonaikai-2025-day6/',
+				'/2025/05/17/travel-setonaikai-2025-day7/',
+				'/2025/05/17/travel-setonaikai-2025-day8/',
+				'/2025/05/17/travel-setonaikai-2025-prologue/',
+			]);
+		}, 30_000);
+	});
+
+	it('the sidebar search box shows the posts found as the reader types', async () => {
+		const found = await onHomePage(async (page) => {
+			const box = page.locator('aside #search');
+			await box.locator('input').fill('電磁筆');
+			const links = box.locator('a[href]');
+			await links.first().waitFor();
+			return links.evaluateAll((links) => links.map((link) => decodeURI((link as HTMLAnchorElement).pathname)));
+		});
+
+		expect(found[0]).toBe('/2021/11/30/電子紙閱讀器使用心得/');
+	}, 30_000);
+
+	it('the sidebar search box speaks Chinese only', async () => {
+		await onHomePage(async (page) => {
+			const box = page.locator('aside #search');
+			await box.locator('input').fill('龘龘');
+
+			// Pagefind's zh-TW text for "no results for 龘龘".
+			await expect.poll(() => box.innerText(), { timeout: 10_000 }).toContain('找不到 龘龘 的相關結果');
+			// No English words.
+			expect(await box.innerText()).not.toMatch(/[a-z]{3,}/i);
+		});
+	}, 30_000);
+});
+
+describe('after a post', () => {
+	/** The section of the post page's main column under the given heading. */
+	async function section(path: string, heading: string) {
+		const response = await get(path);
+		expect(response.status, path).toBe(200);
+		return parse(await response.text())
+			.querySelectorAll('main section')
+			.find((element) => element.querySelector('h2')?.text.trim() === heading);
+	}
+
+	describe('share links', () => {
+		/** Each share link: its text, the page it opens, and the parameters it passes (query and fragment), decoded. */
+		async function shareLinks(path: string) {
+			const share = await section(path, '分享此文');
+			expect(share, path).toBeDefined();
+			return share!.querySelectorAll('a').map((link) => {
+				const url = new URL(link.getAttribute('href')!);
+				const params = [...url.searchParams, ...new URLSearchParams(url.hash.slice(1))];
+				return {
+					name: link.text.trim(),
+					page: `${url.origin}${url.pathname}`,
+					params: Object.fromEntries(params.map(([name, value]) => [name, decodeURI(value)])),
+				};
+			});
+		}
+
+		// The platforms and their order are those of the WordPress site's Jetpack
+		// sharing buttons (aniya.moe, 2026-10-24).
+		it("link to each platform's share page with the post's URL and title", async () => {
+			const url = 'https://aniya.moe/2021/11/30/電子紙閱讀器使用心得/';
+			const title = '電子紙閱讀器使用心得';
+
+			expect(await shareLinks('/2021/11/30/電子紙閱讀器使用心得/')).toEqual([
+				{ name: 'Threads', page: 'https://www.threads.com/intent/post', params: { url, text: title } },
+				{ name: 'Facebook', page: 'https://www.facebook.com/sharer/sharer.php', params: { u: url } },
+				{ name: 'X', page: 'https://x.com/intent/tweet', params: { url, text: title } },
+				{ name: 'Mastodon', page: 'https://share.joinmastodon.org/', params: { text: `${title} ${url}` } },
+				{ name: 'LinkedIn', page: 'https://www.linkedin.com/sharing/share-offsite/', params: { url } },
+				{ name: 'Reddit', page: 'https://www.reddit.com/submit', params: { url, title } },
+				{
+					name: 'Tumblr',
+					page: 'https://www.tumblr.com/widgets/share/tool',
+					params: { posttype: 'link', canonicalUrl: url, content: url, title },
+				},
+				{ name: 'Pinterest', page: 'https://www.pinterest.com/pin/create/button/', params: { url, description: title } },
+				{ name: 'Telegram', page: 'https://t.me/share/url', params: { url, text: title } },
+				{ name: 'WhatsApp', page: 'https://wa.me/', params: { text: `${title} ${url}` } },
+			]);
+		});
+
+		it('are plain links: no scripts or frames from the platforms', async () => {
+			const share = await section('/2021/11/30/電子紙閱讀器使用心得/', '分享此文');
+
+			expect(share?.querySelectorAll('a')).toHaveLength(10);
+			expect(share?.querySelectorAll('script, iframe')).toHaveLength(0);
+		});
+
+		it("pin the post's social image on Pinterest, when it has one", async () => {
+			const pinterest = (await shareLinks('/2025/12/05/2025-koebitai/')).find(({ name }) => name === 'Pinterest');
+			const image = await get(new URL(pinterest!.params.media!).pathname);
+
+			expect(new URL(pinterest!.params.media!).origin).toBe('https://aniya.moe');
+			expect(image.status).toBe(200);
+			expect(image.headers.get('content-type')).toBe('image/webp');
+		});
+	});
+
+	describe('comments', () => {
+		// The repository and category IDs are giscus's for erase2004/blog and its
+		// Comments discussion category (ticket 02).
+		it("are giscus, in Chinese, with one discussion per post, found by the post's path", async () => {
+			const comments = await section('/2021/11/30/電子紙閱讀器使用心得/', '留言');
+			const giscus = comments?.querySelector('script[src="https://giscus.app/client.js"]');
+
+			expect(giscus?.attributes).toMatchObject({
+				'data-repo': 'erase2004/blog',
+				'data-repo-id': 'R_kgDOVVonIg',
+				'data-category': 'Comments',
+				'data-category-id': 'DIC_kwDOVVonIs4DJfJF',
+				'data-lang': 'zh-TW',
+				// The path as written, not as the browser encodes it: the same
+				// discussion whichever percent-encoding a reader's URL has.
+				'data-mapping': 'specific',
+				'data-term': '2021/11/30/電子紙閱讀器使用心得/',
+				// Found by the term's hash, not by GitHub's fuzzy title search.
+				'data-strict': '1',
+			});
+		});
+	});
+
+	describe('related posts', () => {
+		/** The posts the related posts link to, as UTF-8 paths, in order. */
+		async function relatedPosts(path: string): Promise<string[] | undefined> {
+			return (await section(path, '相關文章'))
+				?.querySelectorAll('a')
+				.map((link) => decodeURI(link.getAttribute('href')!));
+		}
+
+		// Expected values worked out by hand from the posts' tags.
+		it('are the 3 posts that share the most tags with it, newer first among equals', async () => {
+			// Day 3's tags: ざつ旅, ゆゆゆ, 沙彌島, 瀨居島, 瀨戶內國際藝術祭, 聖地巡禮, 高松.
+			// Day 4 and Day 2 share 4 of them, Day 5 shares 3, the others 2 or fewer.
+			expect(await relatedPosts('/2025/05/17/travel-setonaikai-2025-day3/')).toEqual([
+				'/2025/05/17/travel-setonaikai-2025-day4/',
+				'/2025/05/17/travel-setonaikai-2025-day2/',
+				'/2025/05/17/travel-setonaikai-2025-day5/',
+			]);
+		});
+
+		it('are made up with posts of the same category when too few share its tags', async () => {
+			// No other post has 第一篇文章's tag (murmur); 閒聊 has 3 other posts.
+			expect(await relatedPosts('/2021/09/30/第一篇文章/')).toEqual([
+				'/2025/12/05/2025-koebitai/',
+				'/2022/03/11/alpha-camp推特專案開發紀錄/',
+				'/2021/11/30/電子紙閱讀器使用心得/',
+			]);
+		});
 	});
 });
 

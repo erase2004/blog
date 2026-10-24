@@ -1,6 +1,9 @@
 ---
 // A post, at its WordPress URL /YYYY/MM/DD/<slug>/.
 import { getEntries, render } from 'astro:content';
+import Comments from '../../../../components/Comments.astro';
+import RelatedPosts from '../../../../components/RelatedPosts.astro';
+import ShareLinks from '../../../../components/ShareLinks.astro';
 import { SITE_TITLE } from '../../../../consts';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import {
@@ -8,27 +11,33 @@ import {
 	getPosts,
 	type Post,
 	postDescription,
+	postPath,
 	postUpdated,
 	siteDate,
 } from '../../../../lib/content';
+import { imageUrl } from '../../../../lib/images';
+import { relatedPosts } from '../../../../lib/related-posts';
 
 export async function getStaticPaths() {
-	return (await getPosts()).map((post) => ({
+	const posts = await getPosts();
+	return posts.map((post) => ({
 		params: { ...siteDate(post.data.published), slug: post.data.slug },
-		props: { post },
+		props: { post, related: relatedPosts(post, posts) },
 	}));
 }
 
-const { post } = Astro.props as { post: Post };
+const { post, related } = Astro.props as { post: Post; related: Post[] };
 const { Content } = await render(post);
 const { title, published } = post.data;
 const updated = postUpdated(post);
 const categories = await getEntries(post.data.categories);
 const tags = await getEntries(post.data.tags);
+const url = new URL(postPath(post), Astro.site).href;
+const socialImage = post.data.socialImage && new URL(await imageUrl(post.data.socialImage), Astro.site).href;
 ---
 
 <BaseLayout title={`${title} - ${SITE_TITLE}`} description={postDescription(post)}>
-	<article class="post">
+	<article class="post" data-pagefind-body>
 		<header class="post-header">
 			<ul class="post-categories" aria-label="分類">
 				{
@@ -72,8 +81,12 @@ const tags = await getEntries(post.data.tags);
 				</footer>
 			)
 		}
-		{/* Ticket 16: share links, related posts and giscus comments go after the post. */}
 	</article>
+	<div class="post-after">
+		<ShareLinks url={url} title={title} image={socialImage} />
+		<RelatedPosts posts={related} />
+		<Comments path={postPath(post)} />
+	</div>
 </BaseLayout>
 
 <style>
@@ -153,5 +166,21 @@ const tags = await getEntries(post.data.tags);
 	}
 	.post-tags a:hover::before {
 		color: inherit;
+	}
+
+	/*
+	 * After the post, outside the <article> (and so outside the search index):
+	 * share links, related posts and comments, each under its own heading.
+	 */
+	.post-after {
+		display: flex;
+		flex-direction: column;
+		gap: 3rem;
+		margin-top: 3rem;
+	}
+	.post-after > :global(section > h2) {
+		margin: 0 0 1rem;
+		font-size: 1.125rem;
+		letter-spacing: 0.06em;
 	}
 </style>
