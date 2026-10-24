@@ -6,6 +6,10 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://aniya.moe',
+	// Every URL ends with "/", as on the WordPress site; each page is written
+	// as <path>/index.html.
+	trailingSlash: 'always',
+	build: { format: 'directory' },
 	integrations: [mdx()],
 	fonts: [
 		{
