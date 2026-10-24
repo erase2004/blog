@@ -314,6 +314,11 @@ describe('the old-URL mapping table', () => {
 		);
 	});
 
+	// AIOSEO made it on the WordPress site (seen there on 2026-10-24).
+	it('keeps llms.txt', () => {
+		expect(urlsOf()).toContainEqual({ url: '/llms.txt', expect: 'file' });
+	});
+
 	it('redirects the old upload paths of moved images: the file served, the original of a scaled one, the sitemap’s name', () => {
 		const urls = urlsOf();
 

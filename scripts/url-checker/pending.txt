@@ -104,8 +104,6 @@
 
 /comments/feed/
 
-/feed/
-/feed/atom/
 
 /page-sitemap.xml
 
@@ -115,9 +113,7 @@
 
 /post_tag-sitemap.xml
 
-/robots.txt
 
-/sitemap.xml
 
 /subscribe/feed/
 

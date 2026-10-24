@@ -1369,6 +1369,7 @@
 		{"url":"/cropped-night-png/","expect":"not-found"},
 		{"url":"/feed/","expect":"file"},
 		{"url":"/feed/atom/","expect":"file"},
+		{"url":"/llms.txt","expect":"file"},
 		{"url":"/night/","expect":"redirect"},
 		{"url":"/page/2/","expect":"page"},
 		{"url":"/page/3/","expect":"page"},
