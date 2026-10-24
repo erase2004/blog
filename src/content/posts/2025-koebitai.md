@@ -11,13 +11,13 @@ draft: false
 wordpressId: 1797
 ---
 
-經歷五、六月兩次短暫住院，期間持續回診追蹤檢查，大致確定了健康問題的原因，所幸是類似體質或慢性病方面，而非癌症腫瘤，經過這一段折騰，也讓我更加注重自己的生命，加緊去實現一些尚未完成的目標，其中包含了異國生活體驗，由於我本身就蠻喜歡日本香川這個地方，又今年已經去了瀨戶內藝術祭春會期，加上 2019 年已經去過的秋會期，藝術祭只剩下夏會期還沒去過，況且今年夏會期增加了新的區域，使我對其更感興趣，在閱讀了瀨戶內藝術祭志工團`wp-unconverted: <sup data-fn="76e7f7fe-a8c5-43d0-a7b6-8b2fe561eee7" class="fn"><a id="76e7f7fe-a8c5-43d0-a7b6-8b2fe561eee7-link" href="#76e7f7fe-a8c5-43d0-a7b6-8b2fe561eee7">1</a></sup>`今年所出版的書`wp-unconverted: <sup data-fn="beb6e550-4a97-4a6b-8a01-7ce4649937f9" class="fn"><a id="beb6e550-4a97-4a6b-8a01-7ce4649937f9-link" href="#beb6e550-4a97-4a6b-8a01-7ce4649937f9">2</a></sup>`後，綜合起來考量後，我決定在夏會期期間擔任為期將近一個月的小蝦隊志工，除了參加夏會期，同時也增加在日本生活的經驗。
+經歷五、六月兩次短暫住院，期間持續回診追蹤檢查，大致確定了健康問題的原因，所幸是類似體質或慢性病方面，而非癌症腫瘤，經過這一段折騰，也讓我更加注重自己的生命，加緊去實現一些尚未完成的目標，其中包含了異國生活體驗，由於我本身就蠻喜歡日本香川這個地方，又今年已經去了瀨戶內藝術祭春會期，加上 2019 年已經去過的秋會期，藝術祭只剩下夏會期還沒去過，況且今年夏會期增加了新的區域，使我對其更感興趣，在閱讀了瀨戶內藝術祭志工團[^1]今年所出版的書[^2]後，綜合起來考量後，我決定在夏會期期間擔任為期將近一個月的小蝦隊志工，除了參加夏會期，同時也增加在日本生活的經驗。
 
-用 e-mail 訂閱小蝦隊的電子報`wp-unconverted: <sup data-fn="6d349eab-eb16-408a-aebf-bf6a63b7027f" class="fn"><a id="6d349eab-eb16-408a-aebf-bf6a63b7027f-link" href="#6d349eab-eb16-408a-aebf-bf6a63b7027f">3</a></sup>`，並且藉由官網上的連結報名了宿舍後，活動時的住宿和任務的安排基本上就交給小蝦隊事務局來處理。
+用 e-mail 訂閱小蝦隊的電子報[^3]，並且藉由官網上的連結報名了宿舍後，活動時的住宿和任務的安排基本上就交給小蝦隊事務局來處理。
 
 ## 關於住宿
 
-今年宿舍的地點不同以往，是和地方旅館業者合作，位置上距離高松港和 JR 高松站比較近，在解決三餐或者往返高松港上都很方便，早餐和午餐可以選擇附近的超商，或者前一晚到車站旁的超市購買，晚餐的話就看各自的時間充裕程度和交通能力，可以選擇附近的德島拉麵、高松車站旁的 [ORNE](https://takamatsu-orne.jp/)，也可以走到[中央商店街](https://www.my-kagawa.jp/zh-TW/see-and-do/10104)，或者租上附近的公共單車`wp-unconverted: <sup data-fn="288517af-e999-4528-a53a-23b3ad525e9d" class="fn"><a id="288517af-e999-4528-a53a-23b3ad525e9d-link" href="#288517af-e999-4528-a53a-23b3ad525e9d">4</a></sup>`，騎到 [AEON MALL 高松東店](https://maps.app.goo.gl/W1DXNBSzLGxtgv1TA) 買熟食特價。
+今年宿舍的地點不同以往，是和地方旅館業者合作，位置上距離高松港和 JR 高松站比較近，在解決三餐或者往返高松港上都很方便，早餐和午餐可以選擇附近的超商，或者前一晚到車站旁的超市購買，晚餐的話就看各自的時間充裕程度和交通能力，可以選擇附近的德島拉麵、高松車站旁的 [ORNE](https://takamatsu-orne.jp/)，也可以走到[中央商店街](https://www.my-kagawa.jp/zh-TW/see-and-do/10104)，或者租上附近的公共單車[^4]，騎到 [AEON MALL 高松東店](https://maps.app.goo.gl/W1DXNBSzLGxtgv1TA) 買熟食特價。
 
 旅館的負責人是一對老夫妻，老爺爺是彰化灣生，如果告知他自己是台灣人或來自台灣，會有比較長的對話。由於宿舍的位置資訊和內部的照片禁止在網路上分享，以下單純以文字的方式分享宿舍的環境。
 
@@ -111,7 +111,7 @@ wordpressId: 1797
 
 在鑑賞護照相關的事物上，主要都集中在「小さなお店プロジェクト」這作品群上，由於女木島和男木島是在同一條船班路線上，兩座島可以規劃成一日遊，且兩座小島上作品的入場費總花費高出護照費用不少，加上該作品群的位置靠近女木島港，本身有不少作品，入場費也比較接近護照的費用，使得有不少遊客在這一站購買護照。
 
-體感上，大部份作品的接待導覽不會說很忙碌，即便是お盆休み期間，可以還是有不少的空閒時間，可以利用這些時間看書之類的，比較忙碌的作品有「小さなお店プロジェクト」和「線の記憶」，前者除了已經提到的原因外，又因場地比較大，導遊會帶旅遊團來這個作品群；後者則因為官方導覽書`wp-unconverted: <sup data-fn="d0109868-f494-4884-8723-cebcbb60c6d2" class="fn"><a id="d0109868-f494-4884-8723-cebcbb60c6d2-link" href="#d0109868-f494-4884-8723-cebcbb60c6d2">5</a></sup>`封面的作品`wp-unconverted: <sup data-fn="0a4271c0-a04d-4e1b-8b17-5fac38c8f99f" class="fn"><a id="0a4271c0-a04d-4e1b-8b17-5fac38c8f99f-link" href="#0a4271c0-a04d-4e1b-8b17-5fac38c8f99f">6</a></sup>`就在附近，可以說這次宣傳的重點就在這個區域，導致不少遊客會慕名而來，進而使作品的參觀人數比其他作品多上不少。
+體感上，大部份作品的接待導覽不會說很忙碌，即便是お盆休み期間，可以還是有不少的空閒時間，可以利用這些時間看書之類的，比較忙碌的作品有「小さなお店プロジェクト」和「線の記憶」，前者除了已經提到的原因外，又因場地比較大，導遊會帶旅遊團來這個作品群；後者則因為官方導覽書[^5]封面的作品[^6]就在附近，可以說這次宣傳的重點就在這個區域，導致不少遊客會慕名而來，進而使作品的參觀人數比其他作品多上不少。
 
 在接待處的環境上，有提供基本的防中暑措施，包含遮陽、遮雨、電風扇、降溫噴霧以及麥茶，也有提供防蟲噴霧。有的作品的接待處是在室外，有的則在室內，比較涼爽的有「女木島名画座」和「黄金の海に消えた船」，兩者都在冷氣房內，後者溫度甚至還要更低；而比較困擾的有「女木島人口増加大計画 ～あなぐまち入居者募集中～」，此處在天氣為晴天大風時，風會把附近的沙土給吹進接待處，整天待下來，志工滿身都是泥沙。
 
@@ -218,7 +218,7 @@ wordpressId: 1797
 
 從志工的角度來觀察整個藝術祭，可以感受到藝術家、志工與在地居民的活動，漸漸給地方注入活水，帶來可能的生機。而我從閱讀作品準備教學，或者與其他志工的交流過程中，也對藝術作品更加瞭解，例如：在「女木島人口増加大計画 ～あなぐまち入居者募集中～」這作品，遊客所創作的角色形象，有機會被藝術家給選上，並作為移入居民放到作品中，成為這座島的居民。
 
-最後，與志工、工作人員或者在地居民的交流，使我更加瞭解這個區域的過去，例如：以前高松港的範圍其實是更接近高松 JR 站、高松港旅客大樓仍保留當初宇高聯絡船鐵路的遺跡等，我也訂了下一次來這旅遊的目標，希望能夠到豐島非法廢棄物事件的發生地點`wp-unconverted: <sup data-fn="6795ffd1-5e73-430c-b131-dba7a1d8e824" class="fn"><a id="6795ffd1-5e73-430c-b131-dba7a1d8e824-link" href="#6795ffd1-5e73-430c-b131-dba7a1d8e824">7</a></sup>`參觀，以更近的距離去瞭解豐島產廢事件。
+最後，與志工、工作人員或者在地居民的交流，使我更加瞭解這個區域的過去，例如：以前高松港的範圍其實是更接近高松 JR 站、高松港旅客大樓仍保留當初宇高聯絡船鐵路的遺跡等，我也訂了下一次來這旅遊的目標，希望能夠到豐島非法廢棄物事件的發生地點[^7]參觀，以更近的距離去瞭解豐島產廢事件。
 
 ```html title="wp-unconverted: core/image"
 <!-- wp:image {"id":1826,"sizeSlug":"large","linkDestination":"none"} -->
@@ -246,7 +246,10 @@ wordpressId: 1797
 
 ---
 
-```html title="wp-unconverted: core/footnotes"
-<!-- wp:footnotes /-->
-<ol class="wp-block-footnotes"><li id="76e7f7fe-a8c5-43d0-a7b6-8b2fe561eee7">瀨戶內藝術祭志工團，日文為<a href="https://www.koebi.jp/about/" target="_blank" rel="noopener" title="">こえび隊</a>，中文通稱小蝦隊</li><li id="beb6e550-4a97-4a6b-8a01-7ce4649937f9"><a href="https://www.amazon.co.jp/exec/obidos/ASIN/4773825049/" target="_blank" rel="noopener" title="">こえび隊、跳ねる！ 瀬戸内国際芸術祭外伝</a></li><li id="6d349eab-eb16-408a-aebf-bf6a63b7027f"><a href="https://www.koebi.jp/join/" target="_blank" rel="noopener" title="">参加する | 瀬戸内国際芸術祭サポーターこえび隊</a></li><li id="288517af-e999-4528-a53a-23b3ad525e9d">HELLO CYCLING 和高松市有<a href="https://www.city.takamatsu.kagawa.jp/kurashi/kurashi/koutsu/bicycle/rental_cycle/" target="_blank" rel="noopener" title="">月租方案</a>的合作，這次因為停留時間夠長，使用該方案會更加划算</li><li id="d0109868-f494-4884-8723-cebcbb60c6d2"><a href="https://setouchi-artfest.jp/buy/guidebook/" target="_blank" rel="noopener" title="">瀬戸内国際芸術祭2025公式ガイドブック</a> </li><li id="0a4271c0-a04d-4e1b-8b17-5fac38c8f99f">豊島 / <a href="https://setouchi-artfest.jp/artworks/detail/b6375f29-8f32-455a-a407-ef4f5e2ebdf1" target="_blank" rel="noopener" title="">海を夢見る人々の場所</a></li><li id="6795ffd1-5e73-430c-b131-dba7a1d8e824"><a href="https://www.teshima-school.jp/access/" target="_blank" rel="noopener" title="">不法投棄現場、資料館的參觀資訊</a></li></ol>
-```
+[^1]: 瀨戶內藝術祭志工團，日文為[こえび隊](https://www.koebi.jp/about/)，中文通稱小蝦隊
+[^2]: [こえび隊、跳ねる！ 瀬戸内国際芸術祭外伝](https://www.amazon.co.jp/exec/obidos/ASIN/4773825049/)
+[^3]: [参加する | 瀬戸内国際芸術祭サポーターこえび隊](https://www.koebi.jp/join/)
+[^4]: HELLO CYCLING 和高松市有[月租方案](https://www.city.takamatsu.kagawa.jp/kurashi/kurashi/koutsu/bicycle/rental_cycle/)的合作，這次因為停留時間夠長，使用該方案會更加划算
+[^5]: [瀬戸内国際芸術祭2025公式ガイドブック](https://setouchi-artfest.jp/buy/guidebook/)
+[^6]: 豊島 / [海を夢見る人々の場所](https://setouchi-artfest.jp/artworks/detail/b6375f29-8f32-455a-a407-ef4f5e2ebdf1)
+[^7]: [不法投棄現場、資料館的參觀資訊](https://www.teshima-school.jp/access/)

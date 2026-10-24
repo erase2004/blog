@@ -11,19 +11,19 @@ wordpressId: 57
 
 ## 我與電腦相遇
 
-我大概在國小四年級時開始接觸電腦，一開始使用電腦是為了用阿毛系列`wp-unconverted: [ref]阿毛系列為昱泉國際的幼教光碟產品[/ref]`，後來獲得一本關於Windows XP系統效能調校的書，參考書上的資訊對電腦進行設定修改，來提昇作業系統的效能，我又參考該書上的內容，以及網路上搜尋的資訊，對電腦的顯示與功能進行調整，例如：修改開機畫面，在這過程中，加深了我對電腦資訊的興趣。
+我大概在國小四年級時開始接觸電腦，一開始使用電腦是為了用阿毛系列[^1]，後來獲得一本關於Windows XP系統效能調校的書，參考書上的資訊對電腦進行設定修改，來提昇作業系統的效能，我又參考該書上的內容，以及網路上搜尋的資訊，對電腦的顯示與功能進行調整，例如：修改開機畫面，在這過程中，加深了我對電腦資訊的興趣。
 
 ## 國中時期
 
-國中時，從學校電腦課程中，學習使用Namo WebEditor來建立個人網站，當時的網站是存放在奇摩的個人網站空間`wp-unconverted: [ref]該服務已於2007年5月31日關閉，<a href="https://briian.com/742/" target="_blank" rel="noreferrer noopener">Yahoo!奇摩「個人網頁」服務，關閉通知！| 重灌狂人</a> [/ref]`。
+國中時，從學校電腦課程中，學習使用Namo WebEditor來建立個人網站，當時的網站是存放在奇摩的個人網站空間[^2]。
 
 ## 高中時期
 
-在高一時，報名參加了創意教學計劃，第一次接觸到樂高機器人`wp-unconverted: [ref]Lego Mindstorms NXT[/ref]`，學習如何撰寫控制機器人的程式語言`wp-unconverted: [ref]NXT-G[/ref]`，課程結束後，與課程同學或朋友組隊，使用樂高機器人參加競賽`wp-unconverted: [ref]<a rel="noreferrer noopener" href="http://www.ppml.url.tw/2007_robot_competition/objective.htm" target="_blank">大葉大學第二次程式設計競賽</a>、<a rel="noreferrer noopener" href="http://www.era.org.tw/main/category/game/game-fll-challenge/fll-2007/" target="_blank">FLL 2007台灣區選拔賽</a>、<a rel="noreferrer noopener" href="https://www.youtube.com/watch?v=-MUGvJ9XrI4" target="_blank">WRO 2007中區校際盃</a>、<a rel="noreferrer noopener" href="http://web2.nmns.edu.tw/PubLib/epaper/2007/347-index.htm" target="_blank">WRO 2007中區初賽</a>[/ref]`。在高一升高二的暑假時，創意教學計劃的資源整併進電研社`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://www.facebook.com/tcfshcirc/" target="_blank">電腦資訊研習社</a>[/ref]`，成為電研社底下的樂高機器人組，我與另一位夥伴成為該組的首屆組長兼教學。加入電研社後，我們協助電研社與樂高機器人組的新生招募、對新人進行課程教學、帶領有興趣的組員參加競賽`wp-unconverted: [ref]<a rel="noreferrer noopener" href="http://www.ppml.url.tw/2008_robot_competition/" target="_blank">2008工業機器人競賽</a>、<a rel="noreferrer noopener" href="http://www.era.org.tw/main/fll-2008/" target="_blank">FLL2008台灣區選拔賽</a>、<a rel="noreferrer noopener" href="http://www.era.org.tw/main/category/game/game-wro/wro-2008/" data-type="URL" data-id="http://www.era.org.tw/main/category/game/game-wro/wro-2008/" target="_blank">WRO 2008中區初賽</a>[/ref]`，以及培養有志願的後繼者作傳承。我在這過程中，萌發對程式開發的興趣、累積撰寫程式的經驗、結交志趣相同的朋友、以及培養組織管理的能力，使用程式來解決問題所獲得的成就感，使我在大學科系選擇資工系。
+在高一時，報名參加了創意教學計劃，第一次接觸到樂高機器人[^3]，學習如何撰寫控制機器人的程式語言[^4]，課程結束後，與課程同學或朋友組隊，使用樂高機器人參加競賽[^5]。在高一升高二的暑假時，創意教學計劃的資源整併進電研社[^6]，成為電研社底下的樂高機器人組，我與另一位夥伴成為該組的首屆組長兼教學。加入電研社後，我們協助電研社與樂高機器人組的新生招募、對新人進行課程教學、帶領有興趣的組員參加競賽[^7]，以及培養有志願的後繼者作傳承。我在這過程中，萌發對程式開發的興趣、累積撰寫程式的經驗、結交志趣相同的朋友、以及培養組織管理的能力，使用程式來解決問題所獲得的成就感，使我在大學科系選擇資工系。
 
 ## 大學時期
 
-進入大學後，我加入動畫社，結交同好，學習MAD製作剪輯技術及其他動漫知識，並在大二時成為社團幹部，協助社團運作。我也加入校園網路策進會，成為末代成員，而在後來組織轉型成為網路福利社後，我也在當中協助新成立組織的發展`wp-unconverted: [ref]<a href="https://ccca.gitbooks.io/-105/content/">校園網路策進會與網路福利社的關係</a>[/ref]`。此外，我也參加了桌遊社、天文社並成為社員，參加社團活動，也培養了對調酒的興趣。
+進入大學後，我加入動畫社，結交同好，學習MAD製作剪輯技術及其他動漫知識，並在大二時成為社團幹部，協助社團運作。我也加入校園網路策進會，成為末代成員，而在後來組織轉型成為網路福利社後，我也在當中協助新成立組織的發展[^8]。此外，我也參加了桌遊社、天文社並成為社員，參加社團活動，也培養了對調酒的興趣。
 
 在線上社群方面，大一時，擔任系級教學版的板主之一，與同學交流課程知識。大二時，我與朋友報名參加學校主要BBS系統NCTU看板的版主選舉，並且勝選取得版主資格，與朋友共同管理看板。
 
@@ -35,6 +35,16 @@ wordpressId: 57
 
 役期結束後，在朋友的引薦下，我參加ONEworks集團底下某部門的面試，面試通過並加入該部門。加入初期，我使用ArchLinux與LDAP來建置與管理整個部門的開發環境。接著加入報球資訊系統的管理網站開發，並在負責後端系統與桌面端程式的人員離職後，接下這部份的工作，與剩下的同事繼續完成系統的開發。後來部門接手GV專案，我處理後端訊息廣播服務集群以及前端資訊圖像化呈現部份，整理專案程式碼的結構，增加對新球種的支援，提昇後端系統的負載能力。
 
-在工作之餘，於遊玩[ACGN股票交易市場](https://acgn-stock.com/)的過程中，我加入了營運組織的團隊，協助處理遊戲管理，同時，我也使用自己的專業能力，修改網站程式碼，增進網站的使用者體驗。另外，開發瀏覽器腳本來解決需求`wp-unconverted: [ref]<a href="https://greasyfork.org/zh-TW/scripts/423403-%E5%A2%9E%E5%8A%A0%E6%9C%83%E9%99%90%E6%B8%85%E5%96%AE%E5%88%86%E9%A0%81%E9%80%A3%E7%B5%90" target="_blank" rel="noreferrer noopener">增加會限清單分頁連結 | Greasy Fork</a>[/ref]`。
+在工作之餘，於遊玩[ACGN股票交易市場](https://acgn-stock.com/)的過程中，我加入了營運組織的團隊，協助處理遊戲管理，同時，我也使用自己的專業能力，修改網站程式碼，增進網站的使用者體驗。另外，開發瀏覽器腳本來解決需求[^9]。
 
 目前，我已離開 ONEworks 集團，謝謝這段因緣，而我的人生故事仍持續下去。
+
+[^1]: 阿毛系列為昱泉國際的幼教光碟產品
+[^2]: 該服務已於2007年5月31日關閉，[Yahoo!奇摩「個人網頁」服務，關閉通知！| 重灌狂人](https://briian.com/742/)
+[^3]: Lego Mindstorms NXT
+[^4]: NXT-G
+[^5]: [大葉大學第二次程式設計競賽](http://www.ppml.url.tw/2007_robot_competition/objective.htm)、[FLL 2007台灣區選拔賽](http://www.era.org.tw/main/category/game/game-fll-challenge/fll-2007/)、[WRO 2007中區校際盃](https://www.youtube.com/watch?v=-MUGvJ9XrI4)、[WRO 2007中區初賽](http://web2.nmns.edu.tw/PubLib/epaper/2007/347-index.htm)
+[^6]: [電腦資訊研習社](https://www.facebook.com/tcfshcirc/)
+[^7]: [2008工業機器人競賽](http://www.ppml.url.tw/2008_robot_competition/)、[FLL2008台灣區選拔賽](http://www.era.org.tw/main/fll-2008/)、[WRO 2008中區初賽](http://www.era.org.tw/main/category/game/game-wro/wro-2008/)
+[^8]: [校園網路策進會與網路福利社的關係](https://ccca.gitbooks.io/-105/content/)
+[^9]: [增加會限清單分頁連結 | Greasy Fork](https://greasyfork.org/zh-TW/scripts/423403-%E5%A2%9E%E5%8A%A0%E6%9C%83%E9%99%90%E6%B8%85%E5%96%AE%E5%88%86%E9%A0%81%E9%80%A3%E7%B5%90)

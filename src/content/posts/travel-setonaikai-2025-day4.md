@@ -117,7 +117,7 @@ wordpressId: 767
 <!-- /wp:envira/envira-gallery -->
 ```
 
-接著，往女木港的方向前進，途中遇到作品「[20世紀の回想](https://setouchi-artfest.jp/artworks/detail/8ac6d670-3f40-4680-ae07-056c75b9fce9)」，該作品是上面有四座帆，看起來有點像船的鋼琴，鋼琴會自動播放音樂，該作品似乎也作為 Summer Pockets 中，登場的海盜船的參考原型。而在鋼琴旁邊的提坊上，有著許多海鷗`wp-unconverted: <sup data-fn="8bd8c27b-ecd9-48a9-ba0e-77abce30a936" class="fn"><a id="8bd8c27b-ecd9-48a9-ba0e-77abce30a936-link" href="#8bd8c27b-ecd9-48a9-ba0e-77abce30a936">1</a></sup>`的藝術裝置，這些海鷗會隨著風向轉動。
+接著，往女木港的方向前進，途中遇到作品「[20世紀の回想](https://setouchi-artfest.jp/artworks/detail/8ac6d670-3f40-4680-ae07-056c75b9fce9)」，該作品是上面有四座帆，看起來有點像船的鋼琴，鋼琴會自動播放音樂，該作品似乎也作為 Summer Pockets 中，登場的海盜船的參考原型。而在鋼琴旁邊的提坊上，有著許多海鷗[^1]的藝術裝置，這些海鷗會隨著風向轉動。
 
 ```html title="wp-unconverted: envira/envira-gallery"
 <!-- wp:envira/envira-gallery {"galleryId":824,"title":"20世紀の回想 / カモメの駐車場","columns":"0","row_height":200,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110913218-1-scaled.jpg","title":"作品「20世紀の回想」與後方的「カモメの駐車場」","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_110913218-1-scaled.jpg","alt":"","caption":"","thumb":"","id":825,"height":287.0192307692308,"width":215.3},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111005154-1-scaled.jpg","title":"作品「カモメの駐車場」的特寫","link":"https://aniya.moe/wp-content/uploads/2025/05/20250423_111005154-1-scaled.jpg","alt":"","caption":"","thumb":"","id":826,"height":287.0192307692308,"width":381.7}]} -->
@@ -301,7 +301,7 @@ wordpressId: 767
 
 ---
 
-回到高松後，我加緊腳步前往高速巴士車站，在服務櫃台下班前，完成預約第七天旅行所要用到的交通套票`wp-unconverted: <sup data-fn="7f320e24-042a-4c4a-8bb2-54898b976eeb" class="fn"><a id="7f320e24-042a-4c4a-8bb2-54898b976eeb-link" href="#7f320e24-042a-4c4a-8bb2-54898b976eeb">2</a></sup>`。完成預約後，我在高松站的[便當店](https://maps.app.goo.gl/y78ZYhsnVRaZfmP88)購買便當作為晚餐，接著，直接回到旅館房間享用晚餐，結束今天的行程。
+回到高松後，我加緊腳步前往高速巴士車站，在服務櫃台下班前，完成預約第七天旅行所要用到的交通套票[^2]。完成預約後，我在高松站的[便當店](https://maps.app.goo.gl/y78ZYhsnVRaZfmP88)購買便當作為晚餐，接著，直接回到旅館房間享用晚餐，結束今天的行程。
 
 ```html title="wp-unconverted: core/image"
 <!-- wp:image {"id":1165,"sizeSlug":"large","linkDestination":"none","align":"center"} -->
@@ -317,7 +317,5 @@ wordpressId: 767
 
 ---
 
-```html title="wp-unconverted: core/footnotes"
-<!-- wp:footnotes /-->
-<ol class="wp-block-footnotes"><li id="8bd8c27b-ecd9-48a9-ba0e-77abce30a936">海鷗，日文讀音為カモメ，在象徵海盜船造型鋼琴旁的海鷗，或許這就是久島鴎（カモメ）名字的由來</li><li id="7f320e24-042a-4c4a-8bb2-54898b976eeb"><a href="https://www.yonkou-bus.co.jp/news/20240801.html" target="_blank" rel="noopener" title="">高松與大塚國際美術館的往返交通套票</a></li></ol>
-```
+[^1]: 海鷗，日文讀音為カモメ，在象徵海盜船造型鋼琴旁的海鷗，或許這就是久島鴎（カモメ）名字的由來
+[^2]: [高松與大塚國際美術館的往返交通套票](https://www.yonkou-bus.co.jp/news/20240801.html)
