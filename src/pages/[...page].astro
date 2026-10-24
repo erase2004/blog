@@ -30,7 +30,7 @@ const title = displayTitle(page.data.title);
 	article={{ headline: title, modified: page.data.updated }}
 	breadcrumbs={trail.map((step) => ({ name: displayTitle(step.data.title), path: pagePath(step) }))}
 >
-	<article>
+	<article data-pagefind-body>
 		<h1>{title}</h1>
 		<div class="prose">
 			<Content />

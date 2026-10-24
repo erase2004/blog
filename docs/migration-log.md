@@ -941,3 +941,85 @@ import Gallery from '../../components/Gallery.astro';
 - 13：Envira 的 463 張圖只有 `/?attachment_id=ID`（06 號記錄的），這次沒動。
 - 18：人工檢查時看一下相簿的版面與圖說位置；前言 2 張 App 截圖的圖說從頁面上移到 lightbox 裡。
 - 04：見上面的建置時間。
+
+## 16：搜尋、相關文章、分享按鈕與 giscus 留言（2026-10-24）
+
+### 搜尋：Pagefind
+
+- `pagefind` 1.5.2（npm），放在 `dependencies`（建置時要用）。npm 套件依平台另外裝 `@pagefind/<平台>`，Windows 版裡只有 `pagefind_extended.exe`：**extended 版才會斷中文詞**，npm 預設就是它。`package-lock.json` 列了所有平台，CI 的 Linux 也裝得到；沒有 install script，npm 11 的封鎖不影響。
+- 建索引寫成 Astro 整合 `src/integrations/pagefind.ts`：在 `astro:build:done` 用 Pagefind 的 Node API（`createIndex` → `addDirectory` → `writeFiles`）把索引寫到 `/pagefind/`。不在 npm script 裡另外跑 CLI，是因為測試的建置（`tests/support/build-site.mjs` 直接呼叫 Astro 的 `build()`）也要有索引。放在 `redirectsBudget()` 前面（它要維持最後一個）。
+- 語言：`forceLanguage: 'zh-TW'`，全站一個繁中索引（`pagefind-entry.json` 的語言是 `zh-TW`）。不設的話 Pagefind 讀 `<html lang="zh-TW">`，結果一樣（只是寫成小寫 `zh-tw`）。Pagefind 對中文不做詞幹處理，只斷詞。
+- **只索引內文**：文章與頁面的 `<article>` 加 `data-pagefind-body`。沒加時 Pagefind 索引每頁的整個 `<body>`：119 頁全部進索引，首頁、分頁、分類、標籤、日期彙整都因為列出文章標題與摘要而被搜到，而且每筆結果的摘要開頭都是「跳到主要內容 TsukiStudio 生活點滴紀錄…」。加了之後是 27 頁（22 篇文章＋5 個頁面）。分享、相關文章、留言都放在 `<article>` 外面，所以也不在索引裡（不然每篇文章都會因為相關文章裡的標題被搜到）。
+- 中文斷詞實測：「電磁筆」只出現在〈電子紙閱讀器使用心得〉內文的句子中間，搜得到而且排第一；後面還會列出 Day 1、Day 2，因為 Pagefind 也比對詞的開頭（「筆記型電腦」「筆直」）。
+- 搜尋框用 Pagefind 1.5 的 Component UI（`<pagefind-searchbox>`；舊的 `pagefind-ui.js` 官方已列為 legacy），放在側欄最上面、15 號預留的位置，標題「搜尋」（`src/components/Search.astro`）。邊打字邊在下拉選單顯示結果（標題＋摘要，關鍵字用網站的螢光筆色）。顏色、字型、圓角用 `--pf-*` 變數接上 `global.css` 的色票。
+  - 介面文字依 `<html lang>` 用 Pagefind 內建的繁中翻譯（「找不到 X 的相關結果」等），不用自己翻。例外是下拉選單底部的鍵盤提示（navigate／select／close）：不管索引語言寫大寫或小寫都是英文，所以用 `show-keyboard-hints="false"` 拿掉；Ctrl+K 快捷鍵的標示也拿掉（`hide-shortcut`）。
+  - 載入時機（實測）：每頁只載入 `pagefind-component-ui.js`（175 KB，gzip 39 KB）與 CSS（gzip 7 KB）；搜尋引擎、wasm（gzip 68 KB）與索引中繼資料等點進搜尋框才載入，索引分塊與內容片段在搜尋時才載入。
+  - 索引只在建置時產生，`astro dev` 底下搜尋框沒有作用，要看效果用 `npm run preview`。沒有 JavaScript 時搜尋框不會出現。WordPress 的 `/?s=` 搜尋網址不沿用（不在 sitemap 裡，也沒有其他 issue 要求）。
+
+### 分享按鈕
+
+- 純連結（`src/components/ShareLinks.astro`），頁面上沒有任何平台的 script 或 iframe，點下去才在新分頁打開該平台自己的分享頁。平台、順序與標題「分享此文」都照線上 Jetpack 的分享按鈕：
+
+  | 平台 | 網址 | 帶的參數 |
+  | --- | --- | --- |
+  | Threads | `https://www.threads.com/intent/post` | `url`、`text`（標題） |
+  | Facebook | `https://www.facebook.com/sharer/sharer.php` | `u` |
+  | X | `https://x.com/intent/tweet` | `url`、`text` |
+  | Mastodon | `https://share.joinmastodon.org/#text=…` | 標題＋網址 |
+  | LinkedIn | `https://www.linkedin.com/sharing/share-offsite/` | `url` |
+  | Reddit | `https://www.reddit.com/submit` | `url`、`title` |
+  | Tumblr | `https://www.tumblr.com/widgets/share/tool` | `posttype=link`、`canonicalUrl`、`content`、`title` |
+  | Pinterest | `https://www.pinterest.com/pin/create/button/` | `url`、`description`、有自訂社群圖片時加 `media` |
+  | Telegram | `https://t.me/share/url` | `url`、`text` |
+  | WhatsApp | `https://wa.me/` | `text`（標題＋網址） |
+
+- 網址參數依各平台官方文件（Threads、X、Tumblr 的 web intent 文件；Mastodon 官方分享頁的原始碼）。分享的網址是文章的正式網址（canonical，中文 slug 是大寫百分比編碼）。
+- **Mastodon** 沒有中央的分享網址，Jetpack 是跳出視窗問讀者的站台（要 JavaScript）。改用 Mastodon 官方的分享頁 `share.joinmastodon.org`：它會問讀者在哪個站台再轉過去；內容放在 `#text=` 片段裡，不會送到它的伺服器。
+- **Pinterest** 要一張圖。有 AIOSEO 自訂社群圖片的 11 篇帶 `media`（圖片的 webp 網址）；其他文章不帶，Pinterest 那邊的行為沒辦法在本機確認。
+- 驗證：每個分享網址都用 curl／headless Chrome 打開過，都有回應（Threads、X、LinkedIn、Tumblr 轉到登入頁；Facebook 用 curl 是 400，用瀏覽器是 200）。實際發文需要各平台帳號，沒有測。
+
+### 相關文章
+
+- 建置時計算（`src/lib/related-posts.ts`），每篇 3 篇（跟 Jetpack 一樣）：共同標籤多的優先；一樣多時共同分類多的優先；再一樣就新的優先。Jetpack 的相關文章是 WordPress.com 伺服器上的內容分析，無法重現，所以照 spec 用標籤。
+- 共同標籤不夠 3 篇時，用同分類的文章補，例如〈第一篇文章〉的標籤 `murmur` 沒有其他文章用，就列出「閒聊」的另外 3 篇。
+- 顯示標題與發布日期，三欄卡片（窄螢幕變一欄），標題「相關文章」（Jetpack 寫「相關」）。
+
+### giscus 留言
+
+- `src/components/Comments.astro`，只放在文章（頁面沒有留言區）。設定：
+
+  | 屬性 | 值 |
+  | --- | --- |
+  | `data-repo` | `erase2004/blog` |
+  | `data-repo-id` | `R_kgDOVVonIg` |
+  | `data-category` | `Comments` |
+  | `data-category-id` | `DIC_kwDOVVonIs4DJfJF` |
+  | `data-mapping` | `specific` |
+  | `data-term` | 文章路徑去掉開頭的 `/`，例如 `2021/11/30/電子紙閱讀器使用心得/` |
+  | `data-strict` | `1` |
+  | `data-lang` | `zh-TW` |
+  | `data-theme` | `light`（網站沒有深色模式） |
+  | `data-loading` | `lazy` |
+
+  另外 `data-reactions-enabled="1"`、`data-input-position="bottom"`。repo ID 與分類 ID 用 giscus 的 API（`/api/discussions/categories?repo=erase2004/blog`）核對過。
+- **對應方式（跟 issue 寫法的差異）**：issue 寫「依網址 pathname 對應 discussion」。giscus 的 `pathname` 模式取的是瀏覽器的 `location.pathname`，中文 slug 會是百分比編碼，而且編碼的大小寫跟著讀者請求的網址走：WordPress 的 canonical 與 Google 索引的都是小寫編碼，如果正式站對小寫編碼的網址直接回 200（01 號在本機看到的是 307 轉到大寫，正式站要到 19 號才確認），同一篇文章就會對應到兩個 discussion。所以改用 `specific`，在建置時把路徑寫進 `data-term`：一樣是「依路徑對應」，但不受編碼影響，GitHub 上 discussion 的標題也是看得懂的中文。
+- `data-strict="1"`：giscus 用 term 的 SHA-1 找 discussion，不靠 GitHub 的標題模糊搜尋（不嚴格時 giscus 直接取搜尋結果的第一筆，Day 1～Day 8 的路徑只差一個字元，容易對錯）。
+- 沒有 JavaScript 時顯示「留言區需要 JavaScript。」
+- **本機驗證**：在本機建置的文章頁打開 giscus（允許外部請求）：iframe 載入 `giscus.app/zh-TW/widget`，介面是中文（「0 個反應」「0 則留言」「用 GitHub 登入」），找 discussion 的 API 回 404，就是「這篇還沒有 discussion」的正常情況。**實際發表留言與回覆沒有測**：要用 GitHub 帳號登入，而且 discussion 在第一則留言時才建立；上線（或預覽網址）後要實測。
+
+### 測試
+
+`tests/site-serving.test.ts`：
+
+- `search`：用 Chromium 打開建置結果的首頁。索引部分直接呼叫 Pagefind 的 JS API：索引語言是 zh-TW；「電磁筆」第一筆是電子紙那篇；「遊記」剛好找到 9 篇遊記，沒有任何列表頁或其他文章（驗證只索引內文）。搜尋框部分：在側欄的搜尋框輸入「電磁筆」會列出那篇；找不到時顯示中文訊息，而且框裡沒有英文字。
+- `after a post`：分享連結（電子紙那篇的 10 個連結，逐一比對平台網址與參數；沒有 script、iframe；有社群圖片的文章 Pinterest 帶的 `media` 是 aniya.moe 上存在的 webp）；giscus 的設定；相關文章（Day 3：Day 4、Day 2、Day 5；〈第一篇文章〉：閒聊的另外 3 篇）。期望值是照各篇的標籤與分類手算的。
+- `layout`：8 種頁面的側欄第一個區塊都是搜尋框。
+- 踩到的坑：傳給 Playwright `page.evaluate()` 的函式會先經過 Vitest（Vite）轉換，裡面的 `import()` 被改成 `__vite_ssr_dynamic_import__`，送到瀏覽器就是 ReferenceError；改用 `new Function('return import("/pagefind/pagefind.js")')()`。
+- 一開始的「只有文章」測試用搜尋框檢查，結果拿掉 `data-pagefind-body` 也會過：搜尋框只顯示前幾筆，文章排在列表頁前面。改用 Pagefind 的 API 拿全部結果才抓得到。
+
+### 留給其他 issue 的發現
+
+- 17：404 頁透過 `BaseLayout` 已經有側欄的搜尋框。若主欄也要一個，第二個 `<pagefind-searchbox>` 要給不同的 `instance`，否則兩個框共用同一組狀態。404 頁沒有 `data-pagefind-body`，不會被搜到。
+- 04：索引在 `astro build` 裡產生，CI 不用多一個步驟。搜尋與手機寬度的測試都需要 Playwright 的 Chromium（15 號已記）。
+- 14：Pinterest 的 `media` 目前只用自訂社群圖片；14 號做好 og:image 的備援（文章第一張圖 → `night.png`）後，把同一張圖傳給 `ShareLinks` 的 `image`。14 號若決定社群圖片不用 webp，這裡也一起改。
+- 19：在預覽網址用 GitHub 帳號實際留言、回覆，確認 discussion 建在 `Comments` 分類、標題是中文路徑。giscus 建議用「Announcement」格式的分類（只有維護者和 giscus 能開新 discussion），站長可以到 repo 的 Discussions 設定確認 `Comments` 的格式。可以再加 `giscus.json` 限制只有 `aniya.moe`（與預覽網址）能嵌入留言，這次沒加（repo 還沒推送，預覽網址的網域也還不確定）。
