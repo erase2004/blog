@@ -1,5 +1,4 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
+// Site-wide settings, most of them carried over from the WordPress site.
 
 /**
  * The site's origin, where WordPress was: canonical URLs, feeds and the
