@@ -4,12 +4,12 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 72 個對照滑桿轉成 `<Compare>`，包括 block 版與手動寫成 `wp:html` 的版本
-- [ ] 含對照滑桿的文章改成 MDX
-- [ ] `<Compare>` 包裝 `img-comparison-slider` web component，滑鼠與觸控都能拖曳
-- [ ] 對照滑桿的 JS 只在有對照滑桿的頁面載入
-- [ ] 轉換後的滑桿數量與原文一致
-- [ ] 兩種來源各有 fixture 測試
-- [ ] 更新搬遷日誌
+- [x] 72 個對照滑桿轉成 `<Compare>`，包括 block 版與手動寫成 `wp:html` 的版本
+- [x] 含對照滑桿的文章改成 MDX
+- [x] `<Compare>` 包裝 `img-comparison-slider` web component，滑鼠與觸控都能拖曳
+- [x] 對照滑桿的 JS 只在有對照滑桿的頁面載入
+- [x] 轉換後的滑桿數量與原文一致
+- [x] 兩種來源各有 fixture 測試
+- [x] 更新搬遷日誌
