@@ -53,6 +53,7 @@ export default defineConfig({
 		trailingSlashRedirects(),
 		imageRedirects(),
 		notFoundPage(),
+		// Ends _redirects with its dynamic rules: keep it after the integrations that add static ones.
 		oldUrlRedirects(),
 		pagefindIndex(),
 		redirectsBudget(),
