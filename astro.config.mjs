@@ -4,10 +4,11 @@ import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
 import { defineConfig } from 'astro/config';
+import { SITE_ORIGIN } from './src/consts';
 import imageRedirects from './src/integrations/image-redirects';
 import mediaRedirects from './src/integrations/media-redirects';
 import notFoundPage from './src/integrations/not-found-page';
-import oldUrlRedirects from './src/integrations/old-url-redirects';
+import pageRedirects from './src/integrations/page-redirects';
 import pagefindIndex from './src/integrations/pagefind';
 import redirectsBudget from './src/integrations/redirects-budget';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
@@ -22,7 +23,7 @@ pluginFramesTexts.addLocale('zh-TW', {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://aniya.moe',
+	site: SITE_ORIGIN,
 	// Every URL ends with "/", as on the WordPress site; each page is written
 	// as <path>/index.html.
 	trailingSlash: 'always',
@@ -54,7 +55,7 @@ export default defineConfig({
 		imageRedirects(),
 		notFoundPage(),
 		// Ends _redirects with its dynamic rules: keep it after the integrations that add static ones.
-		oldUrlRedirects(),
+		pageRedirects(),
 		pagefindIndex(),
 		redirectsBudget(),
 	],

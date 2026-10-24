@@ -2,7 +2,10 @@
 // build output directory, and over HTTP while `wrangler dev` serves the same
 // directory with the project's wrangler.jsonc. Both must reach the same
 // verdicts.
+import { once } from 'node:events';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -100,8 +103,16 @@ const fixtureSite: Record<string, string> = {
 		'/混 /混/ 301',
 		'/%e6%b7%b7/ /ok/ 301',
 		'/old/ /ok/ 301',
+		'/old /ok/ 301',
 		'/old-elsewhere/ /no-title/ 301',
+		'/old-elsewhere /ok/ 301',
 		'/temporary/ /ok/ 302',
+		'/temporary /ok/ 301',
+		'/slashless-missing/ /ok/ 301',
+		'/slashless-elsewhere/ /ok/ 301',
+		'/slashless-elsewhere /no-title/ 301',
+		'/attachment-page/ /img/new.png 301',
+		'/video-page/ https://media.aniya.moe/videos/a/video.mp4 301',
 		'/wp-content/uploads/old.png /img/new.png 301',
 		'/wp-content/uploads/dangling.png /img/missing.png 301',
 		'/wp-content/uploads/video.mp4 https://media.aniya.moe/videos/a/video.mp4 301',
@@ -110,6 +121,7 @@ const fixtureSite: Record<string, string> = {
 		'/proxied-to-nothing/ /nowhere/ 200',
 		// Dynamic rules come last; Workers try them after all static rules.
 		'/tag/:tag/feed/ /tag/:tag/ 301',
+		'/tag/:tag/feed /tag/:tag/ 301',
 		'/archive/* /ok/ 301',
 	].join('\n'),
 };
@@ -264,6 +276,32 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 				problems: ['expected a redirect to /ok/, got /no-title/'],
 			},
 			{ url: '/temporary/', outcome: 'fail', problems: ['expected HTTP 301, got 302 to /ok/'] },
+		]);
+	});
+
+	// As WordPress answered them: without the slash, a 301 to the URL with it,
+	// which redirected on. Not attachment pages (their location is an image
+	// known after the build, or on R2): the site has no static rules left for
+	// them.
+	it('fails a redirect to a page whose URL without the trailing slash does not redirect to the page too', async () => {
+		const report = await check([
+			{ url: '/old/', expect: 'redirect', location: '/ok/' },
+			{ url: '/slashless-missing/', expect: 'redirect', location: '/ok/' },
+			{ url: '/slashless-elsewhere/', expect: 'redirect', location: '/ok/' },
+			{ url: '/attachment-page/', expect: 'redirect' },
+			{ url: '/video-page/', expect: 'redirect', location: 'https://media.aniya.moe/videos/a/video.mp4' },
+		]);
+
+		expect(report.results).toEqual([
+			{ url: '/old/', outcome: 'pass', problems: [] },
+			{ url: '/slashless-missing/', outcome: 'fail', problems: ['/slashless-missing: expected HTTP 301, got 404'] },
+			{
+				url: '/slashless-elsewhere/',
+				outcome: 'fail',
+				problems: ['/slashless-elsewhere: expected a redirect to /ok/, got /no-title/'],
+			},
+			{ url: '/attachment-page/', outcome: 'pass', problems: [] },
+			{ url: '/video-page/', outcome: 'pass', problems: [] },
 		]);
 	});
 
@@ -504,6 +542,120 @@ describe('the pending list', () => {
 		expect(prunePendingList(pendingList, report)).toBe('# Allowed to fail for now.\n\n/a/\n\n/zz/\n');
 	});
 });
+
+describe('checking the production site', () => {
+	// Local servers stand in for https://aniya.moe and https://www.aniya.moe.
+	// The site answers /hsts/<name> with the HSTS header of that name.
+	const HSTS: Record<string, string | null> = {
+		ok: 'max-age=31536000; includeSubDomains; preload',
+		none: null,
+		'no-preload': 'max-age=31536000; includeSubDomains',
+		'no-subdomains': 'max-age=31536000; preload',
+		short: 'max-age=86400; includeSubDomains; preload',
+	};
+	/** How the www stand-in answers: as it should, or as a wrong redirect rule would. */
+	let wwwAnswers: 'same URL' | 'home page' | 'temporary' = 'same URL';
+	let site: StandIn;
+	let www: StandIn;
+
+	beforeAll(async () => {
+		site = await startStandIn((url) => {
+			const name = url.pathname.replace(/^\/hsts\//, '');
+			const hsts = name in HSTS ? HSTS[name] : HSTS.ok;
+			return { status: 200, headers: hsts ? { 'Strict-Transport-Security': hsts } : {} };
+		});
+		www = await startStandIn((url) => {
+			const target = new URL(wwwAnswers === 'home page' ? '/' : url.pathname + url.search, site.url).href;
+			return { status: wwwAnswers === 'temporary' ? 302 : 301, headers: { Location: target } };
+		});
+	});
+
+	afterAll(async () => {
+		await Promise.all([site?.close(), www?.close()]);
+	});
+
+	const check = (expected: ExpectedUrl[], target = httpSite(site.url, { asProduction: { wwwOrigin: www.url } })) =>
+		checkUrls({ expected, target, pendingList: '' });
+
+	it('passes when www redirects every URL to the same URL on the site, and responses keep browsers on HTTPS', async () => {
+		wwwAnswers = 'same URL';
+		const report = await check([{ url: '/hsts/ok', expect: 'file' }]);
+
+		expect(outcomes(report)).toEqual({
+			'/hsts/ok': 'pass',
+			[`${www.url}/`]: 'pass',
+			[`${www.url}/2021/09/30/第一篇文章/`]: 'pass',
+			[`${www.url}/?p=30`]: 'pass',
+		});
+		expect(report.ok).toBe(true);
+	});
+
+	it('fails www URLs that do not 301 to the same URL on the site', async () => {
+		wwwAnswers = 'home page';
+		const toHome = await check([]);
+		wwwAnswers = 'temporary';
+		const temporary = await check([]);
+
+		expect(toHome.results.map(({ url, problems }) => [url, problems])).toEqual([
+			[`${www.url}/`, []],
+			[
+				`${www.url}/2021/09/30/第一篇文章/`,
+				[`expected a redirect to ${site.url}${encodeURI('/2021/09/30/第一篇文章/')}, got ${site.url}/`],
+			],
+			[`${www.url}/?p=30`, [`expected a redirect to ${site.url}/?p=30, got ${site.url}/`]],
+		]);
+		expect(temporary.results.map(({ problems }) => problems[0])).toEqual(
+			Array(3).fill(expect.stringMatching(/^expected HTTP 301, got 302/)),
+		);
+		expect(temporary.ok).toBe(false);
+	});
+
+	// What the HSTS preload list asks of a domain on it (hstspreload.org).
+	it('fails every response without HSTS for the preload list: a year or more, subdomains too, and preload', async () => {
+		wwwAnswers = 'same URL';
+		const report = await check(Object.keys(HSTS).map((name) => ({ url: `/hsts/${name}`, expect: 'file' as const })));
+		const needs = 'expected Strict-Transport-Security with max-age of at least 31536000, includeSubDomains and preload';
+
+		expect(report.results.filter(({ url }) => url.startsWith('/')).map(({ url, problems }) => [url, problems])).toEqual([
+			['/hsts/ok', []],
+			['/hsts/none', [`${needs}; got none`]],
+			['/hsts/no-preload', [`${needs}; got "max-age=31536000; includeSubDomains"`]],
+			['/hsts/no-subdomains', [`${needs}; got "max-age=31536000; preload"`]],
+			['/hsts/short', [`${needs}; got "max-age=86400; includeSubDomains; preload"`]],
+		]);
+	});
+
+	it('are the checks of https://aniya.moe only: not of preview URLs or local servers', async () => {
+		const report = await check([{ url: '/hsts/none', expect: 'file' }], httpSite(site.url));
+
+		expect(httpSite('https://aniya.moe').production).toEqual({ origin: 'https://aniya.moe', wwwOrigin: 'https://www.aniya.moe' });
+		expect(httpSite('https://aniya-moe.example.workers.dev').production).toBeUndefined();
+		expect(outcomes(report)).toEqual({ '/hsts/none': 'pass' });
+	});
+});
+
+type StandIn = { url: string; close(): Promise<void> };
+
+/** A local HTTP server answering every request with `answer`'s status and headers, and an empty body. */
+async function startStandIn(
+	answer: (url: URL) => { status: number; headers: Record<string, string> },
+): Promise<StandIn> {
+	const server = createServer((request, response) => {
+		const { status, headers } = answer(new URL(request.url ?? '/', 'http://localhost'));
+		response.writeHead(status, headers).end();
+	});
+	server.listen(0, '127.0.0.1');
+	await once(server, 'listening');
+	const { port } = server.address() as AddressInfo;
+	return {
+		url: `http://127.0.0.1:${port}`,
+		close: async () => {
+			server.closeAllConnections();
+			server.close();
+			await once(server, 'close');
+		},
+	};
+}
 
 describe('checking the build output only', () => {
 	it('skips URLs with a query string, which only the Worker answers', async () => {

@@ -6,16 +6,13 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
 import { getEntries, render } from 'astro:content';
 import MarkdownImage from '../components/MarkdownImage.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { displayTitle, getPosts, type Post, postDescription, postPath, postUpdated } from './content';
+import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { displayTitle, getPosts, lastUpdated, type Post, postDescription, postPath, postUpdated } from './content';
 import { feedHtml } from './feed-html';
 import { cdata, escapeXml } from './xml';
 
 /** WordPress's `posts_per_rss`. */
 const FEED_POSTS = 10;
-
-/** The WordPress site's only author (user erase2004), by the name its feeds gave. */
-const AUTHOR = 'Tsuki';
 
 /** A post, as both feeds give it. */
 interface FeedEntry {
@@ -55,7 +52,7 @@ export async function rssFeed(site: URL): Promise<string> {
 			'<item>',
 			`<title>${escapeXml(entry.title)}</title>`,
 			`<link>${escapeXml(entry.url)}</link>`,
-			`<dc:creator>${escapeXml(AUTHOR)}</dc:creator>`,
+			`<dc:creator>${escapeXml(SITE_AUTHOR.name)}</dc:creator>`,
 			`<pubDate>${rfc822(entry.published)}</pubDate>`,
 			...entry.terms.map((term) => `<category>${escapeXml(term)}</category>`),
 			`<guid isPermaLink="false">${escapeXml(entry.id)}</guid>`,
@@ -84,7 +81,7 @@ export async function atomFeed(site: URL): Promise<string> {
 		`<link rel="self" type="application/atom+xml" href="${escapeXml(self)}" />`,
 		...entries.flatMap((entry) => [
 			'<entry>',
-			`<author><name>${escapeXml(AUTHOR)}</name><uri>${escapeXml(new URL('/about/', site).href)}</uri></author>`,
+			`<author><name>${escapeXml(SITE_AUTHOR.name)}</name><uri>${escapeXml(new URL('/about/', site).href)}</uri></author>`,
 			`<title type="text">${escapeXml(entry.title)}</title>`,
 			`<link rel="alternate" type="text/html" href="${escapeXml(entry.url)}" />`,
 			`<id>${escapeXml(entry.id)}</id>`,
@@ -103,8 +100,7 @@ export async function atomFeed(site: URL): Promise<string> {
 /** The newest posts, and when the latest change to any post was made (WordPress's `lastBuildDate`). */
 async function feed(site: URL): Promise<{ entries: FeedEntry[]; updated: Date }> {
 	const posts = await getPosts();
-	const updated = new Date(Math.max(...posts.map((post) => postUpdated(post).getTime())));
-	return { entries: await Promise.all(posts.slice(0, FEED_POSTS).map((post) => feedEntry(post, site))), updated };
+	return { entries: await Promise.all(posts.slice(0, FEED_POSTS).map((post) => feedEntry(post, site))), updated: lastUpdated(posts) };
 }
 
 async function feedEntry(post: Post, site: URL): Promise<FeedEntry> {

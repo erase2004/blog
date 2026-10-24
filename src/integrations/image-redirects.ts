@@ -1,10 +1,10 @@
 import type { AstroIntegration } from 'astro';
 import { readFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { appendRedirects } from './redirects-file';
+import { appendRedirects, type RedirectRule } from './redirects-file';
 
 /** Where the rules are built; the file is gone from the build output once they are in _redirects. */
-const RULES_PATH = 'image-redirect-rules.txt';
+const RULES_PATH = 'image-redirect-rules.json';
 
 /**
  * Redirects the old URLs of the moved images (upload paths and attachment
@@ -26,7 +26,7 @@ export default function imageRedirects(): AstroIntegration {
 			},
 			'astro:build:done': async ({ dir, logger }) => {
 				const file = fileURLToPath(new URL(RULES_PATH, dir));
-				const rules = (await readFile(file, 'utf8')).split('\n').filter((rule) => rule !== '');
+				const rules = JSON.parse(await readFile(file, 'utf8')) as RedirectRule[];
 				await rm(file);
 				await appendRedirects(dir, rules);
 				logger.info(`added ${rules.length} image rules to _redirects`);

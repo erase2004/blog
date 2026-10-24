@@ -1,6 +1,6 @@
 // Post HTML as feed readers get it (src/lib/feed-html.ts), for markup the
-// site's posts do not have yet; tests/site-serving.test.ts checks the real
-// feeds.
+// site's posts do not have yet; tests/site/feeds-and-sitemap.test.ts checks
+// the real feeds.
 import { parse } from 'node-html-parser';
 import { describe, expect, it } from 'vitest';
 import { feedHtml } from '../src/lib/feed-html';

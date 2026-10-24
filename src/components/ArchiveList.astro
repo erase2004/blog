@@ -1,20 +1,24 @@
 ---
-// A list of links to archives, each with its post count: `技術 (9)`.
+// Sidebar widget: a list of links to archives, in the order given, each
+// with its post count: `技術 (9)`. The categories that have posts, by name;
+// the years, newest first.
+import type { Archive } from '../lib/archives';
+
 interface Props {
 	/** What the archives are, for screen readers: `分類`, `年份`. */
 	label: string;
-	items: { name: string; path: string; count: number }[];
+	archives: Archive[];
 }
 
-const { label, items } = Astro.props;
+const { label, archives } = Astro.props;
 ---
 
 <nav aria-label={label}>
 	<ul>
 		{
-			items.map(({ name, path, count }) => (
+			archives.map(({ name, path, posts }) => (
 				<li>
-					<a href={path}>{name}</a> <span class="count">({count})</span>
+					<a href={path}>{name}</a> <span class="count">({posts.length})</span>
 				</li>
 			))
 		}

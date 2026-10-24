@@ -1,7 +1,7 @@
 import type { AstroIntegration } from 'astro';
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { appendRedirects } from './redirects-file';
+import { appendRedirects, type RedirectRule } from './redirects-file';
 
 /**
  * Adds a `/<path> /<path>/ 301` rule to `_redirects` for every
@@ -24,7 +24,7 @@ export default function trailingSlashRedirects(): AstroIntegration {
 					.filter((file) => file.endsWith('/index.html'))
 					.map((file) => file.slice(0, -'index.html'.length))
 					.sort()
-					.map((path) => `/${path.slice(0, -1)} /${path} 301`);
+					.map((path): RedirectRule => ({ from: `/${path.slice(0, -1)}`, to: `/${path}`, status: 301 }));
 
 				await appendRedirects(dir, rules);
 				logger.info(`added ${rules.length} trailing-slash rules to _redirects`);

@@ -1,0 +1,13 @@
+---
+// A tag archive, at its WordPress URL /tag/<slug>/ (/page/N/ after the first page).
+import ArchiveLayout from '../../../layouts/ArchiveLayout.astro';
+import { type ArchivePage, termArchiveRoutes } from '../../../lib/archives';
+
+export function getStaticPaths() {
+	return termArchiveRoutes('tags');
+}
+
+const { page } = Astro.props as { page: ArchivePage };
+---
+
+<ArchiveLayout page={page} />

@@ -6,19 +6,15 @@
 //
 // Exits with 1 when a file fails a check. Whether the old URLs redirect to
 // these is the URL checker's job (`npm run check-urls`).
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { readMediaTable } from './r2-media/media-table.ts';
+import { mediaFiles } from '../src/lib/old-url-map.ts';
 import { verifyMedia } from './r2-media/verify.ts';
-import { MAPPING_TABLE_FILE } from './url-checker/settings.ts';
 
 if (process.argv.length > 2) {
 	console.error('usage: node scripts/verify-media.ts');
 	process.exit(2);
 }
 
-const root = fileURLToPath(new URL('../', import.meta.url));
-const results = await verifyMedia(readMediaTable(join(root, MAPPING_TABLE_FILE)));
+const results = await verifyMedia(mediaFiles());
 for (const { url, problems } of results) {
 	console.log(`${problems.length === 0 ? 'ok    ' : 'FAILED'}  ${url}`);
 	for (const problem of problems) console.log(`        ${problem}`);

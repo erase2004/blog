@@ -4,7 +4,6 @@
 // wrangler.jsonc).
 import { type ChildProcess, spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
-import { createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = fileURLToPath(new URL('../../', import.meta.url));
@@ -23,10 +22,13 @@ export interface WranglerDev {
 /**
  * `script` replaces the Worker wrangler.jsonc names (`main`) with another
  * one; the rest of wrangler.jsonc still applies.
+ *
+ * The server and its inspector listen on port 0: the system gives each a
+ * free port as it binds, so servers started at the same time (by test files
+ * running in parallel) never get the same one. wrangler says which port it
+ * got in its "Ready on" line.
  */
 export async function startWranglerDev({ assetsDir, script }: { assetsDir: string; script?: string }): Promise<WranglerDev> {
-	const port = await findFreePort();
-	const inspectorPort = await findFreePort();
 	const child = spawn(
 		process.execPath,
 		[
@@ -38,12 +40,13 @@ export async function startWranglerDev({ assetsDir, script }: { assetsDir: strin
 			'--ip',
 			'127.0.0.1',
 			'--port',
-			String(port),
+			'0',
 			'--inspector-port',
-			String(inspectorPort),
+			'0',
 			'--show-interactive-dev-session=false',
+			// The "Ready on" line is an info message.
 			'--log-level',
-			'warn',
+			'info',
 		],
 		{
 			cwd: projectRoot,
@@ -53,34 +56,39 @@ export async function startWranglerDev({ assetsDir, script }: { assetsDir: strin
 			detached: process.platform !== 'win32',
 		},
 	);
-	let output = '';
-	child.stdout?.on('data', (chunk) => (output += chunk));
-	child.stderr?.on('data', (chunk) => (output += chunk));
-
-	const url = `http://127.0.0.1:${port}`;
 	try {
-		await waitUntilServing(url, child);
+		return { url: await readyUrl(child), stop: () => stop(child) };
 	} catch (error) {
 		await stop(child);
-		throw new Error(`wrangler dev did not start: ${(error as Error).message}\n${output}`);
+		throw error;
 	}
-	return { url, stop: () => stop(child) };
 }
 
-async function waitUntilServing(url: string, child: ChildProcess): Promise<void> {
-	const deadline = Date.now() + READY_TIMEOUT_MS;
-	while (Date.now() < deadline) {
-		if (child.exitCode !== null) {
-			throw new Error(`exited with code ${child.exitCode}`);
-		}
-		try {
-			await fetch(url, { redirect: 'manual' });
-			return;
-		} catch {
-			await new Promise((resolve) => setTimeout(resolve, 250));
-		}
-	}
-	throw new Error(`no response from ${url} within ${READY_TIMEOUT_MS} ms`);
+/** The origin wrangler says it is ready on; what it prints after that (a line per request) is dropped. */
+function readyUrl(child: ChildProcess): Promise<string> {
+	return new Promise((resolve, reject) => {
+		let output = '';
+		let settled = false;
+		const settle = (outcome: () => void) => {
+			settled = true;
+			clearTimeout(timer);
+			child.off('exit', exited);
+			outcome();
+		};
+		const fail = (reason: string) =>
+			settle(() => reject(new Error(`wrangler dev did not start: ${reason}\n${output}`)));
+		const timer = setTimeout(() => fail(`not ready within ${READY_TIMEOUT_MS} ms`), READY_TIMEOUT_MS);
+		const exited = (code: number | null) => fail(`exited with code ${code}`);
+		const read = (chunk: Buffer) => {
+			if (settled) return;
+			output += chunk;
+			const ready = /Ready on (http:\/\/\S+)/.exec(output);
+			if (ready) settle(() => resolve(new URL(ready[1]!).origin));
+		};
+		child.stdout?.on('data', read);
+		child.stderr?.on('data', read);
+		child.once('exit', exited);
+	});
 }
 
 async function stop(child: ChildProcess): Promise<void> {
@@ -95,17 +103,4 @@ async function stop(child: ChildProcess): Promise<void> {
 		process.kill(-child.pid, 'SIGTERM');
 	}
 	await exited;
-}
-
-async function findFreePort(): Promise<number> {
-	const server = createServer();
-	server.listen(0, '127.0.0.1');
-	await once(server, 'listening');
-	const address = server.address();
-	server.close();
-	await once(server, 'close');
-	if (address === null || typeof address === 'string') {
-		throw new Error('could not determine a free port');
-	}
-	return address.port;
 }

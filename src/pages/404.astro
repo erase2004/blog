@@ -10,7 +10,7 @@ const latest = (await getPosts()).slice(0, 5);
 ---
 
 <BaseLayout title={`找不到頁面 - ${SITE_TITLE}`} description="找不到這個頁面。" robots="noindex" canonical={false}>
-	<h1>找不到頁面</h1>
+	<h1 class="page-title ruled">找不到頁面</h1>
 	<p>這個網址沒有內容，可能已經移動或刪除。可以搜尋看看，或從最新的文章讀起。</p>
 
 	{/* Its own Pagefind instance: the sidebar's box is the default one. */}
@@ -53,9 +53,6 @@ const latest = (await getPosts()).slice(0, 5);
 <style>
 	h1 {
 		margin-bottom: 1.5rem;
-		padding-bottom: 1rem;
-		border-bottom: 3px solid var(--color-frame);
-		font-size: clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem);
 	}
 	h2 {
 		font-size: 1.25rem;

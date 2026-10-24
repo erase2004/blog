@@ -7,7 +7,7 @@
 //
 //   <Compare before={frame} after={photo}>動畫中出現的公車站</Compare>
 import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
 import { CONTENT_IMAGE_SIZES } from '../lib/image-sizes';
 
 interface Props {
@@ -22,14 +22,18 @@ const { before, after } = Astro.props;
 // The slider takes the shape of the before image, as WordPress's (Jetpack's
 // Juxtapose) did; the after image fills the same frame.
 const shape = `--compare-aspect-ratio: ${before.width} / ${before.height}`;
-// The images are as wide as the post's column.
-const sizes = CONTENT_IMAGE_SIZES;
+// Made as a post's Markdown images are (src/components/MarkdownImage.astro),
+// as wide as the post's column: at full size, each is the file its old URLs
+// redirect to. Astro's <Image> adds `fit` and `position`, which would make
+// other files of the same photos.
+const image = (src: ImageMetadata) => getImage({ src, alt: '', sizes: CONTENT_IMAGE_SIZES });
+const [left, right] = await Promise.all([image(before), image(after)]);
 ---
 
 <figure class="compare">
 	<img-comparison-slider style={shape}>
-		<div slot="first"><Image src={before} alt="" sizes={sizes} /></div>
-		<div slot="second"><Image src={after} alt="" sizes={sizes} /></div>
+		<div slot="first"><img src={left.src} srcset={left.srcSet.attribute || undefined} {...left.attributes} /></div>
+		<div slot="second"><img src={right.src} srcset={right.srcSet.attribute || undefined} {...right.attributes} /></div>
 	</img-comparison-slider>
 	{
 		Astro.slots.has('default') && (

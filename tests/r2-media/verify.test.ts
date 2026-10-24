@@ -2,7 +2,7 @@
 // file, and a part of it (a <video> seeks with range requests). A local HTTP
 // server stands in for media.aniya.moe.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { MediaFile } from '../../scripts/r2-media/media-table';
+import type { MediaFile } from '../../src/lib/old-url-map';
 import { verifyMedia } from '../../scripts/r2-media/verify';
 import { type MediaServer, startMediaServer } from '../support/media-server';
 

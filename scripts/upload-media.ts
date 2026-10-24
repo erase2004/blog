@@ -14,10 +14,9 @@ import { once } from 'node:events';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { readMediaTable } from './r2-media/media-table.ts';
+import { mediaFiles } from '../src/lib/old-url-map.ts';
 import { MEDIA_BUCKET, WORDPRESS_BACKUP_DIR } from './r2-media/settings.ts';
 import { uploadMedia } from './r2-media/upload.ts';
-import { MAPPING_TABLE_FILE } from './url-checker/settings.ts';
 
 const USAGE = 'usage: node scripts/upload-media.ts [--dry-run] [--force] [--backup <dir>]';
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -41,7 +40,7 @@ async function wrangler(args: string[]): Promise<void> {
 }
 
 const ok = await uploadMedia({
-	files: readMediaTable(join(root, MAPPING_TABLE_FILE)),
+	files: mediaFiles(),
 	backupDir: resolve(values.backup ?? WORDPRESS_BACKUP_DIR),
 	bucket: MEDIA_BUCKET,
 	dryRun: values['dry-run'] ?? false,
