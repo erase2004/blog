@@ -4,11 +4,25 @@
 // `astro dev`). Its texts follow the page's language (zh-TW), except the
 // keyboard hints under the results, which stay in English: they are hidden,
 // as is the Ctrl+K shortcut badge.
+interface Props {
+	/**
+	 * Pagefind's name for the box's search, for a second box on a page (the
+	 * 404 page's): boxes of the same instance share their query and results.
+	 */
+	instance?: string;
+}
+
+const { instance } = Astro.props;
 ---
 
 <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
 <script is:inline type="module" src="/pagefind/pagefind-component-ui.js"></script>
-<pagefind-searchbox class="search" placeholder="搜尋文章" hide-shortcut show-keyboard-hints="false"></pagefind-searchbox>
+<pagefind-searchbox
+	class="search"
+	instance={instance}
+	placeholder="搜尋文章"
+	hide-shortcut
+	show-keyboard-hints="false"></pagefind-searchbox>
 
 <style>
 	/* Pagefind's colours and sizes, set to the site's. */
