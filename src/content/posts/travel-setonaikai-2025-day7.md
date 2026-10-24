@@ -45,17 +45,15 @@ wordpressId: 1331
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1403,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103131827.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day7/20250426_103131827.mp4"></video>
+<figcaption>影片：鳴門漩渦</figcaption>
+</figure>
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1404,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103338052.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day7/20250426_103338052.mp4"></video>
+<figcaption>影片：鳴門漩渦</figcaption>
+</figure>
 
 ---
 

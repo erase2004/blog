@@ -313,12 +313,6 @@ describe('blocks left for later tickets', () => {
 https://www.youtube.com/watch?v=x3_Pcru8SS8
 </div></figure>
 <!-- /wp:embed -->`,
-		'core/video': `<!-- wp:video {"id":1403,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103131827.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->`,
-		'core/file': `<!-- wp:file {"id":459,"href":"https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf","displayPreview":false} -->
-<div class="wp-block-file"><a id="wp-block-file--media-e5b93318" href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" target="_blank" rel="noreferrer noopener">瀨戶內國際藝術祭 2025 旅遊計畫</a><a href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" class="wp-block-file__button wp-element-button" download aria-describedby="wp-block-file--media-e5b93318">下載</a></div>
-<!-- /wp:file -->`,
 		'core/quote': `<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>No rule converts quotes: the site has none.</p></blockquote>
 <!-- /wp:quote -->`,

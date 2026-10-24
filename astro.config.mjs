@@ -2,6 +2,7 @@
 
 import mdx from '@astrojs/mdx';
 import { defineConfig, fontProviders } from 'astro/config';
+import mediaRedirects from './src/integrations/media-redirects';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
 
 // https://astro.build/config
@@ -11,7 +12,7 @@ export default defineConfig({
 	// as <path>/index.html.
 	trailingSlash: 'always',
 	build: { format: 'directory' },
-	integrations: [mdx(), trailingSlashRedirects()],
+	integrations: [mdx(), mediaRedirects(), trailingSlashRedirects()],
 	fonts: [
 		{
 			provider: fontProviders.local(),
