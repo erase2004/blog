@@ -13,6 +13,8 @@ interface Props {
 const { page } = Astro.props;
 // The home page's heading is the site name, which the site header shows already.
 const isHome = page.archive.path === '/';
+// WordPress (AIOSEO) kept the pages after the first out of search results.
+const robots = page.number > 1 ? 'noindex, nofollow, max-image-preview:large' : undefined;
 const posts = await Promise.all(
 	page.posts.map(async (post) => ({ post, categories: await getEntries(post.data.categories) })),
 );
@@ -22,10 +24,9 @@ const posts = await Promise.all(
 	title={page.title}
 	description={page.description}
 	breadcrumbs={isHome ? undefined : [{ name: page.archive.name, path: page.archive.path }]}
+	robots={robots}
 >
 	<Fragment slot="head">
-		{/* WordPress (AIOSEO) kept the pages after the first out of search results. */}
-		{page.number > 1 && <meta name="robots" content="noindex, nofollow" />}
 		{page.newer && <link rel="prev" href={page.newer} />}
 		{page.older && <link rel="next" href={page.older} />}
 	</Fragment>

@@ -3,7 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
 import type { ImageMetadata } from 'astro';
-import { SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { GA4_MEASUREMENT_ID, SITE_AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import {
 	type Article,
 	type Breadcrumb,
@@ -22,20 +22,30 @@ interface Props {
 	article?: Article;
 	/** The trail from the home page to the page; none for the home page. */
 	breadcrumbs?: Breadcrumb[];
+	/** The robots meta tag; by default, as on WordPress, indexable with large image previews. */
+	robots?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, article, breadcrumbs } = Astro.props;
+const { title, description, article, breadcrumbs, robots = 'max-image-preview:large' } = Astro.props;
 const image = await socialImageFile(Astro.props.image ?? (await socialImage()));
 const site = new URL('/', Astro.site);
+// Google's snippet. `gtag()` is global, so that the 404 page can send an event with it.
+const gtagConfig = `window.dataLayer = window.dataLayer || [];
+function gtag() { dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});`;
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="icon" href="/favicon.ico" />
+<!-- The WordPress site icon (cropped-night.png), in the sizes WordPress gave it; also /favicon.ico. -->
+<link rel="icon" href="/favicon-32x32.png" sizes="32x32" />
+<link rel="icon" href="/favicon-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta name="msapplication-TileImage" content="/mstile-270x270.png" />
 <meta name="generator" content={Astro.generator} />
 <!-- The site header's colour, for the browser's toolbar on phones. -->
 <meta name="theme-color" content="#1a1a1a" />
@@ -46,6 +56,7 @@ const site = new URL('/', Astro.site);
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="description" content={description} />
+<meta name="robots" content={robots} />
 
 <meta name="fediverse:creator" content={SITE_AUTHOR.fediverse} />
 {article && <meta name="author" content={SITE_AUTHOR.name} />}
@@ -65,8 +76,8 @@ const site = new URL('/', Astro.site);
 {article && <meta property="article:modified_time" content={article.modified.toISOString()} />}
 {article?.tags?.map((tag) => <meta property="article:tag" content={tag} />)}
 
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image" />
+<!-- X: title, description and image come from Open Graph. -->
+<meta name="twitter:card" content="summary" />
 
 <!-- Structured data -->
 <script
@@ -74,3 +85,17 @@ const site = new URL('/', Astro.site);
 	is:inline
 	set:html={scriptJson(structuredData({ site, url: canonicalURL, description, image, article, breadcrumbs }))}
 />
+
+{
+	/*
+	 * Google Analytics 4: the WordPress site's property, so visits before and
+	 * after the move can be compared. Not in `astro dev`, so that writing
+	 * posts locally does not count as visits.
+	 */
+	import.meta.env.PROD && (
+		<>
+			<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`} />
+			<script is:inline set:html={gtagConfig} />
+		</>
+	)
+}

@@ -17,15 +17,24 @@ interface Props {
 	article?: Article;
 	/** The trail from the home page to the page, ending with it; none for the home page. */
 	breadcrumbs?: Breadcrumb[];
+	/** The robots meta tag, if not the default: indexable, with large image previews. */
+	robots?: string;
 }
 
-const { title, description, image, article, breadcrumbs } = Astro.props;
+const { title, description, image, article, breadcrumbs, robots } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="zh-TW">
 	<head>
-		<BaseHead title={title} description={description} image={image} article={article} breadcrumbs={breadcrumbs} />
+		<BaseHead
+			title={title}
+			description={description}
+			image={image}
+			article={article}
+			breadcrumbs={breadcrumbs}
+			robots={robots}
+		/>
 		<slot name="head" />
 	</head>
 	<body>

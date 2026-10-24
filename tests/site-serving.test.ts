@@ -755,6 +755,102 @@ describe('SEO head', () => {
 		});
 	});
 
+	it('every kind of page counts its visit in the GA4 property of the WordPress site, G-NWNYVH87N4', async () => {
+		const browser = await chromium.launch();
+		try {
+			const context = await browser.newContext();
+			// Google's script is not loaded for real: only that the page asks for it.
+			const outside: string[] = [];
+			await context.route(
+				(url) => url.origin !== server!.url,
+				(route) => {
+					outside.push(route.request().url());
+					return route.fulfill({ contentType: 'text/javascript', body: '' });
+				},
+			);
+			const page = await context.newPage();
+			const paths = ['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'];
+			const configs: Record<string, unknown> = {};
+			for (const path of paths) {
+				await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
+				// What the page told gtag.js: its commands, queued in dataLayer.
+				configs[path] = await page.evaluate(() =>
+					((window as unknown as { dataLayer?: IArguments[] }).dataLayer ?? [])
+						.map((command) => Array.from(command))
+						.filter(([name]) => name === 'config'),
+				);
+			}
+
+			expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
+			expect(outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
+		} finally {
+			await browser.close();
+		}
+	}, 60_000);
+
+	it('link previews on X are summary cards, as on WordPress', async () => {
+		for (const path of ['/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/']) {
+			const card = (await head(path)).querySelector('meta[name="twitter:card"]')?.getAttribute('content');
+			expect(card, path).toBe('summary');
+		}
+	});
+
+	describe('site icon', () => {
+		/** The size and type of the image the site serves at a URL. */
+		async function served(url: string) {
+			const response = await get(new URL(url, 'https://aniya.moe').pathname);
+			const { width, height } = await sharp(Buffer.from(await response.arrayBuffer())).metadata();
+			return { status: response.status, type: response.headers.get('content-type'), size: `${width}x${height}` };
+		}
+
+		// The icons of the WordPress site, in the sizes it had (aniya.moe, 2026-10-24).
+		it.each(['/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/no-such-page/'])(
+			'%s links the icons WordPress had: 32 and 192px, 180px for iOS, 270px for Windows tiles',
+			async (path) => {
+				const html = parse(await (await get(path)).text());
+				const icons = await Promise.all(
+					html.querySelectorAll('head link[rel="icon"], head link[rel="apple-touch-icon"]').map(async (link) => ({
+						rel: link.getAttribute('rel'),
+						sizes: link.getAttribute('sizes') ?? null,
+						...(await served(link.getAttribute('href')!)),
+					})),
+				);
+				const tile = html.querySelector('head meta[name="msapplication-TileImage"]')?.getAttribute('content');
+
+				expect(icons).toEqual([
+					{ rel: 'icon', sizes: '32x32', status: 200, type: 'image/png', size: '32x32' },
+					{ rel: 'icon', sizes: '192x192', status: 200, type: 'image/png', size: '192x192' },
+					{ rel: 'apple-touch-icon', sizes: null, status: 200, type: 'image/png', size: '180x180' },
+				]);
+				expect(await served(tile!)).toEqual({ status: 200, type: 'image/png', size: '270x270' });
+			},
+		);
+
+		it('is at /favicon.ico too, for browsers and feed readers that look there', async () => {
+			const response = await get('/favicon.ico');
+			const ico = Buffer.from(await response.arrayBuffer());
+
+			expect(response.status).toBe(200);
+			expect(response.headers.get('content-type')).toBe('image/vnd.microsoft.icon');
+			// An ICO file (type 1) with one 32 × 32 image.
+			expect([ico.readUInt16LE(2), ico.readUInt16LE(4), ico[6], ico[7]]).toEqual([1, 1, 32, 32]);
+		});
+	});
+
+	// As AIOSEO wrote them (aniya.moe, 2026-10-24).
+	it.each([
+		['/', 'max-image-preview:large'],
+		['/2021/11/30/電子紙閱讀器使用心得/', 'max-image-preview:large'],
+		['/about/', 'max-image-preview:large'],
+		['/2025/05/', 'max-image-preview:large'],
+		['/page/2/', 'noindex, nofollow, max-image-preview:large'],
+		['/no-such-page/', 'noindex'],
+	])('%s has one robots meta tag: %s', async (path, robots) => {
+		const tags = parse(await (await get(path)).text()).querySelectorAll('meta[name="robots"]');
+
+		expect(tags.map((tag) => tag.getAttribute('content'))).toEqual([robots]);
+	});
+
 	describe('structured data (JSON-LD)', () => {
 		/** The page's JSON-LD graph, by `@type`. */
 		async function graph(path: string): Promise<Record<string, Record<string, unknown>>> {

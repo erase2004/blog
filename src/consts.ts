@@ -11,6 +11,9 @@ export const SITE_AUTHOR = {
 	mastodon: 'https://g0v.social/@erase2004',
 };
 
+/** The Google Analytics 4 property the WordPress site sent its visits to (MonsterInsights). */
+export const GA4_MEASUREMENT_ID = 'G-NWNYVH87N4';
+
 /**
  * The WordPress site's time zone (its `timezone_string`). Post URLs carry the
  * publish date in this time zone, as WordPress permalinks did.
