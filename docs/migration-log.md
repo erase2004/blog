@@ -227,7 +227,7 @@ npm run check-urls -- build --prune-pending   # 順便把已經通過的網址�
 ### GitHub
 
 - 建立公開 repo `erase2004/blog`，開啟 Discussions，建立 `Comments` 分類，安裝 giscus GitHub App。giscus 的 API 讀得到這個 repo 的分類，代表 app 已經裝好。
-- **還沒推送**：站長決定先不推。04 號 CI/CD 要等推上去之後才能開始。
+- **推送（2026-10-25）**：站長一開始決定先不推，code review 修正合併之後才推上 `main` 與 `feature/wordpress-migration`。分支依 Conventional Branch 的命名規則，從 `wordpress-migration` 改成 `feature/wordpress-migration`。repo 是公開的，推送前掃過整段歷史，沒有 token、金鑰、密碼雜湊或 SQL 備份；出現的 email 只有聯絡方式頁面上本來就公開的地址。推送用的是 gh 的憑證（`git -c credential.helper=… push`），沒有改全域的 git 設定。04 號 CI/CD 可以開始了。
 - 安裝 gh CLI 2.103.2，用 `gh auth login --web` 登入。踩到的坑：Claude Code 的 `!` 指令跑在 bash，PowerShell 的 `& "路徑"` 寫法會出現語法錯誤，要改寫成 `"/c/Program Files/GitHub CLI/gh.exe"`。
 - GitHub Secrets 設了 `CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID`。
 

@@ -4,9 +4,9 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-human
+**Status:** resolved
 
-- [ ] 在 GitHub 建立公開 repo，把現有 commit 推上去（repo 已建立；推送由站長決定暫緩）
+- [x] 在 GitHub 建立公開 repo，把現有 commit 推上去（2026-10-25 推上 `main` 與 `feature/wordpress-migration`）
 - [x] 開啟 repo 的 Discussions，建立 `Comments` 分類
 - [x] 安裝 giscus GitHub App，授權這個 repo
 - [x] 建立 Cloudflare API token，權限涵蓋 Workers 部署與 R2 寫入；token 和 account ID 存進 GitHub Secrets
