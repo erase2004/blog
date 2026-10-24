@@ -1,0 +1,6 @@
+# Response headers for Cloudflare Workers static assets.
+
+# The feeds are written as <path>/index.html, the file served for the URL
+# with its trailing slash, so their Content-Type is set here.
+/feed/
+  Content-Type: application/rss+xml; charset=utf-8

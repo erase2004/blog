@@ -6,6 +6,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import { parse } from 'node-html-parser';
 import { type Browser, chromium } from 'playwright';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -625,5 +626,143 @@ describe('converted content', () => {
 			expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
 			expect(html.querySelectorAll('iframe')).toHaveLength(0);
 		});
+	});
+});
+
+/** An XML document as objects; elements named in `lists` are always arrays. */
+function parseXml(xml: string, lists: string[] = []) {
+	expect(XMLValidator.validate(xml), 'well-formed XML').toBe(true);
+	return new XMLParser({
+		ignoreAttributes: false,
+		attributeNamePrefix: '@',
+		// Character references such as &#60; too.
+		htmlEntities: true,
+		isArray: (name) => lists.includes(name),
+	}).parse(xml);
+}
+
+// Expected values from the WordPress feeds (aniya.moe/feed/ and /feed/atom/,
+// 2026-10-24): the same 10 newest posts, full text.
+describe('feeds', () => {
+	const NEWEST_POSTS = [
+		'https://aniya.moe/2026/01/23/acgn-museum-ssg/',
+		'https://aniya.moe/2025/12/05/2025-koebitai/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day8/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day7/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day6/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day5/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day4/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day3/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day2/',
+		'https://aniya.moe/2025/05/17/travel-setonaikai-2025-day1/',
+	];
+
+	async function rss() {
+		return parseXml(await (await get('/feed/')).text(), ['item', 'category']).rss;
+	}
+
+	it('/feed/ is an RSS 2.0 feed of the 10 newest posts, newest first', async () => {
+		const response = await get('/feed/');
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toBe('application/rss+xml; charset=utf-8');
+		const feed = await rss();
+		expect(feed['@version']).toBe('2.0');
+		expect(feed.channel.title).toBe('TsukiStudio');
+		expect(feed.channel.description).toBe('生活點滴紀錄');
+		expect(feed.channel.item.map((item: { link: string }) => item.link)).toEqual(NEWEST_POSTS);
+	});
+
+	/** The text a reader reads: whitespace runs as one space. */
+	const readableText = (html: ReturnType<typeof parse> | undefined | null) => html?.text.replace(/\s+/g, ' ').trim();
+
+	it('/feed/ has the full text of each post, as the post page has it', async () => {
+		for (const item of (await rss()).channel.item) {
+			const page = parse(await (await get(new URL(item.link).pathname)).text());
+
+			expect(readableText(parse(item['content:encoded'])), item.link).toBe(
+				readableText(page.querySelector('main article .prose')),
+			);
+		}
+	});
+
+	/** Every URL a feed item's HTML links to or loads, by attribute. */
+	function urlsIn(html: ReturnType<typeof parse>) {
+		const attribute = (selector: string, name: string) =>
+			html.querySelectorAll(selector).map((element) => element.getAttribute(name)!);
+		return {
+			links: attribute('a[href]', 'href'),
+			images: [
+				...attribute('img[src], video[src], source[src]', 'src'),
+				...attribute('video[poster]', 'poster'),
+				...attribute('img[srcset], source[srcset]', 'srcset').flatMap((srcset) =>
+					srcset.split(',').map((candidate) => candidate.trim().split(/\s+/)[0]!),
+				),
+			],
+		};
+	}
+
+	it('/feed/ links and loads images by absolute URLs, which work', async () => {
+		const sameSite = new Set<string>();
+		for (const item of (await rss()).channel.item) {
+			const { links, images } = urlsIn(parse(item['content:encoded']));
+
+			// Fragment links (footnotes) stay within the item.
+			const relative = [...links.filter((link) => !link.startsWith('#')), ...images].filter(
+				(url) => !/^(https?|mailto):/.test(url),
+			);
+			expect(relative, item.link).toEqual([]);
+			expect(images.length + links.length, item.link).toBeGreaterThan(0);
+			for (const url of [...links, ...images].filter((url) => url.startsWith('https://aniya.moe/'))) {
+				sameSite.add(new URL(url).pathname);
+			}
+		}
+
+		const broken: Record<string, number> = {};
+		const paths = [...sameSite];
+		while (paths.length > 0) {
+			await Promise.all(
+				paths.splice(0, 20).map(async (path) => {
+					const { status } = await fetch(new URL(path, server!.url), { method: 'HEAD', redirect: 'manual' });
+					if (status !== 200) broken[decodeURI(path)] = status;
+				}),
+			);
+		}
+		expect(sameSite.size).toBeGreaterThan(100);
+		expect(broken).toEqual({});
+	}, 120_000);
+
+	// A reader may show several items on one page: footnote 1 of one post must
+	// not jump to footnote 1 of another.
+	it('/feed/ items share no element IDs, and their fragment links stay within the item', async () => {
+		const seen = new Map<string, string>();
+		const shared: string[] = [];
+		let fragmentLinks = 0;
+		for (const item of (await rss()).channel.item) {
+			const html = parse(item['content:encoded']);
+			const ids = html.querySelectorAll('[id]').map((element) => element.id);
+			for (const id of ids) {
+				if (seen.has(id)) shared.push(`${id} (${seen.get(id)}, ${item.link})`);
+				seen.set(id, item.link);
+			}
+			const targets = urlsIn(html)
+				.links.filter((link) => link.startsWith('#'))
+				.map((link) => decodeURIComponent(link.slice(1)));
+			expect(targets.filter((target) => !ids.includes(target)), item.link).toEqual([]);
+			fragmentLinks += targets.length;
+		}
+
+		expect(shared).toEqual([]);
+		// The footnotes of 2025-koebitai, at least.
+		expect(fragmentLinks).toBeGreaterThan(4);
+	});
+
+	// Feed readers run no scripts and load no stylesheets of the site.
+	it('/feed/ items have no scripts, stylesheets or controls that need them', async () => {
+		for (const item of (await rss()).channel.item) {
+			const html = parse(item['content:encoded']);
+
+			expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName), item.link).toEqual([]);
+		}
 	});
 });
