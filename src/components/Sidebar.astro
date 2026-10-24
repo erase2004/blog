@@ -2,19 +2,16 @@
 // The sidebar, in the WordPress sidebar's order: search, categories, years,
 // tag cloud. Each widget is a `.widget` section with an h2.
 import CategoryList from './CategoryList.astro';
+import Search from './Search.astro';
 import TagCloud from './TagCloud.astro';
 import YearList from './YearList.astro';
 ---
 
 <aside class="sidebar" aria-label="側欄">
-	{
-		/*
-		 * SEARCH SLOT (ticket 16): the Pagefind search box goes here, first in
-		 * the sidebar, as <section class="widget" id="search"> with an
-		 * <h2>搜尋</h2> (or <h2 class="sr-only">搜尋</h2> to show only the box).
-		 * It takes the full sidebar width, like the tag cloud.
-		 */
-	}
+	<section class="widget" id="search" role="search" aria-labelledby="search-heading">
+		<h2 id="search-heading">搜尋</h2>
+		<Search />
+	</section>
 	<section class="widget" id="categories">
 		<h2>分類</h2>
 		<CategoryList />

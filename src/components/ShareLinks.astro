@@ -1,0 +1,86 @@
+---
+// Share links after a post: plain links to each platform's own share page, in
+// the order of the WordPress site's Jetpack sharing buttons. No script or
+// frame from the platforms is loaded until a reader follows a link.
+interface Props {
+	/** The post's URL. */
+	url: string;
+	title: string;
+	/** The image to pin on Pinterest. */
+	image?: string;
+}
+
+const { url, title, image } = Astro.props;
+
+/** `page` with the parameters in its query string, or in its fragment (`#a=b`). */
+function link(page: string, params: Record<string, string | undefined>, { inFragment = false } = {}): string {
+	const encoded = Object.entries(params)
+		.filter((param): param is [string, string] => param[1] !== undefined)
+		.map(([name, value]) => `${name}=${encodeURIComponent(value)}`)
+		.join('&');
+	return `${page}${inFragment ? '#' : '?'}${encoded}`;
+}
+
+const text = `${title} ${url}`;
+const platforms = [
+	{ name: 'Threads', href: link('https://www.threads.com/intent/post', { url, text: title }) },
+	{ name: 'Facebook', href: link('https://www.facebook.com/sharer/sharer.php', { u: url }) },
+	{ name: 'X', href: link('https://x.com/intent/tweet', { url, text: title }) },
+	// Mastodon's own share page: it asks for the reader's server. The text stays
+	// in the fragment, out of its server's logs.
+	{ name: 'Mastodon', href: link('https://share.joinmastodon.org/', { text }, { inFragment: true }) },
+	{ name: 'LinkedIn', href: link('https://www.linkedin.com/sharing/share-offsite/', { url }) },
+	{ name: 'Reddit', href: link('https://www.reddit.com/submit', { url, title }) },
+	{
+		name: 'Tumblr',
+		href: link('https://www.tumblr.com/widgets/share/tool', { posttype: 'link', canonicalUrl: url, content: url, title }),
+	},
+	{
+		name: 'Pinterest',
+		href: link('https://www.pinterest.com/pin/create/button/', { url, media: image, description: title }),
+	},
+	{ name: 'Telegram', href: link('https://t.me/share/url', { url, text: title }) },
+	{ name: 'WhatsApp', href: link('https://wa.me/', { text }) },
+];
+---
+
+<section class="share" aria-labelledby="share-heading">
+	<h2 id="share-heading">分享此文</h2>
+	<ul>
+		{
+			platforms.map(({ name, href }) => (
+				<li>
+					<a href={href} target="_blank" rel="noopener nofollow">
+						{name}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.875rem;
+	}
+	a {
+		display: block;
+		padding: 0.3rem 0.85rem;
+		border: 1px solid var(--color-rule);
+		border-radius: 999px;
+		color: var(--color-text);
+		line-height: 1.5;
+		text-decoration: none;
+	}
+	a:hover {
+		border-color: var(--color-link);
+		background: var(--color-link);
+		color: #fff;
+	}
+</style>

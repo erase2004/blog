@@ -1,0 +1,63 @@
+---
+// giscus comments: each post's comments are a discussion in the Comments
+// category of the site's own repository (github.com/erase2004/blog). Readers
+// sign in with GitHub to comment and reply.
+interface Props {
+	/** The post's path (`/YYYY/MM/DD/<slug>/`), with its slug as written. */
+	path: string;
+}
+
+const { path } = Astro.props;
+
+/**
+ * The repository and its Comments category, with the IDs giscus gives them
+ * (giscus.app's configuration page, or its /api/discussions/categories?repo=).
+ */
+const GISCUS = {
+	repo: 'erase2004/blog',
+	repoId: 'R_kgDOVVonIg',
+	category: 'Comments',
+	categoryId: 'DIC_kwDOVVonIs4DJfJF',
+};
+---
+
+<section class="comments" aria-labelledby="comments-heading">
+	<h2 id="comments-heading">留言</h2>
+	<div class="giscus"></div>
+	{
+		/*
+		 * The discussion is the one titled with the post's path, like giscus's
+		 * "pathname" mapping, but with the path as written: `location.pathname`
+		 * would be percent-encoded, differently for lowercase-encoded URLs (the
+		 * WordPress canonical style), and so find a second discussion. Strict:
+		 * found by the path's hash, as GitHub's title search is fuzzy (e.g. the
+		 * Day 1–8 posts' paths differ by one character).
+		 */
+	}
+	<script
+		is:inline
+		src="https://giscus.app/client.js"
+		data-repo={GISCUS.repo}
+		data-repo-id={GISCUS.repoId}
+		data-category={GISCUS.category}
+		data-category-id={GISCUS.categoryId}
+		data-mapping="specific"
+		data-term={path.slice(1)}
+		data-strict="1"
+		data-reactions-enabled="1"
+		data-emit-metadata="0"
+		data-input-position="bottom"
+		data-theme="light"
+		data-lang="zh-TW"
+		data-loading="lazy"
+		crossorigin="anonymous"
+		async></script>
+	<noscript><p>留言區需要 JavaScript。</p></noscript>
+</section>
+
+<style>
+	noscript p {
+		margin: 0;
+		color: var(--color-muted);
+	}
+</style>
