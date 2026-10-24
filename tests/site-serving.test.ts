@@ -1305,6 +1305,55 @@ describe('WordPress query-string URLs', () => {
 	});
 });
 
+describe('the Worker', () => {
+	// Each request that reaches the Worker counts towards the Workers free
+	// plan's daily limit; requests the static assets answer are free. A Worker
+	// that answers everything itself, in place of the site's, shows which
+	// requests wrangler.jsonc sends to it.
+	let marking: WranglerDev | undefined;
+	beforeAll(async () => {
+		const script = fileURLToPath(new URL('./fixtures/marking-worker.ts', import.meta.url));
+		marking = await startWranglerDev({ assetsDir: outDir, script });
+	}, 120_000);
+	afterAll(async () => {
+		await marking?.stop();
+	});
+
+	async function reachesWorker(path: string) {
+		const response = await fetch(new URL(path, marking!.url), { redirect: 'manual' });
+		await response.body?.cancel();
+		return response.headers.get('x-test-worker') === 'ran';
+	}
+
+	it.each(['/', '/?p=30', '/?page_id=86', '/?attachment_id=639', '/?utm_source=mastodon'])('runs for the home page URL: %s', async (path) => {
+		expect(await reachesWorker(path)).toBe(true);
+	});
+
+	it.each([
+		// Pages, files and their trailing-slash redirects.
+		'/about/',
+		'/about',
+		'/index.html',
+		'/2021/09/30/第一篇文章/',
+		'/feed/',
+		'/sitemap.xml',
+		'/favicon.ico',
+		// Old URLs that _redirects rules answer.
+		'/wp-content/uploads/2022/03/preview-1.png',
+		'/2021/09/30/第一篇文章/feed/',
+		'/author/erase2004/',
+		// Unknown URLs, which get the 404 page.
+		'/no-such-page/',
+		'/no-such-page',
+		'/wp-admin/',
+		'/404/',
+		// A query string below the home page.
+		'/about/?p=30',
+	])('does not run for any other URL: %s', async (path) => {
+		expect(await reachesWorker(path)).toBe(false);
+	});
+});
+
 describe('the URL checker', () => {
 	// The committed pending list must name exactly the expected URLs this
 	// build does not answer correctly yet, in both modes.

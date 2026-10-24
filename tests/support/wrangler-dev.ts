@@ -20,7 +20,11 @@ export interface WranglerDev {
 	stop(): Promise<void>;
 }
 
-export async function startWranglerDev({ assetsDir }: { assetsDir: string }): Promise<WranglerDev> {
+/**
+ * `script` replaces the Worker wrangler.jsonc names (`main`) with another
+ * one; the rest of wrangler.jsonc still applies.
+ */
+export async function startWranglerDev({ assetsDir, script }: { assetsDir: string; script?: string }): Promise<WranglerDev> {
 	const port = await findFreePort();
 	const inspectorPort = await findFreePort();
 	const child = spawn(
@@ -28,6 +32,7 @@ export async function startWranglerDev({ assetsDir }: { assetsDir: string }): Pr
 		[
 			wranglerBin,
 			'dev',
+			...(script === undefined ? [] : [script]),
 			'--assets',
 			assetsDir,
 			'--ip',
