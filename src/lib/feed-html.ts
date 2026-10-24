@@ -13,7 +13,8 @@ const SITE_ONLY = 'script, style, link, button, template';
 
 /**
  * `html`, rendered at `postUrl`, for a feed:
- *   - without scripts, stylesheets, and controls that need them;
+ *   - without scripts, stylesheets, and controls and custom elements that
+ *     need them;
  *   - every link and image URL is absolute;
  *   - every ID starts with `idPrefix`, and so do the links to them (`#…`),
  *     so that the IDs of posts shown together differ (footnote 1 of each
@@ -22,6 +23,11 @@ const SITE_ONLY = 'script, style, link, button, template';
 export function feedHtml(html: string, { postUrl, idPrefix }: { postUrl: URL; idPrefix: string }): string {
 	const root = parse(html, { comment: false });
 	for (const element of root.querySelectorAll(SITE_ONLY)) element.remove();
+	// Custom elements (web components) are nothing without their scripts:
+	// what they contain takes their place.
+	for (const element of root.querySelectorAll('*').filter(({ rawTagName }) => rawTagName.includes('-'))) {
+		element.replaceWith(...element.childNodes);
+	}
 	const absolute = (url: string) => (url.startsWith('#') ? `#${idPrefix}${url.slice(1)}` : new URL(url, postUrl).href);
 	for (const element of root.querySelectorAll('[href], [src], [poster], [srcset]')) {
 		for (const name of ['href', 'src', 'poster']) {

@@ -20,8 +20,10 @@ const urlChecker = fileURLToPath(new URL('../scripts/check-urls.ts', import.meta
 const PROBE_PATH = '/probe/';
 const WIDGETS_PATH = '/widgets/';
 // Test-only pages with what the WordPress converter writes, in an .md and an
-// .mdx file (tests/fixtures/converted-content.*).
+// .mdx file (tests/fixtures/converted-content.*), and the .mdx file as the
+// feeds give it to feed readers.
 const CONVERTED = { md: '/converted/md/', mdx: '/converted/mdx/' };
+const CONVERTED_FEED_ITEM = '/converted/feed-item/';
 
 let outDir: string;
 let server: WranglerDev | undefined;
@@ -30,7 +32,14 @@ beforeAll(async () => {
 	outDir = mkdtempSync(join(tmpdir(), 'aniya-moe-site-'));
 	execFileSync(
 		process.execPath,
-		[buildScript, outDir, PROBE_PATH, WIDGETS_PATH, '/converted/[format]/=converted-content.astro'],
+		[
+			buildScript,
+			outDir,
+			PROBE_PATH,
+			WIDGETS_PATH,
+			'/converted/[format]/=converted-content.astro',
+			`${CONVERTED_FEED_ITEM}index.html=converted-feed-item.ts`,
+		],
 		{ stdio: 'inherit' },
 	);
 	server = await startWranglerDev({ assetsDir: outDir });
@@ -629,6 +638,11 @@ describe('converted content', () => {
 	});
 });
 
+/** HTML, with <pre> parsed as elements too (Expressive Code puts its lines in it). */
+function parseHtml(html: string) {
+	return parse(html, { blockTextElements: { script: true, style: true } });
+}
+
 /** An XML document as objects; elements named in `lists` are always arrays. */
 function parseXml(xml: string, lists: string[] = []) {
 	expect(XMLValidator.validate(xml), 'well-formed XML').toBe(true);
@@ -674,20 +688,20 @@ describe('feeds', () => {
 	});
 
 	/** The text a reader reads: whitespace runs as one space. */
-	const readableText = (html: ReturnType<typeof parse> | undefined | null) => html?.text.replace(/\s+/g, ' ').trim();
+	const readableText = (html: ReturnType<typeof parseHtml> | undefined | null) => html?.text.replace(/\s+/g, ' ').trim();
 
 	it('/feed/ has the full text of each post, as the post page has it', async () => {
 		for (const item of (await rss()).channel.item) {
-			const page = parse(await (await get(new URL(item.link).pathname)).text());
+			const page = parseHtml(await (await get(new URL(item.link).pathname)).text());
 
-			expect(readableText(parse(item['content:encoded'])), item.link).toBe(
+			expect(readableText(parseHtml(item['content:encoded'])), item.link).toBe(
 				readableText(page.querySelector('main article .prose')),
 			);
 		}
 	});
 
 	/** Every URL a feed item's HTML links to or loads, by attribute. */
-	function urlsIn(html: ReturnType<typeof parse>) {
+	function urlsIn(html: ReturnType<typeof parseHtml>) {
 		const attribute = (selector: string, name: string) =>
 			html.querySelectorAll(selector).map((element) => element.getAttribute(name)!);
 		return {
@@ -705,7 +719,7 @@ describe('feeds', () => {
 	it('/feed/ links and loads images by absolute URLs, which work', async () => {
 		const sameSite = new Set<string>();
 		for (const item of (await rss()).channel.item) {
-			const { links, images } = urlsIn(parse(item['content:encoded']));
+			const { links, images } = urlsIn(parseHtml(item['content:encoded']));
 
 			// Fragment links (footnotes) stay within the item.
 			const relative = [...links.filter((link) => !link.startsWith('#')), ...images].filter(
@@ -739,7 +753,7 @@ describe('feeds', () => {
 		const shared: string[] = [];
 		let fragmentLinks = 0;
 		for (const item of (await rss()).channel.item) {
-			const html = parse(item['content:encoded']);
+			const html = parseHtml(item['content:encoded']);
 			const ids = html.querySelectorAll('[id]').map((element) => element.id);
 			for (const id of ids) {
 				if (seen.has(id)) shared.push(`${id} (${seen.get(id)}, ${item.link})`);
@@ -760,9 +774,20 @@ describe('feeds', () => {
 	// Feed readers run no scripts and load no stylesheets of the site.
 	it('/feed/ items have no scripts, stylesheets or controls that need them', async () => {
 		for (const item of (await rss()).channel.item) {
-			const html = parse(item['content:encoded']);
+			const html = parseHtml(item['content:encoded']);
 
 			expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName), item.link).toEqual([]);
 		}
+	});
+
+	it('give MDX posts as plain HTML: a YouTube embed is its thumbnail, linked to the video', () => {
+		const html = parseHtml(readFileSync(join(outDir, CONVERTED_FEED_ITEM, 'index.html'), 'utf8'));
+
+		const link = html.querySelector('a[href="https://www.youtube.com/watch?v=x3_Pcru8SS8"]');
+		expect(link?.querySelector('img')?.getAttribute('src')).toBe('https://i.ytimg.com/vi/x3_Pcru8SS8/hqdefault.jpg');
+		expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
+		expect(html.querySelector('.expressive-code pre')?.text).toContain("const routes = [{ path: '/nested' }]");
+		expect(html.querySelector('a[data-footnote-ref]')?.getAttribute('href')).toBe('#post-mdx-user-content-fn-1');
+		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
 });
