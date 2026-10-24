@@ -63,6 +63,14 @@ export function pagePath(page: Page): string {
 	return `/${page.data.parent ? `${page.data.parent}/` : ''}${page.data.slug}/`;
 }
 
+/** A category or tag: an entry of either collection, or a post's reference to one. */
+export type Term = { collection: 'categories' | 'tags'; id: string };
+
+/** The archive of a category or tag, `/category/<slug>/` or `/tag/<slug>/`: `/category/技術/`. */
+export function termPath({ collection, id }: Term): string {
+	return `/${collection === 'categories' ? 'category' : 'tag'}/${id}/`;
+}
+
 /**
  * When a post was last updated, as readers are told: its `updated` time, or
  * its publish time for a scheduled post last edited before it went out.

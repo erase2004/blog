@@ -6,7 +6,7 @@ import { type ArchivePage, archivePages, pageParam, tagArchives } from '../../..
 export async function getStaticPaths() {
 	return (await tagArchives()).flatMap((archive) =>
 		archivePages(archive).map((page) => ({
-			params: { tag: archive.path.slice('/tag/'.length, -1), page: pageParam(page) },
+			params: { tag: archive.id, page: pageParam(page) },
 			props: { page },
 		})),
 	);

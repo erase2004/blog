@@ -3,7 +3,7 @@
 // are `<archive URL>page/N/`.
 import { getCollection } from 'astro:content';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { formatSiteDate, getPosts, type Post, siteDate } from './content';
+import { formatSiteDate, getPosts, type Post, siteDate, type Term, termPath } from './content';
 
 /** WordPress's `posts_per_page`. */
 export const POSTS_PER_PAGE = 10;
@@ -82,14 +82,20 @@ export async function homeArchive(): Promise<Archive> {
 	};
 }
 
+/** The archive of a category or tag. */
+export interface TermArchive extends Archive {
+	/** The category's or tag's ID, the slug in its URL: `技術`. */
+	id: string;
+}
+
 /** `/category/<slug>/` of each category that has posts, by name. */
-export async function categoryArchives(): Promise<Archive[]> {
-	return termArchives('categories', { base: '/category/', label: '分類' });
+export async function categoryArchives(): Promise<TermArchive[]> {
+	return termArchives('categories', '分類');
 }
 
 /** `/tag/<slug>/` of each tag that has posts, by name. */
-export async function tagArchives(): Promise<Archive[]> {
-	return termArchives('tags', { base: '/tag/', label: '標籤' });
+export async function tagArchives(): Promise<TermArchive[]> {
+	return termArchives('tags', '標籤');
 }
 
 /**
@@ -155,14 +161,12 @@ function groupPosts(posts: Post[], archiveOf: (post: Post) => Omit<Archive, 'pos
 	return [...archives.values()];
 }
 
-async function termArchives(
-	collection: 'categories' | 'tags',
-	{ base, label }: { base: string; label: string },
-): Promise<Archive[]> {
+async function termArchives(collection: Term['collection'], label: string): Promise<TermArchive[]> {
 	const posts = await getPosts();
 	return (await getCollection(collection))
 		.map(({ id, data: { name } }) => ({
-			path: `${base}${id}/`,
+			id,
+			path: termPath({ collection, id }),
 			name,
 			title: `${name} - ${SITE_TITLE}`,
 			description: `${label}「${name}」的文章`,

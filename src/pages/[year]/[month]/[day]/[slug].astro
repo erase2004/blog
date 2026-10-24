@@ -16,6 +16,7 @@ import {
 	postPath,
 	postUpdated,
 	siteDate,
+	termPath,
 } from '../../../../lib/content';
 import { relatedPosts } from '../../../../lib/related-posts';
 import { socialImage, socialImageFile } from '../../../../lib/seo';
@@ -54,7 +55,7 @@ const socialImageUrl = new URL((await socialImageFile(image)).src, Astro.site).h
 		tags: tags.map((tag) => tag.data.name),
 	}}
 	breadcrumbs={[
-		{ name: category!.data.name, path: `/category/${category!.id}/` },
+		{ name: category!.data.name, path: termPath(category!) },
 		{ name: title, path: postPath(post) },
 	]}
 >
@@ -64,7 +65,7 @@ const socialImageUrl = new URL((await socialImageFile(image)).src, Astro.site).h
 				{
 					categories.map((category) => (
 						<li>
-							<a href={`/category/${category.id}/`} rel="category tag">
+							<a href={termPath(category)} rel="category tag">
 								{category.data.name}
 							</a>
 						</li>
@@ -93,7 +94,7 @@ const socialImageUrl = new URL((await socialImageFile(image)).src, Astro.site).h
 					<ul class="post-tags">
 						{tags.map((tag) => (
 							<li>
-								<a href={`/tag/${tag.id}/`} rel="tag">
+								<a href={termPath(tag)} rel="tag">
 									{tag.data.name}
 								</a>
 							</li>

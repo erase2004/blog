@@ -3,7 +3,7 @@
 // links to the pages with newer and older posts.
 import { getEntries } from 'astro:content';
 import type { ArchivePage } from '../lib/archives';
-import { displayTitle, formatSiteDate, postPath } from '../lib/content';
+import { displayTitle, formatSiteDate, postPath, termPath } from '../lib/content';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -38,7 +38,7 @@ const posts = await Promise.all(
 					<p class="meta">
 						<time datetime={post.data.published.toISOString()}>{formatSiteDate(post.data.published)}</time>
 						{categories.map((category) => (
-							<a href={`/category/${category.id}/`} rel="category tag">
+							<a href={termPath(category)} rel="category tag">
 								{category.data.name}
 							</a>
 						))}
