@@ -4,51 +4,94 @@ import { createHash } from 'node:crypto';
 import { getContainerRenderer as mdxRenderer } from '@astrojs/mdx/container-renderer';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
-import { render } from 'astro:content';
+import { getEntries, render } from 'astro:content';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { getPosts, type Post, postPath } from './content';
+import { getPosts, type Post, postDescription, postPath, postUpdated } from './content';
 import { feedHtml } from './feed-html';
 
 /** WordPress's `posts_per_rss`. */
 const FEED_POSTS = 10;
 
+/** The WordPress site's only author (user erase2004), as its feeds named her. */
+const AUTHOR = 'Tsuki';
+
+/** A post, as both feeds give it. */
+interface FeedEntry {
+	title: string;
+	/** Absolute. */
+	url: string;
+	/**
+	 * What feed readers tell posts apart by. WordPress's (`https://aniya.moe/?p=1854`)
+	 * for its posts, so readers do not take them for new posts; the post URL
+	 * for posts written since.
+	 */
+	id: string;
+	published: Date;
+	updated: Date;
+	/** The names of its categories, then of its tags. */
+	terms: string[];
+	summary: string;
+	/** The full post, as HTML for feed readers. */
+	content: string;
+}
+
 /** The RSS 2.0 feed at /feed/. */
 export async function rssFeed(site: URL): Promise<string> {
-	const items = await Promise.all(
-		(await feedPosts()).map(async (post) => [
-			'<item>',
-			`<title>${escapeXml(post.data.title)}</title>`,
-			`<link>${escapeXml(new URL(postPath(post), site).href)}</link>`,
-			`<content:encoded>${escapeXml(await postHtml(post, site))}</content:encoded>`,
-			'</item>',
-		]),
-	);
+	const { entries, updated } = await feed(site);
 	return [
 		'<?xml version="1.0" encoding="UTF-8"?>',
-		'<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">',
+		'<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" ' +
+			'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">',
 		'<channel>',
 		`<title>${escapeXml(SITE_TITLE)}</title>`,
+		`<atom:link href="${escapeXml(new URL('/feed/', site).href)}" rel="self" type="application/rss+xml" />`,
 		`<link>${escapeXml(site.href)}</link>`,
 		`<description>${escapeXml(SITE_DESCRIPTION)}</description>`,
-		...items.flat(),
+		`<lastBuildDate>${rfc822(updated)}</lastBuildDate>`,
+		'<language>zh-TW</language>',
+		...entries.flatMap((entry) => [
+			'<item>',
+			`<title>${escapeXml(entry.title)}</title>`,
+			`<link>${escapeXml(entry.url)}</link>`,
+			`<dc:creator>${escapeXml(AUTHOR)}</dc:creator>`,
+			`<pubDate>${rfc822(entry.published)}</pubDate>`,
+			...entry.terms.map((term) => `<category>${escapeXml(term)}</category>`),
+			`<guid isPermaLink="false">${escapeXml(entry.id)}</guid>`,
+			`<description>${escapeXml(entry.summary)}</description>`,
+			`<content:encoded>${cdata(entry.content)}</content:encoded>`,
+			'</item>',
+		]),
 		'</channel>',
 		'</rss>',
 		'',
 	].join('\n');
 }
 
-async function feedPosts(): Promise<Post[]> {
-	return (await getPosts()).slice(0, FEED_POSTS);
+/** The newest posts, and when the latest change to any post was made (WordPress's `lastBuildDate`). */
+async function feed(site: URL): Promise<{ entries: FeedEntry[]; updated: Date }> {
+	const posts = await getPosts();
+	const updated = new Date(Math.max(...posts.map((post) => postUpdated(post).getTime())));
+	return { entries: await Promise.all(posts.slice(0, FEED_POSTS).map((post) => feedEntry(post, site))), updated };
 }
 
-/** The post's content, as HTML for feed readers. */
-async function postHtml(post: Post, site: URL): Promise<string> {
+async function feedEntry(post: Post, site: URL): Promise<FeedEntry> {
+	const url = new URL(postPath(post), site);
+	const terms = [...(await getEntries(post.data.categories)), ...(await getEntries(post.data.tags))];
 	const { Content } = await render(post);
-	return feedContent(Content, {
-		postUrl: new URL(postPath(post), site),
-		// Unique to the post, and only ASCII whatever its slug.
-		idPrefix: `post-${createHash('sha256').update(post.id).digest('hex').slice(0, 8)}-`,
-	});
+	return {
+		title: post.data.title,
+		url: url.href,
+		id: post.data.wordpressId === undefined ? url.href : new URL(`/?p=${post.data.wordpressId}`, site).href,
+		published: post.data.published,
+		updated: postUpdated(post),
+		terms: terms.map(({ data }) => data.name),
+		summary: postDescription(post),
+		content: await feedContent(Content, {
+			postUrl: url,
+			// Unique to the post, and only ASCII whatever its slug.
+			idPrefix: `post-${createHash('sha256').update(post.id).digest('hex').slice(0, 8)}-`,
+		}),
+	};
 }
 
 /**
@@ -65,6 +108,17 @@ export async function feedContent(
 	return feedHtml(await container.renderToString(Content), options);
 }
 
+/** RSS's date format, as WordPress wrote it: `Fri, 23 Jan 2026 10:00:00 +0000`. */
+function rfc822(date: Date): string {
+	return date.toUTCString().replace(/GMT$/, '+0000');
+}
+
 function escapeXml(text: string): string {
-	return text.replace(/[<>&'"]/g, (character) => `&#${character.charCodeAt(0)};`);
+	const entities: Record<string, string> = { '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' };
+	return text.replace(/[<>&'"]/g, (character) => entities[character]!);
+}
+
+/** Text as a CDATA section: HTML stays readable, and shorter than with every `<` escaped. */
+function cdata(text: string): string {
+	return `<![CDATA[${text.replaceAll(']]>', ']]]]><![CDATA[>')}]]>`;
 }

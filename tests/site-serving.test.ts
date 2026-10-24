@@ -687,6 +687,27 @@ describe('feeds', () => {
 		expect(feed.channel.item.map((item: { link: string }) => item.link)).toEqual(NEWEST_POSTS);
 	});
 
+	// Feed readers tell items apart by GUID: new GUIDs would show the 10 posts
+	// as new posts again.
+	it('/feed/ keeps the GUIDs WordPress gave the items, and their dates and categories', async () => {
+		const feed = await rss();
+		const [newest] = feed.channel.item;
+
+		expect(feed.channel.item.map((item: { guid: { '#text': string } }) => item.guid['#text'])).toEqual(
+			[1854, 1797, 1590, 1331, 1158, 947, 767, 701, 552, 493].map((id) => `https://aniya.moe/?p=${id}`),
+		);
+		expect(newest).toMatchObject({
+			title: '從 SSR 到 SSG：ACGN 股市歷史博物館 7 萬頁靜態化的實戰轉型紀錄',
+			guid: { '@isPermaLink': 'false' },
+			pubDate: 'Fri, 23 Jan 2026 10:00:00 +0000',
+			'dc:creator': 'Tsuki',
+			category: ['技術', 'Astro', 'SSG', 'Website Optimization'],
+		});
+		expect(feed.channel.lastBuildDate).toBe('Fri, 23 Jan 2026 10:01:26 +0000');
+		expect(feed.channel.language).toBe('zh-TW');
+		expect(feed.channel['atom:link']).toMatchObject({ '@href': 'https://aniya.moe/feed/', '@rel': 'self' });
+	});
+
 	/** The text a reader reads: whitespace runs as one space. */
 	const readableText = (html: ReturnType<typeof parseHtml> | undefined | null) => html?.text.replace(/\s+/g, ' ').trim();
 
