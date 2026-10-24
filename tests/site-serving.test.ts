@@ -1073,6 +1073,21 @@ describe('feeds', () => {
 		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
 
+	it.each(['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'])(
+		'%s links to both feeds in its head, for browsers and feed readers to find',
+		async (path) => {
+			const head = parseHtml(await (await get(path)).text()).querySelector('head');
+			const feeds = head
+				?.querySelectorAll('link[rel="alternate"]')
+				.map((link) => [link.getAttribute('type'), link.getAttribute('href')]);
+
+			expect(feeds).toEqual([
+				['application/rss+xml', 'https://aniya.moe/feed/'],
+				['application/atom+xml', 'https://aniya.moe/feed/atom/'],
+			]);
+		},
+	);
+
 	it('/feed/atom/ is an Atom feed of the same posts, with the same full text and WordPress’s entry IDs', async () => {
 		const response = await get('/feed/atom/');
 
