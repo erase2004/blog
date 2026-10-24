@@ -11,6 +11,7 @@ draft: false
 wordpressId: 442
 ---
 
+import Gallery from '../../components/Gallery.astro';
 import YouTube from '../../components/YouTube.astro';
 
 在三月下旬某日準備下一季要看的動畫新番清單時，看到 [Summer Pockets](https://summerpockets-anime.jp/ "Summer Pockets 動畫官網") 的 PV，同時想起今年初設定的目標—再去一次瀨戶內藝術祭（春或夏），在聖地巡禮與參加瀨戶內藝術祭（之後簡稱瀨戶藝）這兩個目的下，就決定了這次旅行。
@@ -36,27 +37,26 @@ import YouTube from '../../components/YouTube.astro';
 
 順道一提，在安排每天行程時，順便統計當天參觀作品所需要的花費，作為是否購買[鑑賞護照](https://setouchi-artfest.jp/buy/passport "作品鑑賞護照")的參考，關於鑑賞護照的更多資訊，可以參考[深海札記](https://deepseanotes.com/2025-setouchi-artfest-eticket/#5-%e6%b3%a8%e6%84%8f%e4%ba%8b%e9%a0%85%e8%88%87%e5%bb%ba%e8%ad%b0)的資料彙整。由於這次是購買電子票，針對電子票的部份，可以分享查詢蓋章紀錄的方法。首先，打開[官方的 App](https://setouchi-artfest.jp/access/app/#app-info)，並且切換到「メニュー」的畫面，接著再點選「スタンプラリー」，就會進到蓋章清單的頁面，點選清單中任一座島嶼，便會顯示該島的蓋章紀錄。
 
-```html title="wp-unconverted: core/gallery"
-<!-- wp:gallery {"linkTo":"none","align":"center"} -->
-<figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":474,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003312-519x1024.png" alt="官方 App 的「メニュー」畫面" class="wp-image-474"/><figcaption class="wp-element-caption">官方 App 的「メニュー」畫面</figcaption></figure>
-<!-- /wp:image -->
-
-<!-- wp:image {"id":475,"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://aniya.moe/wp-content/uploads/2025/05/Screenshot_20250508-003355-518x1024.png" alt="蓋章清單的頁面" class="wp-image-475"/><figcaption class="wp-element-caption">蓋章清單的頁面</figcaption></figure>
-<!-- /wp:image --></figure>
-<!-- /wp:gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/Screenshot_20250508-003312.png'), caption: '官方 App 的「メニュー」畫面' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/Screenshot_20250508-003355.png'), caption: '蓋章清單的頁面' },
+	]}
+/>
 
 ※使用電子票時，需留意在參觀免費的作品時，由於不會有工作人員幫忙掃 QR code（蓋章），需要在觀看付費作品時，請工作人員幫忙補蓋免費作品的章。
 
 順便附上上次參加瀨戶藝的蓋章紀錄。
 
-```html title="wp-unconverted: envira/envira-gallery"
-<!-- wp:envira/envira-gallery {"galleryId":521,"title":"瀨戶藝 2019 秋會期蓋章紀錄","columns":"0","row_height":140,"margins":"custom","custom_margins":8,"lightbox_enabled":1,"lazyload_enabled":1,"isotope":1,"lightbox_theme":"base","images":[{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1274-scaled.jpg","title":"瀨戶藝 2019 秋會期紙本護照封面","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1274-scaled.jpg","alt":"","caption":"","thumb":"","id":488,"height":141.01941747572815,"width":79},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1275-scaled.jpg","title":"直島 / 直島家計畫 / 豐島 / 男木島 / 女木島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1275-scaled.jpg","alt":"","caption":"","thumb":"","id":484,"height":141.01941747572815,"width":251},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1276-scaled.jpg","title":"小豆島 / 大島 / 犬島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1276-scaled.jpg","alt":"","caption":"","thumb":"","id":487,"height":141.01941747572815,"width":251},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1277-scaled.jpg","title":"高松港 / 宇野港 / 本島 / 高見島 / 其他","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1277-scaled.jpg","alt":"","caption":"","thumb":"","id":485,"height":167.69662921348313,"width":298.5},{"status":"active","src":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1278-scaled.jpg","title":"粟島 / 伊吹島","link":"https://aniya.moe/wp-content/uploads/2025/05/DSC_1278-scaled.jpg","alt":"","caption":"","thumb":"","id":486,"height":167.69662921348313,"width":298.5}]} -->
-<div class="wp-block-envira-envira-gallery">[envira-gallery id='521']</div>
-<!-- /wp:envira/envira-gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/DSC_1274.jpg'), caption: '瀨戶藝 2019 秋會期紙本護照封面' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/DSC_1275.jpg'), caption: '直島 / 直島家計畫 / 豐島 / 男木島 / 女木島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/DSC_1276.jpg'), caption: '小豆島 / 大島 / 犬島' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/DSC_1277.jpg'), caption: '高松港 / 宇野港 / 本島 / 高見島 / 其他' },
+		{ src: import('../../assets/images/travel-setonaikai-2025-prologue/DSC_1278.jpg'), caption: '粟島 / 伊吹島' },
+	]}
+/>
 
 <sup>*2019 瀨戶藝秋會期的蓋章紀錄*</sup>
 
