@@ -113,7 +113,9 @@ export function wordpressTables(): Tables {
 				post_modified_gmt: '2026-01-23 10:01:26',
 				post_title: '從 SSR 到 SSG：ACGN 股市歷史博物館 7 萬頁靜態化的實戰轉型紀錄',
 				post_name: 'acgn-museum-ssg',
-				post_content: `${paragraph('記錄一個大型網站從 SSR 轉為 SSG 的完整過程。')}\n\n<!-- wp:footnotes /-->`,
+				post_content: `${paragraph(
+					'記錄一個大型網站從 SSR 轉為 SSG 的完整過程。<sup data-fn="1e48c1c2-1de0" class="fn"><a id="1e48c1c2-1de0-link" href="#1e48c1c2-1de0">1</a></sup>',
+				)}\n\n<!-- wp:footnotes /-->`,
 			}),
 			post({
 				ID: 86,

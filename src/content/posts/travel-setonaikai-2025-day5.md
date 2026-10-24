@@ -237,7 +237,7 @@ wordpressId: 947
 <!-- /wp:html -->
 ```
 
-拍照結束後，我騎單車回土庄港，並歸還單車給店家。歸還時，向老闆表示今天設定的行程都達成了，老闆對於我能用這輛單車完成所有的行程`wp-unconverted: <sup data-fn="9cce15ad-10e7-45da-a5e3-6b26e11b678d" class="fn"><a href="#9cce15ad-10e7-45da-a5e3-6b26e11b678d" id="9cce15ad-10e7-45da-a5e3-6b26e11b678d-link">1</a></sup>`感到驚訝與佩服。歸還後，我前往觀光中心，看看有沒有什麼土產可以買，接著，前往附近的渡輪售票處購買船票，搭上即將返回高松的船班，結束今天在小豆島的行程。
+拍照結束後，我騎單車回土庄港，並歸還單車給店家。歸還時，向老闆表示今天設定的行程都達成了，老闆對於我能用這輛單車完成所有的行程[^1]感到驚訝與佩服。歸還後，我前往觀光中心，看看有沒有什麼土產可以買，接著，前往附近的渡輪售票處購買船票，搭上即將返回高松的船班，結束今天在小豆島的行程。
 
 在船上，我跟店家點了わかとろうどん當作晚餐，當我在觀景台圓桌準備用餐時，有遊客過來徵詢同意，借拍一下食物。
 
@@ -277,7 +277,4 @@ wordpressId: 947
 
 ---
 
-```html title="wp-unconverted: core/footnotes"
-<!-- wp:footnotes /-->
-<ol class="wp-block-footnotes"><li id="9cce15ad-10e7-45da-a5e3-6b26e11b678d">有兩段路的交通方式是使用單車，分別是<a href="https://maps.app.goo.gl/pr53FJVUEnLfCTqF8" target="_blank" rel="noopener" title="">土庄港→中山→草壁港</a>和<a href="https://maps.app.goo.gl/LUzbWarqnKcWQm6dA" target="_blank" rel="noopener" title="">紅雲亭→草壁港→エンジェルロード→土庄港</a>，總騎行距離約 40 公里</li></ol>
-```
+[^1]: 有兩段路的交通方式是使用單車，分別是[土庄港→中山→草壁港](https://maps.app.goo.gl/pr53FJVUEnLfCTqF8)和[紅雲亭→草壁港→エンジェルロード→土庄港](https://maps.app.goo.gl/LUzbWarqnKcWQm6dA)，總騎行距離約 40 公里

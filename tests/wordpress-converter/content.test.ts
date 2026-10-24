@@ -302,17 +302,6 @@ describe('blocks left for later tickets', () => {
 		'core/html': `<!-- wp:html -->
 <figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1762" src="https://aniya.moe/wp-content/uploads/2025/05/8a6a5bf6243acbe99900d2e8417652e7.jpg" alt="" width="1624" height="915" class="image-compare__image-before"/><img id="727" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_104948.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的展望台</figcaption></figure>
 <!-- /wp:html -->`,
-		'core/code': `<!-- wp:code {"lineNumbers":false} -->
-<pre title="src/router/index.js" class="wp-block-code"><code lang="javascript" class="language-javascript">{ // Nested Route 的 Route 物件
-  component: () =&gt; import('@/views/NestedRoute.vue'),
-}</code></pre>
-<!-- /wp:code -->`,
-		'core/footnotes': '<!-- wp:footnotes /-->',
-		'core/embed': `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=x3_Pcru8SS8","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
-<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
-https://www.youtube.com/watch?v=x3_Pcru8SS8
-</div></figure>
-<!-- /wp:embed -->`,
 		'core/quote': `<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>No rule converts quotes: the site has none.</p></blockquote>
 <!-- /wp:quote -->`,
@@ -342,12 +331,8 @@ https://www.youtube.com/watch?v=x3_Pcru8SS8
 });
 
 describe('text left for later tickets', () => {
-	// Footnotes (ticket 08) and images inside text (ticket 06).
+	// Images inside text (ticket 06).
 	const pieces = {
-		'[ref]':
-			'[ref]<a rel="noreferrer noopener" href="https://thegeekpage.com/visual-c-runtime-library-error/" target="_blank">Fix Microsoft Visual C++ Runtime Library Error</a>[/ref]',
-		'sup[data-fn]':
-			'<sup data-fn="a7805dd0-74e1-4b06-83df-fc66858a6a2c" class="fn"><a id="a7805dd0-74e1-4b06-83df-fc66858a6a2c-link" href="#a7805dd0-74e1-4b06-83df-fc66858a6a2c">13</a></sup>',
 		img: '<img class="wp-image-496" style="width: 48px;" src="https://aniya.moe/wp-content/uploads/2025/05/25251efc7b05ba337e25294a5a690e92_w48_h46.jpeg" alt="">',
 	};
 

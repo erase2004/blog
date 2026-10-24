@@ -76,12 +76,11 @@ wordpressId: 30
 		expect(() => convertWordPress(tables)).toThrow('Post 2000: post_date_gmt in Asia/Taipei is not its post_date');
 	});
 
-	it('keep the texts of their Gutenberg footnotes in the footnotes marker until ticket 08 converts them', () => {
+	it('have their Gutenberg footnotes as GFM footnotes, the texts taken from the post metadata', () => {
 		const file = files()['src/content/posts/acgn-museum-ssg.md']!;
 
-		expect(file).toContain(
-			'```html title="wp-unconverted: core/footnotes"\n<!-- wp:footnotes /-->\n' +
-				'<ol class="wp-block-footnotes"><li id="1e48c1c2-1de0"><a href="https://weathernews.jp/s/topics/202504/190065/">瀬戸内海で濃霧発生</a></li></ol>\n```',
+		expect(file).toMatch(
+			/\n記錄一個大型網站從 SSR 轉為 SSG 的完整過程。\[\^1\]\n\n\[\^1\]: \[瀬戸内海で濃霧発生\]\(https:\/\/weathernews\.jp\/s\/topics\/202504\/190065\/\)\n$/,
 		);
 	});
 });

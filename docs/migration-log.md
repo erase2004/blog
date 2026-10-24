@@ -554,3 +554,72 @@ npm run verify-media                   # 每個網址回 200、Content-Type 與�
 - 由 orchestrator 用 `npm run upload-media` 上傳，token 只放在執行當下的環境變數裡，沒有寫進任何檔案。
 - 9 個檔案全部上傳完成。再跑一次 `--dry-run` 顯示「0 個要上傳、9 個已在 R2」，確認重複執行不會重傳。
 - `npm run verify-media`：9 個全部通過。每個檔案都回 200，Content-Type 與大小正確；從中段要 1 KiB 的 range request 回 206，Content-Range 正確，影片可以拖曳進度條。
+
+## 08：程式碼區塊、腳註與 YouTube（2026-10-24）
+
+### 程式碼區塊 → Expressive Code
+
+- 9 個程式碼區塊（3 篇文章）由 Code Syntax Block 外掛寫成：`<pre title="src/router/index.js" class="wp-block-code"><code lang="javascript">`。轉換規則 `rules/code.ts` 轉成 fenced code：`` ```javascript title="src/router/index.js" ``，`title` 屬性就是 Expressive Code 的檔名標題；沒有 `title` 的 3 個就只有語言。
+- **語言名稱**：外掛用的是 Prism 的名稱，其中 `markup` Shiki（Expressive Code 用的高亮引擎）不認得。外掛自己的語言清單把 `markup` 標示為「HTML」，所以轉成 `html`；`javascript`、`typescript` 照舊。
+- 程式碼內容只解碼 HTML 字元參照（`&gt;` → `>`），不經過 shortcode 的處理，程式碼裡長得像 `[ref]` 的文字原樣保留；內容有 `` ``` `` 時自動加長 fence。
+- 行號：外掛的 `lineNumbers` 屬性從來沒有設成 true（只有一個區塊明確寫 false），原本就沒有行號，所以沒裝行號外掛。`<pre id="block-…">` 沒有被任何連結用到，不保留。
+- 網站端：`astro-expressive-code` 0.44.3。Astro 7 預設的 Markdown 引擎是 Sätteri，Expressive Code 從 0.44 起直接支援（把自己加進 Sätteri 的 hast plugin），**不需要**改回 remark／`@astrojs/markdown-remark`。整合要放在 `mdx()` 前面，.md 與 .mdx 都有效。
+- Expressive Code 只有英文與德文的介面文字，複製按鈕用 `pluginFramesTexts.addLocale('zh-TW', …)` 加上中文（「複製到剪貼簿」「已複製！」），`defaultLocale: 'zh-TW'`。
+- 佈景主題用預設的 `github-dark`／`github-light`，跟著系統的深淺色切換；15 號決定配色時可以在 `expressiveCode({ themes })` 改。
+- 其他 issue 還沒處理的未轉換標記本來就是 `html title="wp-unconverted: …"` 的程式碼區塊，現在也由 Expressive Code 顯示（標題列寫著 `wp-unconverted: core/image` 等），一樣看得到。
+
+### 腳註 → GFM 腳註
+
+- 兩套腳註都轉成 GFM 腳註 `[^n]`（`rules/footnotes.ts`），一篇文章裡兩套共用同一組編號，依出現在內文的順序編號，註解文字統一放在檔案最後（`[^1]: …`，一行一則）：
+  - `[ref]…[/ref]`（Footnotes 外掛）：38 個，在 5 篇 2021–22 年的文章與「自傳」頁面。外掛設定是 `[ref]`／`[/ref]`、阿拉伯數字、相同內容合併（實際沒有內容相同的腳註）、註解列在文末。
+  - Gutenberg 內建腳註：內文的 `<sup data-fn="ID">` 共 37 個，在 8 篇 2025 年以後的文章；註解文字存在 postmeta `footnotes`（JSON），依 ID 對應。逐篇比對過：內文出現的順序跟 JSON 的順序一致，原本的編號就是 1、2、3…，所以轉換後的編號跟原文一模一樣。`core/footnotes` 區塊本身不輸出，註解改由網站列在文末。
+- 防呆：JSON 裡有註解沒被內文引用時，轉換器直接停下（GFM 不顯示沒被引用的註解，等於默默遺失）；內文引用了 JSON 裡沒有的 ID，留下未轉換標記。實際資料兩種情況都沒有。352 號文章的 `footnotes` 是空字串、442 號是 `[]`，都沒有 Gutenberg 腳註。
+- 網站端：Sätteri 本來就支援 GFM 腳註。點編號跳到 `#user-content-fn-n`，註解後面的 ↩ 跳回 `#user-content-fnref-n`。腳註區的標題預設是英文「Footnotes」（`sr-only`，只給螢幕閱讀器），改成中文：
+
+  ```js
+  markdown: {
+    processor: satteri({
+      features: {
+        gfm: { footnotes: { label: '註腳', backLabel: '回到內文的註腳 {reference}' } },
+        smartPunctuation: true,
+      },
+    }),
+  },
+  ```
+
+  為了 import `satteri()`，把 `@astrojs/markdown-satteri` 加成直接相依，版本跟 Astro 用的同一個（0.4.5）。傳入 `features` 時明確寫上 `smartPunctuation: true`，維持 Astro 的預設。
+- WordPress 原本的錨點（Gutenberg 的 `#<uuid>`、外掛的 `#footnote_plugin_…`）不保留：站內沒有連結指向它們，搜尋引擎也不會索引片段。
+
+### YouTube → 輕量嵌入
+
+- 前言那篇的 2 個 YouTube 嵌入轉成 `<YouTube id="x3_Pcru8SS8" title="TVアニメ『Summer Pockets』第1弾PV" />`（`rules/youtube.ts`），檔案因為 import 變成 `.mdx`，對應表裡的檔名跟著改。其他網站的嵌入（實際沒有）留下未轉換標記。
+- **標題從 oEmbed 快取來**：WordPress 把嵌入時拿到的 player HTML 存在 postmeta `_oembed_<md5>`，iframe 的 `title` 就是影片標題。key 是網址加參數的 md5，不好重算，所以在這篇文章的 `_oembed_*` 裡找 `src` 含有該影片 ID 的 iframe。找不到時元件用「YouTube 影片」。
+- 元件 `src/components/YouTube.astro`：
+  - 先顯示縮圖 `https://i.ytimg.com/vi/<id>/hqdefault.jpg`（480×360、上下有黑邊，用 `object-fit: cover` 放進 16:9 的框剛好裁掉），外面包著到 YouTube 影片頁的連結，所以沒有 JavaScript 也能看。
+  - 點下去才換成 `youtube-nocookie.com` 的 iframe（`autoplay=1`，一次點擊就開始播放），焦點移到 player。
+  - 元件裡的 `<script>` 由 Astro 打包，只在用到元件的頁面載入。
+  - 縮圖本身仍是對 `i.ytimg.com` 的請求（沒有 cookie）；要完全不連第三方，得在建置時下載縮圖，目前沒做。
+- 踩到的坑：縮圖是 inline 元素時，底下的行高空隙把 16:9 的框撐高，露出一條黑邊；改成 `display: block`。
+
+### 測試
+
+- `tests/wordpress-converter/code.test.ts`、`footnotes.test.ts`、`youtube.test.ts`：一條規則一個檔案，片段取自真正的備份；腳註用 Sätteri 渲染確認編號與來回連結，Gutenberg 腳註和 YouTube 標題用小型的 WordPress 資料（含 postmeta）轉換。`content.test.ts` 的「留給後續 issue」清單拿掉這幾種，`convert-wordpress.test.ts` 改成確認 Gutenberg 腳註從 postmeta 轉出來。
+- `tests/site-serving.test.ts` 加了「converted content」：建置時多產生測試用的 `/converted/md/` 與 `/converted/mdx/`（`tests/fixtures/converted-content.*`，內容就是轉換器輸出的寫法），檢查 Expressive Code 的檔名標題、語言與高亮、中文複製按鈕、腳註的來回連結與中文標籤、YouTube 只有縮圖沒有 iframe。
+- 踩到的坑：
+  - `injectRoute()` 直接指向 `.md`／`.mdx` 時，Astro 把它當成 API endpoint（警告「No API Route handler exists for the method GET」），不會產生頁面。改用一個 `.astro` 頁面 import 兩個檔案、用 `getStaticPaths()` 產生兩頁。`tests/support/build-site.mjs` 多收 `<路徑>=<fixture>` 參數。
+  - 兩個測試檔同時對同一個專案跑 Astro 建置，會互相刪掉 `.astro/.prerender` 裡的檔案而失敗，所以建置相關的檢查都放在 `site-serving.test.ts`，共用一次建置。
+  - 在 Git Bash 手動執行 `build-site.mjs` 時，`/probe/` 這種參數會被轉成 `C:/Program Files/Git/probe/`，要加 `MSYS_NO_PATHCONV=1`。
+- 點擊行為用 headless Chrome（DevTools Protocol）實際操作確認：前言頁一開始 0 個 iframe、2 張縮圖，點第一張後換成 `youtube-nocookie.com/embed/x3_Pcru8SS8?autoplay=1` 的 iframe，標題正確、取得焦點、沒有 JavaScript 錯誤；腳註點編號跳到註解、點 ↩ 跳回原處。
+
+### 未轉換標記
+
+08 號負責的 `core/code`（9）、`[ref]`（38）、`sup[data-fn]`（37）、`core/footnotes`（8）、`core/embed`（2）全部處理掉。合併 07、11 號之後重跑轉換器，剩下的都屬於 06、09、10 號：
+
+```text
+core/gallery: 3 in 3 files
+core/html: 8 in 4 files
+core/image: 93 in 18 files
+envira/envira-gallery: 83 in 10 files
+img: 6 in 4 files
+jetpack/image-compare: 72 in 6 files
+```
