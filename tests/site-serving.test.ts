@@ -10,7 +10,6 @@ import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import { parse } from 'node-html-parser';
 import {
 	type Browser,
-	type BrowserContext,
 	type BrowserContextOptions,
 	chromium,
 	type Locator,
@@ -66,23 +65,31 @@ function get(path: string): Promise<Response> {
 }
 
 // A browser, for what only a browser decides: which image of a srcset it
-// loads, what JavaScript does. Started when first needed; tests using it get
-// more time than the default 5 seconds.
+// loads, what JavaScript does. One Chromium for every test, started when
+// first needed; each test opens its own context. Tests using it get more
+// time than the default 5 seconds.
 let sharedBrowser: Promise<Browser> | undefined;
 const BROWSER_TEST_TIMEOUT = 60_000;
+
+function browser(): Promise<Browser> {
+	// Headless Chromium jumps where a page asks for a smooth scroll, unless
+	// told not to: the 回到頂部 button's tests watch it scroll.
+	sharedBrowser ??= chromium.launch({ args: ['--enable-smooth-scrolling'] });
+	return sharedBrowser;
+}
 
 afterAll(async () => {
 	await (await sharedBrowser)?.close();
 });
 
 /**
- * A page of the site opened in a browser window of this size and pixel
- * density, with the JavaScript it loaded (files and inline scripts). Only the
- * site itself is reached: no YouTube thumbnails or videos from R2.
+ * A page of the site opened in a new browser context with these options (by
+ * default a 1280 × 800 window), with the JavaScript it loaded (files and
+ * inline scripts). Only the site itself is reached: no YouTube thumbnails or
+ * videos from R2.
  */
-async function openPage(path: string, viewport = { width: 1280, height: 800 }, deviceScaleFactor = 1) {
-	sharedBrowser ??= chromium.launch();
-	const context = await (await sharedBrowser).newContext({ viewport, deviceScaleFactor });
+async function openPage(path: string, options: BrowserContextOptions = {}) {
+	const context = await (await browser()).newContext({ viewport: { width: 1280, height: 800 }, ...options });
 	await context.route((url) => url.origin !== server!.url, (route) => route.abort());
 	const page = await context.newPage();
 	const scriptFiles: Promise<string>[] = [];
@@ -91,6 +98,7 @@ async function openPage(path: string, viewport = { width: 1280, height: 800 }, d
 	});
 	await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
 	return {
+		context,
 		page,
 		scripts: async () => [...(await Promise.all(scriptFiles)), ...(await page.locator('script:not([src])').allTextContents())],
 		close: () => context.close(),
@@ -231,7 +239,7 @@ describe('images', () => {
 		[{ width: 390, height: 844 }, 3],
 		[{ width: 360, height: 780 }, 2],
 	])('in posts are webp in several widths, of which a %o screen at %ix loads one as wide as the post’s column', async (viewport, density) => {
-		const { page, close } = await openPage(POST, viewport, density);
+		const { page, close } = await openPage(POST, { viewport, deviceScaleFactor: density });
 		const { shown, loaded, url, widths } = await loadedImage(page, 'main img[alt="頁面預覽"]');
 		await close();
 
@@ -339,7 +347,7 @@ describe('galleries', () => {
 		[{ width: 1440, height: 900 }, 1],
 		[{ width: 390, height: 844 }, 3],
 	])('show small images of the photos on a %o screen at %ix, not the photos at full size', async (viewport, density) => {
-		const { page, close } = await openPage(DAY_2, viewport, density);
+		const { page, close } = await openPage(DAY_2, { viewport, deviceScaleFactor: density });
 		const { shown, loaded } = await loadedImage(page, 'main figure.gallery img');
 		await close();
 
@@ -726,16 +734,6 @@ describe('layout', () => {
 		// WCAG's reflow width: content fits 320 CSS pixels without scrolling sideways.
 		const PHONE = { width: 320, height: 640 };
 
-		let browser: Browser | undefined;
-
-		beforeAll(async () => {
-			browser = await chromium.launch();
-		}, 60_000);
-
-		afterAll(async () => {
-			await browser?.close();
-		});
-
 		/** Every post, as UTF-8 paths, from the build output. */
 		function postPaths(): string[] {
 			return readdirSync(outDir, { recursive: true, encoding: 'utf8' })
@@ -752,10 +750,7 @@ describe('layout', () => {
 				...['/about/', '/about/autobiography/', '/about/contact/', '/subscribe/', '/policy/'],
 				...posts,
 			];
-			const context = await browser!.newContext({ viewport: PHONE });
-			// Only the site itself: no YouTube thumbnails or videos from R2.
-			await context.route((url) => url.origin !== server!.url, (route) => route.abort());
-			const page = await context.newPage();
+			const { page, close } = await openPage(paths[0]!, { viewport: PHONE });
 
 			const overflowing: Record<string, unknown> = {};
 			for (const path of paths) {
@@ -782,7 +777,7 @@ describe('layout', () => {
 				});
 				if (overflow) overflowing[path] = overflow;
 			}
-			await context.close();
+			await close();
 
 			expect(overflowing).toEqual({});
 		}, 120_000);
@@ -792,29 +787,17 @@ describe('layout', () => {
 		const LONG_POST = '/2021/11/30/電子紙閱讀器使用心得/';
 		const DESKTOP = { width: 1280, height: 720 };
 
-		let browser: Browser | undefined;
-		let context: BrowserContext | undefined;
-
-		beforeAll(async () => {
-			// Headless Chromium jumps where a page asks for a smooth scroll, unless told not to.
-			browser = await chromium.launch({ args: ['--enable-smooth-scrolling'] });
-		}, 60_000);
+		let close: (() => Promise<void>) | undefined;
 
 		afterEach(async () => {
-			await context?.close();
+			await close?.();
 		});
 
-		afterAll(async () => {
-			await browser?.close();
-		});
-
-		/** The long post, in a fresh browser tab with these options; only the site itself loads. */
+		/** The long post, in a fresh browser tab with these options. */
 		async function openLongPost(options: BrowserContextOptions = {}) {
-			context = await browser!.newContext({ viewport: DESKTOP, ...options });
-			await context.route((url) => url.origin !== server!.url, (route) => route.abort());
-			const page = await context.newPage();
-			await page.goto(new URL(LONG_POST, server!.url).href, { waitUntil: 'load' });
-			return { page, button: page.getByRole('button', { name: '回到頂部' }) };
+			const opened = await openPage(LONG_POST, { viewport: DESKTOP, ...options });
+			close = opened.close;
+			return { page: opened.page, button: opened.page.getByRole('button', { name: '回到頂部' }) };
 		}
 
 		/** Lets the page react to what just happened: scroll events come with the next frame. */
@@ -1057,27 +1040,14 @@ describe('layout', () => {
 });
 
 describe('search', () => {
-	let browser: Browser | undefined;
-
-	beforeAll(async () => {
-		browser = await chromium.launch();
-	}, 60_000);
-
-	afterAll(async () => {
-		await browser?.close();
-	});
-
-	/** Opens the home page in the browser, with nothing from other sites, and runs `use` on it. */
+	/** Opens the home page in the browser and runs `use` on it. */
 	async function onHomePage<T>(use: (page: Page) => Promise<T>): Promise<T> {
-		const context = await browser!.newContext();
-		await context.route((url) => url.origin !== server!.url, (route) => route.abort());
-		const page = await context.newPage();
+		const { page, close } = await openPage('/');
 		page.setDefaultTimeout(10_000);
 		try {
-			await page.goto(new URL('/', server!.url).href);
 			return await use(page);
 		} finally {
-			await context.close();
+			await close();
 		}
 	}
 
@@ -1545,22 +1515,9 @@ describe('converted content', () => {
 		}, 60_000);
 
 		describe('in a browser', () => {
-			let browser: Browser | undefined;
-
-			beforeAll(async () => {
-				browser = await chromium.launch();
-			}, 60_000);
-
-			afterAll(async () => {
-				await browser?.close();
-			});
-
-			/** A page with the slider in view, once its script has run; only the site itself loads. */
+			/** A page with the slider in view, once its script has run. */
 			async function openSlider(options: BrowserContextOptions = {}) {
-				const context = await browser!.newContext(options);
-				await context.route((url) => url.origin !== server!.url, (route) => route.abort());
-				const page = await context.newPage();
-				await page.goto(new URL(CONVERTED.mdx, server!.url).href);
+				const { context, page } = await openPage(CONVERTED.mdx, options);
 				const slider = page.locator('img-comparison-slider');
 				await slider.scrollIntoViewIfNeeded();
 				await expect.poll(() => slider.evaluate((element) => element.classList.contains('rendered'))).toBe(true);
@@ -1603,9 +1560,7 @@ describe('converted content', () => {
 			});
 
 			it('load their script only on pages that have a slider', async () => {
-				const context = await browser!.newContext();
-				await context.route((url) => url.origin !== server!.url, (route) => route.abort());
-				const page = await context.newPage();
+				const { page, close } = await openPage(CONVERTED.mdx);
 				const sliderScriptRan = async (path: string) => {
 					await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
 					return page.evaluate(() => customElements.get('img-comparison-slider') !== undefined);
@@ -1616,7 +1571,7 @@ describe('converted content', () => {
 				expect(await sliderScriptRan(CONVERTED.md)).toBe(false);
 				expect(await sliderScriptRan('/2025/05/17/travel-setonaikai-2025-day1/')).toBe(false);
 				expect(await sliderScriptRan('/2021/11/30/電子紙閱讀器使用心得/')).toBe(false);
-				await context.close();
+				await close();
 			});
 		});
 	});
@@ -2121,23 +2076,13 @@ describe('SEO head', () => {
 	});
 
 	describe('GA4', () => {
-		let browser: Browser | undefined;
-
-		beforeAll(async () => {
-			browser = await chromium.launch();
-		}, 60_000);
-
-		afterAll(async () => {
-			await browser?.close();
-		});
-
 		/**
 		 * A browser in which the built site is at `origin`: the local server
 		 * answers for it. Google's script is not loaded for real: every other
 		 * site answers with an empty script, and the requests are recorded.
 		 */
 		async function siteAt(origin: string) {
-			const context = await browser!.newContext();
+			const context = await (await browser()).newContext();
 			const outside: string[] = [];
 			const errors: Error[] = [];
 			await context.route(
