@@ -20,9 +20,8 @@ export async function imageAt(file: string): Promise<ImageMetadata> {
  * component before a Markdown image. None if it refers to none.
  */
 export async function firstImage(entry: { filePath?: string; body?: string }): Promise<ImageMetadata | undefined> {
-	const path = /(?:\.\.\/)+assets\/images\/[^\n"'()<>]+?\.(?:avif|gif|jpe?g|png|svg|webp)\b/i.exec(entry.body ?? '')?.[0];
-	if (path === undefined || entry.filePath === undefined) return undefined;
-	return imageAt(posix.join(posix.dirname(entry.filePath.replaceAll('\\', '/')), decodeURI(path)));
+	const [file] = imagesIn(entry);
+	return file === undefined ? undefined : imageAt(file);
 }
 
 /**
@@ -42,9 +41,10 @@ export async function imageUrl(image: ImageMetadata): Promise<string> {
  * among them unless the content shows it too.
  */
 export function imagesIn({ filePath, body }: { filePath?: string; body?: string }): string[] {
-	const dir = posix.dirname(filePath!);
-	const paths = [...(body ?? '').matchAll(/[^\s'"()<>]*assets\/images\/[^\s'"()<>]+/g)].map(([path]) =>
-		posix.join(dir, path),
+	if (filePath === undefined) return [];
+	const dir = posix.dirname(filePath.replaceAll('\\', '/'));
+	const paths = [...(body ?? '').matchAll(/(?:\.\.\/)+assets\/images\/[^\n"'()<>]+?\.(?:avif|gif|jpe?g|png|svg|webp)\b/gi)].map(
+		([path]) => posix.join(dir, decodeURI(path)),
 	);
 	// Paths elsewhere, e.g. in a code block, are not the site's images.
 	return [...new Set(paths)].filter((path) => `/${path}` in images);
