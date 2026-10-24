@@ -966,6 +966,18 @@ describe('feeds', () => {
 		}
 	});
 
+	it('/feed/ items show the image files the post pages show', async () => {
+		for (const item of (await rss()).channel.item) {
+			const page = parseHtml(await (await get(new URL(item.link).pathname)).text());
+			const sources = (html: ReturnType<typeof parseHtml> | null) =>
+				new Set(html?.querySelectorAll('img').map((img) => new URL(img.getAttribute('src')!, 'https://aniya.moe/').href));
+
+			expect(sources(parseHtml(item['content:encoded'])), item.link).toEqual(
+				sources(page.querySelector('main article .prose')),
+			);
+		}
+	});
+
 	/** Every URL a feed item's HTML links to or loads, by attribute. */
 	function urlsIn(html: ReturnType<typeof parseHtml>) {
 		const attribute = (selector: string, name: string) =>
@@ -1038,11 +1050,15 @@ describe('feeds', () => {
 	});
 
 	// Feed readers run no scripts and load no stylesheets of the site.
-	it('/feed/ items have no scripts, stylesheets or controls that need them', async () => {
+	it('/feed/ items have no scripts, stylesheets, or controls and data attributes for them', async () => {
 		for (const item of (await rss()).channel.item) {
 			const html = parseHtml(item['content:encoded']);
 
 			expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName), item.link).toEqual([]);
+			const dataAttributes = html
+				.querySelectorAll('*')
+				.flatMap((element) => Object.keys(element.attributes).filter((name) => name.startsWith('data-')));
+			expect(new Set(dataAttributes), item.link).toEqual(new Set());
 		}
 	});
 
@@ -1053,7 +1069,7 @@ describe('feeds', () => {
 		expect(link?.querySelector('img')?.getAttribute('src')).toBe('https://i.ytimg.com/vi/x3_Pcru8SS8/hqdefault.jpg');
 		expect(link?.text).toContain('TVアニメ『Summer Pockets』第1弾PV');
 		expect(html.querySelector('.expressive-code pre')?.text).toContain("const routes = [{ path: '/nested' }]");
-		expect(html.querySelector('a[data-footnote-ref]')?.getAttribute('href')).toBe('#post-mdx-user-content-fn-1');
+		expect(html.querySelector('sup > a')?.getAttribute('href')).toBe('#post-mdx-user-content-fn-1');
 		expect(html.querySelectorAll('script, style, link, button').map(({ tagName }) => tagName)).toEqual([]);
 	});
 

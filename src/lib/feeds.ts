@@ -5,6 +5,7 @@ import { getContainerRenderer as mdxRenderer } from '@astrojs/mdx/container-rend
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
 import { getEntries, render } from 'astro:content';
+import MarkdownImage from '../components/MarkdownImage.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getPosts, type Post, postDescription, postPath, postUpdated } from './content';
 import { feedHtml } from './feed-html';
@@ -126,9 +127,9 @@ async function feedEntry(post: Post, site: URL): Promise<FeedEntry> {
 }
 
 /**
- * The content of a Markdown or MDX file (its `Content` component), as HTML
- * for feed readers (see feed-html.ts): components become what they render on
- * the server, without their scripts.
+ * The content of a Markdown or MDX file (its `Content` component), rendered
+ * as the post page renders it, as HTML for feed readers (see feed-html.ts):
+ * components become what they render on the server, without their scripts.
  */
 export async function feedContent(
 	Content: Parameters<AstroContainer['renderToString']>[0],
@@ -136,7 +137,10 @@ export async function feedContent(
 ): Promise<string> {
 	// MDX content needs MDX's renderer; Markdown content needs none.
 	const container = await AstroContainer.create({ renderers: await loadRenderers([mdxRenderer()]) });
-	return feedHtml(await container.renderToString(Content), options);
+	// The post page's components (src/pages/[year]/[month]/[day]/[slug].astro),
+	// so that images are the same files.
+	const html = await container.renderToString(Content, { props: { components: { img: MarkdownImage } } });
+	return feedHtml(html, options);
 }
 
 /** RSS's date format, as WordPress wrote it: `Fri, 23 Jan 2026 10:00:00 +0000`. */
