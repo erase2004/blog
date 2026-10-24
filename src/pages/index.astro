@@ -1,9 +1,9 @@
 ---
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import BaseLayout from '../layouts/BaseLayout.astro';
+// The home page: the 10 newest posts; older ones on /page/N/.
+import ArchiveLayout from '../layouts/ArchiveLayout.astro';
+import { archivePages, homeArchive } from '../lib/archives';
+
+const [page] = archivePages(await homeArchive());
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-	<h1>{SITE_TITLE}</h1>
-	<p>{SITE_DESCRIPTION}</p>
-</BaseLayout>
+<ArchiveLayout page={page!} />

@@ -1,0 +1,23 @@
+---
+// Test-only pages (tests/support/build-site.mjs): converted-content.md and
+// converted-content.mdx as /<path>/md/ and /<path>/mdx/.
+import * as md from './converted-content.md';
+import * as mdx from './converted-content.mdx';
+
+export function getStaticPaths() {
+	return [{ params: { format: 'md' } }, { params: { format: 'mdx' } }];
+}
+
+const { Content } = Astro.params.format === 'md' ? md : mdx;
+---
+
+<!doctype html>
+<html lang="zh-TW">
+	<head>
+		<meta charset="utf-8" />
+		<title>converted content</title>
+	</head>
+	<body>
+		<Content />
+	</body>
+</html>

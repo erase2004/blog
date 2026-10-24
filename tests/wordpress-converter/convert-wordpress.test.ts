@@ -3,7 +3,7 @@
 // the old-URL mapping table.
 import { describe, expect, it } from 'vitest';
 import { convertWordPress } from '../../scripts/wordpress-converter/convert';
-import { meta, post, wordpressTables } from './fixtures';
+import { addAttachments, attachment, meta, post, wordpressTables } from './fixtures';
 
 const files = () => convertWordPress(wordpressTables()).files;
 
@@ -82,12 +82,11 @@ wordpressId: 30
 		expect(() => convertWordPress(tables)).toThrow('Post 2000: post_date_gmt in Asia/Taipei is not its post_date');
 	});
 
-	it('keep the texts of their Gutenberg footnotes in the footnotes marker until ticket 08 converts them', () => {
+	it('have their Gutenberg footnotes as GFM footnotes, the texts taken from the post metadata', () => {
 		const file = files()['src/content/posts/acgn-museum-ssg.md']!;
 
-		expect(file).toContain(
-			'```html title="wp-unconverted: core/footnotes"\n<!-- wp:footnotes /-->\n' +
-				'<ol class="wp-block-footnotes"><li id="1e48c1c2-1de0"><a href="https://weathernews.jp/s/topics/202504/190065/">瀬戸内海で濃霧発生</a></li></ol>\n```',
+		expect(file).toMatch(
+			/\n記錄一個大型網站從 SSR 轉為 SSG 的完整過程。\[\^1\]\n\n\[\^1\]: \[瀬戸内海で濃霧発生\]\(https:\/\/weathernews\.jp\/s\/topics\/202504\/190065\/\)\n$/,
 		);
 	});
 });
@@ -353,8 +352,6 @@ describe('the old-URL mapping table', () => {
 				].map((url) => ({ url, expect: 'redirect' })),
 			),
 		);
-		// Videos and the PDF are ticket 07's.
-		expect(urls.map(({ url }) => url)).not.toContain('/2026/01/23/acgn-museum-ssg/fcp-01/');
 	});
 
 	it('answers the attachment pages and files of images nothing uses with 404: they do not move', () => {
@@ -402,7 +399,14 @@ describe('the old-URL mapping table', () => {
 
 describe('images', () => {
 	it('are copied into a folder of the first post using them, named without -scaled; unused ones are not', () => {
-		const { images } = convertWordPress(wordpressTables());
+		const tables = addAttachments(
+			wordpressTables(),
+			attachment({ id: 1871, parent: 1854, slug: 'fcp-01', file: '2026/01/fcp-01.mp4', mime: 'video/mp4' }),
+		);
+		const post1854 = tables.wp_posts!.find((row) => row.ID === '1854')!;
+		post1854.post_content +=
+			'\n\n<!-- wp:video {"id":1871} -->\n<figure class="wp-block-video"><video controls src="https://aniya.moe/wp-content/uploads/2026/01/fcp-01.mp4"></video></figure>\n<!-- /wp:video -->';
+		const { images } = convertWordPress(tables);
 
 		expect(images).toContainEqual({
 			upload: '2022/03/preview-1.png',

@@ -1,10 +1,20 @@
 // @ts-check
 
+import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
+import expressiveCode, { pluginFramesTexts } from 'astro-expressive-code';
 import { defineConfig, fontProviders } from 'astro/config';
 import imageRedirects from './src/integrations/image-redirects';
+import mediaRedirects from './src/integrations/media-redirects';
 import redirectsBudget from './src/integrations/redirects-budget';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
+
+// Expressive Code has no Chinese texts of its own.
+pluginFramesTexts.addLocale('zh-TW', {
+	terminalWindowFallbackTitle: '終端機視窗',
+	copyButtonTooltip: '複製到剪貼簿',
+	copyButtonCopied: '已複製！',
+});
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,11 +23,29 @@ export default defineConfig({
 	// as <path>/index.html.
 	trailingSlash: 'always',
 	build: { format: 'directory' },
+	markdown: {
+		// Astro's default Markdown processor and features, with the GFM
+		// footnotes section labelled in Chinese.
+		processor: satteri({
+			features: {
+				gfm: { footnotes: { label: '註腳', backLabel: '回到內文的註腳 {reference}' } },
+				smartPunctuation: true,
+			},
+		}),
+	},
 	// Images become webp in several widths (srcset), up to their own width;
 	// the browser picks the one that fits the screen.
 	image: { layout: 'constrained' },
+	// Expressive Code highlights code blocks (and must come before MDX).
 	// redirectsBudget() checks the _redirects the others wrote: keep it last.
-	integrations: [mdx(), trailingSlashRedirects(), imageRedirects(), redirectsBudget()],
+	integrations: [
+		expressiveCode({ defaultLocale: 'zh-TW' }),
+		mdx(),
+		mediaRedirects(),
+		trailingSlashRedirects(),
+		imageRedirects(),
+		redirectsBudget(),
+	],
 	fonts: [
 		{
 			provider: fontProviders.local(),

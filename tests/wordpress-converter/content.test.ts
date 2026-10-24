@@ -416,7 +416,7 @@ describe('images', () => {
 });
 
 describe('blocks left for later tickets', () => {
-	// One of each kind the backup has; converted by tickets 07–10.
+	// One of each kind the backup has; converted by tickets 09 and 10.
 	const blocks = {
 		'core/gallery': `<!-- wp:gallery {"linkTo":"none","align":"center"} -->
 <figure class="wp-block-gallery aligncenter has-nested-images columns-default is-cropped"><!-- wp:image {"id":500,"sizeSlug":"large","linkDestination":"none"} -->
@@ -432,23 +432,6 @@ describe('blocks left for later tickets', () => {
 		'core/html': `<!-- wp:html -->
 <figure class="wp-block-jetpack-image-compare"><div class="juxtapose" data-mode="horizontal"><img id="1762" src="https://aniya.moe/wp-content/uploads/2025/05/8a6a5bf6243acbe99900d2e8417652e7.jpg" alt="" width="1624" height="915" class="image-compare__image-before"/><img id="727" src="https://aniya.moe/wp-content/uploads/2025/05/pi_20250422_104948.jpg" alt="" width="1920" height="1080" class="image-compare__image-after"/></div><figcaption>結城友奈は勇者である中出現的展望台</figcaption></figure>
 <!-- /wp:html -->`,
-		'core/code': `<!-- wp:code {"lineNumbers":false} -->
-<pre title="src/router/index.js" class="wp-block-code"><code lang="javascript" class="language-javascript">{ // Nested Route 的 Route 物件
-  component: () =&gt; import('@/views/NestedRoute.vue'),
-}</code></pre>
-<!-- /wp:code -->`,
-		'core/footnotes': '<!-- wp:footnotes /-->',
-		'core/embed': `<!-- wp:embed {"url":"https://www.youtube.com/watch?v=x3_Pcru8SS8","type":"video","providerNameSlug":"youtube","responsive":true,"className":"wp-embed-aspect-16-9 wp-has-aspect-ratio"} -->
-<figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio"><div class="wp-block-embed__wrapper">
-https://www.youtube.com/watch?v=x3_Pcru8SS8
-</div></figure>
-<!-- /wp:embed -->`,
-		'core/video': `<!-- wp:video {"id":1403,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103131827.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->`,
-		'core/file': `<!-- wp:file {"id":459,"href":"https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf","displayPreview":false} -->
-<div class="wp-block-file"><a id="wp-block-file--media-e5b93318" href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" target="_blank" rel="noreferrer noopener">瀨戶內國際藝術祭 2025 旅遊計畫</a><a href="https://aniya.moe/wp-content/uploads/2025/05/瀨戶內國際藝術祭-2025-3.pdf" class="wp-block-file__button wp-element-button" download aria-describedby="wp-block-file--media-e5b93318">下載</a></div>
-<!-- /wp:file -->`,
 		'core/quote': `<!-- wp:quote -->
 <blockquote class="wp-block-quote"><p>No rule converts quotes: the site has none.</p></blockquote>
 <!-- /wp:quote -->`,
@@ -474,24 +457,6 @@ https://www.youtube.com/watch?v=x3_Pcru8SS8
 		const block = '<!-- wp:quote -->\n<blockquote><p>```</p></blockquote>\n<!-- /wp:quote -->';
 
 		expect(markdownOf(block)).toBe(`\`\`\`\`html title="wp-unconverted: core/quote"\n${block}\n\`\`\`\`\n`);
-	});
-});
-
-describe('text left for later tickets', () => {
-	// Footnotes (ticket 08).
-	const pieces = {
-		'[ref]':
-			'[ref]<a rel="noreferrer noopener" href="https://thegeekpage.com/visual-c-runtime-library-error/" target="_blank">Fix Microsoft Visual C++ Runtime Library Error</a>[/ref]',
-		'sup[data-fn]':
-			'<sup data-fn="a7805dd0-74e1-4b06-83df-fc66858a6a2c" class="fn"><a id="a7805dd0-74e1-4b06-83df-fc66858a6a2c-link" href="#a7805dd0-74e1-4b06-83df-fc66858a6a2c">13</a></sup>',
-	};
-
-	it.each(Object.entries(pieces))('keeps %s as it was, visibly marked', (kind, piece) => {
-		const { markdown, unconverted } = convertContent(paragraphBlock(`問題${piece}。`));
-
-		expect(markdown).toBe(`問題\`wp-unconverted: ${piece}\`。\n`);
-		expect(unconverted).toEqual([{ kind, source: piece }]);
-		expect(() => compileMdx(markdown)).not.toThrow();
 	});
 });
 

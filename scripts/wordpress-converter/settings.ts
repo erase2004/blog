@@ -8,3 +8,6 @@ export const WORDPRESS_UPLOADS = 'D:/wordpress-backup/wp-content/uploads';
 
 /** The site's origin; links to it become site-relative paths. Must equal the WordPress `home` option. */
 export const SITE_ORIGIN = 'https://aniya.moe';
+
+/** Where the videos and the PDF are served from: the custom domain of the R2 bucket `media` (ticket 07). */
+export const MEDIA_ORIGIN = 'https://media.aniya.moe';

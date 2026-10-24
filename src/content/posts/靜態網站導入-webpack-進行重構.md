@@ -10,7 +10,7 @@ draft: false
 wordpressId: 265
 ---
 
-這次將 ACGN股市歷史博物館`wp-unconverted: [ref]<a href="https://museum.acgn-stock.com/" data-type="URL" data-id="https://museum.acgn-stock.com/" target="_blank" rel="noreferrer noopener">ACGN股市歷史博物館</a>[/ref]` 的頁面，從原先只有單純的 HTML、CSS和JavaScript，逐一導入 webpack 和 loader 套件，鋪設基礎建設後，使其更利於未來的開發與維護。
+這次將 ACGN股市歷史博物館[^1] 的頁面，從原先只有單純的 HTML、CSS和JavaScript，逐一導入 webpack 和 loader 套件，鋪設基礎建設後，使其更利於未來的開發與維護。
 
 <figure>
 
@@ -19,15 +19,15 @@ wordpressId: 265
 <figcaption>導入前的專案目錄截圖，<a href="https://github.com/erase2004/museum-landmark/tree/ef6284d0e6e99def41456fcc0b87a53a28f9a3b2">commit 連結</a></figcaption>
 </figure>
 
-這次執行過程，主要是受到這篇文章`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://www.sitepoint.com/bundle-static-site-webpack/" data-type="URL" data-id="https://www.sitepoint.com/bundle-static-site-webpack/" target="_blank">How to Bundle a Simple Static Site Using Webpack</a>[/ref]`的啟發，同時，也參考該篇文章的操作流程，進行專案導入 webpack 的處理，也藉由操作的過程，更加熟悉 webpack 生態系。以下，將依序介紹這次導入的相關工具，以及他們的使用場景。
+這次執行過程，主要是受到這篇文章[^2]的啟發，同時，也參考該篇文章的操作流程，進行專案導入 webpack 的處理，也藉由操作的過程，更加熟悉 webpack 生態系。以下，將依序介紹這次導入的相關工具，以及他們的使用場景。
 
 ### Yarn
 
-專案套件管理的基礎，在後續處理專案安全漏洞問題時，使用 Yarn 提供的 Selective dependency resolutions`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/" data-type="URL" data-id="https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/" target="_blank">Selective dependency resolutions | Yarn</a>[/ref]` 功能，在 package.json 檔裡設定 resolution，有限地解決部份安全漏洞。
+專案套件管理的基礎，在後續處理專案安全漏洞問題時，使用 Yarn 提供的 Selective dependency resolutions[^3] 功能，在 package.json 檔裡設定 resolution，有限地解決部份安全漏洞。
 
 ### webpack 5
 
-專案打包工具，將專案依照設定，打包成滿足特定情境需求的版本，由於 webpack 5 有提供 Asset Modules`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://webpack.js.org/guides/asset-modules/" target="_blank">Asset Modules</a>[/ref]` 的功能，不用再像以往，需要使用 raw-loader, url-loader 和 file-loader 之類。
+專案打包工具，將專案依照設定，打包成滿足特定情境需求的版本，由於 webpack 5 有提供 Asset Modules[^4] 的功能，不用再像以往，需要使用 raw-loader, url-loader 和 file-loader 之類。
 
 #### ．babel-loader
 
@@ -51,7 +51,7 @@ wordpressId: 265
 
 #### ．webpack-dev-server
 
-供專案開發時使用的網頁伺服器，並利用其 HMR (`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://webpack.js.org/concepts/hot-module-replacement/" data-type="URL" data-id="https://webpack.js.org/concepts/hot-module-replacement/" target="_blank">Hot Module Replacement | webpack</a>[/ref]`) 特性，讓程式碼在被修改後，能夠立即在網頁上呈現，進而提昇開發效率。
+供專案開發時使用的網頁伺服器，並利用其 HMR ([^5]) 特性，讓程式碼在被修改後，能夠立即在網頁上呈現，進而提昇開發效率。
 
 ## browserlist
 
@@ -75,7 +75,7 @@ wordpressId: 265
 
 ### ESLint、babel-eslint
 
-依照設定的規則，檢查 JavaScript 原始碼的程式語法，並提出修改建議，以達成程式碼美化與風格上的統一。規劃未來將 babel-eslint 替換成 @babel/eslint-parser`wp-unconverted: [ref]<a href="https://babeljs.io/blog/2020/07/13/the-state-of-babel-eslint" data-type="URL" data-id="https://babeljs.io/blog/2020/07/13/the-state-of-babel-eslint" target="_blank" rel="noreferrer noopener">The State of babel-eslint | BABEL</a>[/ref]`。
+依照設定的規則，檢查 JavaScript 原始碼的程式語法，並提出修改建議，以達成程式碼美化與風格上的統一。規劃未來將 babel-eslint 替換成 @babel/eslint-parser[^6]。
 
 ## Stylelint
 
@@ -90,7 +90,7 @@ wordpressId: 265
 
 原先根目錄底下的 index.html 搬移到 src 目錄底下管理，同時，assets 目錄底下的 JavaScript 和 CSS 的程式碼，以及 favicon 檔案都也搬移到 src 目錄底下管理。又 images 底下的圖片檔也搬移到 src 目錄底下管理。專案根目錄多了 public 和 dist 目錄，前者用作開發時 devServer 使用，後者用作部屬版本的輸出目錄使用。
 
-新版本的專案要部屬前，先在正式環境上，參考教學`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://www.freecodecamp.org/news/a-b-testing-with-nginx-in-40-lines-of-code-d4f94397130a/" data-type="URL" data-id="https://www.freecodecamp.org/news/a-b-testing-with-nginx-in-40-lines-of-code-d4f94397130a/" target="_blank">A/B testing with NGINX in under 40 lines of code | freeCodeCamp</a>[/ref]``wp-unconverted: [ref]<a href="https://www.nginx.com/blog/performing-a-b-testing-nginx-plus/" data-type="URL" data-id="https://www.nginx.com/blog/performing-a-b-testing-nginx-plus/" target="_blank" rel="noreferrer noopener">Performing A/B Testing with NGINX and NGINX Plus</a>[/ref]`來修改 NGINX 設定，使其能夠同時服務新舊兩個版本，以利做 A/B 測試做對照。
+新版本的專案要部屬前，先在正式環境上，參考教學[^7][^8]來修改 NGINX 設定，使其能夠同時服務新舊兩個版本，以利做 A/B 測試做對照。
 
 <figure>
 
@@ -128,14 +128,14 @@ wordpressId: 265
 
 首先，導入 image-webpack-loader，來處理以往圖片壓縮處理人工操作的部份，在輸入檔案總共 62 MB 的情況下，原先人工操作的部份可以壓縮到 24 MB，使用該 plugin 來處理的話，則會壓縮到 32 MB，考量到自動化以及圖片並非全部一次載入，plugin 帶來的優劣還是可以接受的。
 
-接著，導入 Tailwind CSS`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://tailwindcss.com/" data-type="URL" data-id="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>[/ref]` 與 Flowbite`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://flowbite.com/" data-type="URL" data-id="https://flowbite.com/" target="_blank">Flowbite</a>[/ref]`，讓 CSS style 在撰寫與管理上更加清楚明瞭，並善用 html-webpack-loader 與 EJS`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://ejs.co/#promo" data-type="URL" data-id="https://ejs.co/#promo" target="_blank">EJS</a>[/ref]` 語法對 index.html 進行重構，最後，參考教學`wp-unconverted: [ref]<a rel="noreferrer noopener" href="https://css-tricks.com/the-complete-guide-to-lazy-loading-images/#aa-method-1-trigger-the-image-load-using-javascript-events" data-type="URL" data-id="https://css-tricks.com/the-complete-guide-to-lazy-loading-images/#aa-method-1-trigger-the-image-load-using-javascript-events" target="_blank">The Complete Guide to Lazy Loading&nbsp;Images | CSS-TRICKS</a>[/ref]`撰寫 image lazy-loading 處理。
+接著，導入 Tailwind CSS[^9] 與 Flowbite[^10]，讓 CSS style 在撰寫與管理上更加清楚明瞭，並善用 html-webpack-loader 與 EJS[^11] 語法對 index.html 進行重構，最後，參考教學[^12]撰寫 image lazy-loading 處理。
 
 重構完成後的網站，帶來以下好處：
 
 - 由於網站清單和圖片清單資料都抽出來獨立成檔案來管理，未來在新增對應資訊上的處理更加便捷。
 - 網站清單的呈現與操作在桌面端與移動端上更加友好。
 - 圖片可以完整的呈現，點擊圖片也能開啟對應賽季公司的詳細資訊頁。
-- 圖片顯示區塊有要載入圖片的**主要顏色**`wp-unconverted: [ref]<a href="https://onlinejpgtools.com/find-dominant-jpg-colors" data-type="URL" data-id="https://onlinejpgtools.com/find-dominant-jpg-colors" target="_blank" rel="noreferrer noopener">主要顏色的分析工具</a>[/ref]`作墊底顯示。
+- 圖片顯示區塊有要載入圖片的**主要顏色**[^13]作墊底顯示。
 - 圖片顯示區塊有載入動畫，能讓使用者更清楚圖片正在載入狀態。
 
 <figure>
@@ -156,3 +156,17 @@ wordpressId: 265
 <!-- /wp:image --><figcaption class="blocks-gallery-caption">PageSpeed Insight 的分析結果</figcaption></figure>
 <!-- /wp:gallery -->
 ```
+
+[^1]: [ACGN股市歷史博物館](https://museum.acgn-stock.com/)
+[^2]: [How to Bundle a Simple Static Site Using Webpack](https://www.sitepoint.com/bundle-static-site-webpack/)
+[^3]: [Selective dependency resolutions | Yarn](https://classic.yarnpkg.com/lang/en/docs/selective-version-resolutions/)
+[^4]: [Asset Modules](https://webpack.js.org/guides/asset-modules/)
+[^5]: [Hot Module Replacement | webpack](https://webpack.js.org/concepts/hot-module-replacement/)
+[^6]: [The State of babel-eslint | BABEL](https://babeljs.io/blog/2020/07/13/the-state-of-babel-eslint)
+[^7]: [A/B testing with NGINX in under 40 lines of code | freeCodeCamp](https://www.freecodecamp.org/news/a-b-testing-with-nginx-in-40-lines-of-code-d4f94397130a/)
+[^8]: [Performing A/B Testing with NGINX and NGINX Plus](https://www.nginx.com/blog/performing-a-b-testing-nginx-plus/)
+[^9]: [Tailwind CSS](https://tailwindcss.com/)
+[^10]: [Flowbite](https://flowbite.com/)
+[^11]: [EJS](https://ejs.co/#promo)
+[^12]: [The Complete Guide to Lazy Loading&nbsp;Images | CSS-TRICKS](https://css-tricks.com/the-complete-guide-to-lazy-loading-images/#aa-method-1-trigger-the-image-load-using-javascript-events)
+[^13]: [主要顏色的分析工具](https://onlinejpgtools.com/find-dominant-jpg-colors)

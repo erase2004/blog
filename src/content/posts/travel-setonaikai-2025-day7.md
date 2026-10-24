@@ -45,17 +45,15 @@ wordpressId: 1331
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1403,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103131827.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day7/20250426_103131827.mp4"></video>
+<figcaption>影片：鳴門漩渦</figcaption>
+</figure>
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1404,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250426_103338052.mp4"></video><figcaption class="wp-element-caption">影片：鳴門漩渦</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day7/20250426_103338052.mp4"></video>
+<figcaption>影片：鳴門漩渦</figcaption>
+</figure>
 
 ---
 
@@ -187,7 +185,7 @@ wordpressId: 1331
 
 我短暫整理一下，將右手大拇指往掌心靠，改用右手食指壓在大拇指的傷口上，將右手舉高超過頭頂，維持這樣的姿勢走回美術館。抵達美術館後，我借用美術館入口外的洗手間清洗傷口，更換濕紙巾，並繼續用右手食指做加壓止血，接著，搭上回程的高速巴士。
 
-在回程的路上，除了維持加壓止血，我也查詢可能會使用到的資料，包含描述受傷會使用到的單字`wp-unconverted: <sup data-fn="631175a9-8567-4660-9502-e2c2892349c9" class="fn"><a href="#631175a9-8567-4660-9502-e2c2892349c9" id="631175a9-8567-4660-9502-e2c2892349c9-link">1</a></sup>`、醫療診所營業資訊`wp-unconverted: <sup data-fn="ee2e0f8e-f748-4acf-a6c0-47822336b1fe" class="fn"><a href="#ee2e0f8e-f748-4acf-a6c0-47822336b1fe" id="ee2e0f8e-f748-4acf-a6c0-47822336b1fe-link">2</a></sup>`和保險理賠險所需文件`wp-unconverted: <sup data-fn="36e3614a-ef3a-452c-a42b-5d5ede53fa25" class="fn"><a href="#36e3614a-ef3a-452c-a42b-5d5ede53fa25" id="36e3614a-ef3a-452c-a42b-5d5ede53fa25-link">3</a></sup>`。
+在回程的路上，除了維持加壓止血，我也查詢可能會使用到的資料，包含描述受傷會使用到的單字[^1]、醫療診所營業資訊[^2]和保險理賠險所需文件[^3]。
 
 ---
 
@@ -213,7 +211,6 @@ wordpressId: 1331
 
 ---
 
-```html title="wp-unconverted: core/footnotes"
-<!-- wp:footnotes /-->
-<ol class="wp-block-footnotes"><li id="631175a9-8567-4660-9502-e2c2892349c9"><a href="https://www.letsgojp.com/archives/449245/" target="_blank" rel="noopener" title="">在日本不慎受傷免驚慌，學會簡單日語讓你立刻派上用場！</a></li><li id="ee2e0f8e-f748-4acf-a6c0-47822336b1fe"><a href="https://www.jnto.go.jp/emergency/chc/mi_guide.html" target="_blank" rel="noopener" title="">讓您的日本之旅更加安心 - 身體不適之時 應急指南 | 日本：官方指南</a></li><li id="36e3614a-ef3a-452c-a42b-5d5ede53fa25"><a href="https://b2c.518fb.com/TravelHouseKeeper/qa#" target="_blank" rel="noopener" title="">富邦產險 - 旅遊小管家</a></li></ol>
-```
+[^1]: [在日本不慎受傷免驚慌，學會簡單日語讓你立刻派上用場！](https://www.letsgojp.com/archives/449245/)
+[^2]: [讓您的日本之旅更加安心 - 身體不適之時 應急指南 | 日本：官方指南](https://www.jnto.go.jp/emergency/chc/mi_guide.html)
+[^3]: [富邦產險 - 旅遊小管家](https://b2c.518fb.com/TravelHouseKeeper/qa#)

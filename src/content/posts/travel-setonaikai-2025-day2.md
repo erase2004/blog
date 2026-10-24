@@ -199,11 +199,9 @@ wordpressId: 552
 <!-- /wp:envira/envira-gallery -->
 ```
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":653,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls src="https://aniya.moe/wp-content/uploads/2025/05/20250421_172759284.mp4"></video></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls preload="metadata" src="https://media.aniya.moe/videos/travel-setonaikai-2025-day2/20250421_172759284.mp4"></video>
+</figure>
 
 <sup>*影片：從渡輪後方拍攝一閃一閃的海面*</sup>
 

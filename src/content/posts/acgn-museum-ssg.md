@@ -129,11 +129,10 @@ wordpressId: 1854
 
 第六季以前，公司名稱和 ID 尚未綁定，會使公司在不同賽事季度切換的功能失靈，須額外撰寫[程式](https://github.com/erase2004/museum-tools/blob/main/src/scripts/fix-company-id-inconsistency.ts)來處理這問題，讓第六季以前的公司 ID，在不同賽季間盡可能相同。
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1859,"loop":true,"muted":true} -->
-<figure class="wp-block-video"><video controls loop muted src="https://aniya.moe/wp-content/uploads/2026/01/round-switch-01.mp4"></video><figcaption class="wp-element-caption">在不同賽季間切換瀏覽「初音未來」這家公司的資訊</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls loop muted preload="metadata" src="https://media.aniya.moe/videos/acgn-museum-ssg/round-switch-01.mp4"></video>
+<figcaption>在不同賽季間切換瀏覽「初音未來」這家公司的資訊</figcaption>
+</figure>
 
 以下是個別賽季的重要差異紀錄
 
@@ -213,11 +212,10 @@ wordpressId: 1854
 <figcaption>改善後的金管會紀錄頁的 performance 表現，網頁的載入時間被縮短，使用者可以更快看到網頁的初始畫面</figcaption>
 </figure>
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1871,"loop":true,"muted":true,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls loop muted src="https://aniya.moe/wp-content/uploads/2026/01/fcp-01.mp4"></video><figcaption class="wp-element-caption">先載入網頁，再載入後需的資料</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls loop muted preload="metadata" src="https://media.aniya.moe/videos/acgn-museum-ssg/fcp-01.mp4"></video>
+<figcaption>先載入網頁，再載入後需的資料</figcaption>
+</figure>
 
 ### 過多的資料清單導致捲動卡頓
 
@@ -234,11 +232,10 @@ wordpressId: 1854
 
 Tip: react-virtuoso 可以藉由 *totalListHeightChanged* 的參數，來[實現自動容器高度](https://github.com/petyosi/react-virtuoso/issues/37#issuecomment-2788229595)
 
-```html title="wp-unconverted: core/video"
-<!-- wp:video {"id":1874,"loop":true,"muted":true,"align":"center"} -->
-<figure class="wp-block-video aligncenter"><video controls loop muted src="https://aniya.moe/wp-content/uploads/2026/01/virtualized-view-01-1.mp4"></video><figcaption class="wp-element-caption">股市總覽頁總共有 3000 多筆資料，使用 virtualized window 技巧後，不論滾動多少，都能維持流暢的體驗</figcaption></figure>
-<!-- /wp:video -->
-```
+<figure>
+<video controls loop muted preload="metadata" src="https://media.aniya.moe/videos/acgn-museum-ssg/virtualized-view-01-1.mp4"></video>
+<figcaption>股市總覽頁總共有 3000 多筆資料，使用 virtualized window 技巧後，不論滾動多少，都能維持流暢的體驗</figcaption>
+</figure>
 
 ### Build 速度最佳化
 

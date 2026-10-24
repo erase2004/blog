@@ -89,6 +89,7 @@ export function attachment({
 		width: 2560,
 		height: 1920,
 		file,
+		filesize: 100000,
 		sizes: Object.fromEntries(sizes.map((size, i) => [`size-${i}`, { file: size, width: 300, height: 225 }])),
 		...(original ? { original_image: original } : {}),
 	};
@@ -120,7 +121,7 @@ const paragraph = (html: string) => `<!-- wp:paragraph -->\n<p>${html}</p>\n<!--
 const image = (src: string) =>
 	`<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="${src}" alt=""/></figure>\n<!-- /wp:image -->`;
 
-/** The media library: images posts use, one nothing uses, a video. */
+/** The media library: images posts use, one nothing uses, the site's own images. */
 function mediaLibrary() {
 	return [
 		// The featured image of post 442, its AIOSEO social image.
@@ -163,7 +164,6 @@ function mediaLibrary() {
 			file: '2021/10/Snipaste_2021-10-21_16-04-26.png',
 			mime: 'image/png',
 		}),
-		attachment({ id: 1871, parent: 1854, slug: 'fcp-01', file: '2026/01/fcp-01.mp4', mime: 'video/mp4' }),
 		// The site's own images: AIOSEO's default social image, the theme's header image, the site icon.
 		attachment({ id: 41, slug: 'night', file: '2021/09/night.png', mime: 'image/png', sizes: ['night-300x300.png'] }),
 		attachment({ id: 28, slug: 'cropped-akiba07-scaled-3-jpg', file: '2021/09/cropped-akiba07-scaled-3.jpg' }),
@@ -265,9 +265,10 @@ function tablesWithoutMedia(): Tables {
 				post_title: '從 SSR 到 SSG：ACGN 股市歷史博物館 7 萬頁靜態化的實戰轉型紀錄',
 				post_name: 'acgn-museum-ssg',
 				post_content: [
-					paragraph('記錄一個大型網站從 SSR 轉為 SSG 的完整過程。'),
 					image('https://aniya.moe/wp-content/uploads/2025/05/si_20250418_220750_23-scaled.jpg'),
-					'<!-- wp:video {"id":1871} -->\n<figure class="wp-block-video"><video controls src="https://aniya.moe/wp-content/uploads/2026/01/fcp-01.mp4"></video></figure>\n<!-- /wp:video -->',
+					paragraph(
+						'記錄一個大型網站從 SSR 轉為 SSG 的完整過程。<sup data-fn="1e48c1c2-1de0" class="fn"><a id="1e48c1c2-1de0-link" href="#1e48c1c2-1de0">1</a></sup>',
+					),
 					'<!-- wp:footnotes /-->',
 				].join('\n\n'),
 			}),

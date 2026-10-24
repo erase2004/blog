@@ -1,0 +1,18 @@
+---
+// A tag archive, at its WordPress URL /tag/<slug>/ (/page/N/ after the first page).
+import ArchiveLayout from '../../../layouts/ArchiveLayout.astro';
+import { type ArchivePage, archivePages, pageParam, tagArchives } from '../../../lib/archives';
+
+export async function getStaticPaths() {
+	return (await tagArchives()).flatMap((archive) =>
+		archivePages(archive).map((page) => ({
+			params: { tag: archive.path.slice('/tag/'.length, -1), page: pageParam(page) },
+			props: { page },
+		})),
+	);
+}
+
+const { page } = Astro.props as { page: ArchivePage };
+---
+
+<ArchiveLayout page={page} />

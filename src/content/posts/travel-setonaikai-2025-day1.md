@@ -13,9 +13,9 @@ wordpressId: 493
 
 旅遊第一天，我從台灣搭乘飛機飛往岡山機場，接著在 JR 岡山站搭乘電車前往丸龜，最後入住東橫 INN 丸龜站。
 
-在旅途開始的前一天，瀨戶內海區域出現的濃霧情況`wp-unconverted: <sup data-fn="1e48c1c2-1de0-4d5a-b471-78275c7b96cb" class="fn"><a id="1e48c1c2-1de0-4d5a-b471-78275c7b96cb-link" href="#1e48c1c2-1de0-4d5a-b471-78275c7b96cb">1</a></sup>`，導致上午有部份的船班取消`wp-unconverted: <sup data-fn="90a4d1a6-dfde-447f-bc32-0c2a21365cd6" class="fn"><a id="90a4d1a6-dfde-447f-bc32-0c2a21365cd6-link" href="#90a4d1a6-dfde-447f-bc32-0c2a21365cd6">2</a></sup>`，因為有裝[官方的 App](https://setouchi-artfest.jp/access/app/#app-info)，所以知道這情況，有初步構想了遇到濃霧，導致船班取消的行程調整備案，不過還好整趟旅程都很幸運，都沒遇到這狀況，備案也就沒有被執行。
+在旅途開始的前一天，瀨戶內海區域出現的濃霧情況[^1]，導致上午有部份的船班取消[^2]，因為有裝[官方的 App](https://setouchi-artfest.jp/access/app/#app-info)，所以知道這情況，有初步構想了遇到濃霧，導致船班取消的行程調整備案，不過還好整趟旅程都很幸運，都沒遇到這狀況，備案也就沒有被執行。
 
-這次從台灣前往日本的航班是搭乘虎航 IT 714，從 TPE 飛往 OKJ，表定起飛時間是中午 12:50，不過實際起飛時間是 13:11`wp-unconverted: <sup data-fn="28257d8f-f6c9-4778-b739-89daf541ca2f" class="fn"><a id="28257d8f-f6c9-4778-b739-89daf541ca2f-link" href="#28257d8f-f6c9-4778-b739-89daf541ca2f">3</a></sup>`。午餐已經在機場內解決了，所以進到機艙坐下後，就是戴上耳塞和眼罩，想辦法睡到降落，由於這個航班在中午時段，似乎有不少人有預購機內餐，使得休息的過程中，不時可以聞到熱騰騰食物的氣味。
+這次從台灣前往日本的航班是搭乘虎航 IT 714，從 TPE 飛往 OKJ，表定起飛時間是中午 12:50，不過實際起飛時間是 13:11[^3]。午餐已經在機場內解決了，所以進到機艙坐下後，就是戴上耳塞和眼罩，想辦法睡到降落，由於這個航班在中午時段，似乎有不少人有預購機內餐，使得休息的過程中，不時可以聞到熱騰騰食物的氣味。
 
 <figure>
 
@@ -24,7 +24,7 @@ wordpressId: 493
 <figcaption>航班的資訊看板要到 12:00 時，才更新為 IT714</figcaption>
 </figure>
 
-由於是坐在靠窗的位置，飛機即將降落時，從窗外看出去的景色是一堆小山丘，推測岡山機場可能是在丘陵地上開闢的。飛機降落後到滑行到停機坪的時間其實很短，從窗外看到的機場大樓和停機坪數量，猜測比高松機場還小，後續查找相關資料`wp-unconverted: <sup data-fn="7166e23e-cb87-4bf8-b391-ada10d45842d" class="fn"><a id="7166e23e-cb87-4bf8-b391-ada10d45842d-link" href="#7166e23e-cb87-4bf8-b391-ada10d45842d">4</a></sup>` `wp-unconverted: <sup data-fn="87524452-247c-46d2-b9e4-c86a2cbe5155" class="fn"><a id="87524452-247c-46d2-b9e4-c86a2cbe5155-link" href="#87524452-247c-46d2-b9e4-c86a2cbe5155">5</a></sup>`，也證實這個猜測是正確的。
+由於是坐在靠窗的位置，飛機即將降落時，從窗外看出去的景色是一堆小山丘，推測岡山機場可能是在丘陵地上開闢的。飛機降落後到滑行到停機坪的時間其實很短，從窗外看到的機場大樓和停機坪數量，猜測比高松機場還小，後續查找相關資料[^4] [^5]，也證實這個猜測是正確的。
 
 飛機停妥到機艙門開啟，允許乘客解開安全帶，拿取行李下飛機前，已經有不少人解開安全帶要拿行李，於是，空服員便廣播請乘客坐下，稍安勿躁，在我搭過這麼多次飛機的經驗中，這是第一次聽到空服員廣播這內容（笑。
 
@@ -105,7 +105,8 @@ wordpressId: 493
 
 ---
 
-```html title="wp-unconverted: core/footnotes"
-<!-- wp:footnotes /-->
-<ol class="wp-block-footnotes"><li id="1e48c1c2-1de0-4d5a-b471-78275c7b96cb"><a href="https://weathernews.jp/s/topics/202504/190065/" target="_blank" rel="noopener" title="">瀬戸内海で濃霧発生　昼頃にかけて視界不良に注意</a></li><li id="90a4d1a6-dfde-447f-bc32-0c2a21365cd6"><a href="https://www.shikokukisen.com/news/traffic-info/entry-925.html" target="_blank" rel="noopener" title="">【2025/4/19 運航見合せ】全航路（2025/4/19 08:30現在） 四国汽船株式会社</a></li><li id="28257d8f-f6c9-4778-b739-89daf541ca2f"><a href="https://zh-tw.flightaware.com/live/flight/TTW714/history/20250420/0500Z/RCTP/RJOB" target="_blank" rel="noopener" title="">IT714 (TTW714) Tigerair 航班跟蹤和歷史資料 2025年 04月 20日 (TPE / RCTP-OKJ / RJOB) - FlightAware</a></li><li id="7166e23e-cb87-4bf8-b391-ada10d45842d"><a href="https://www.okayama-airport.org/about#about" target="_blank" rel="noopener" title="">岡山桃太郎空港について</a></li><li id="87524452-247c-46d2-b9e4-c86a2cbe5155"><a href="https://www.takamatsu-airport.com/assets/docments/doc_footer_20180327-02.pdf" target="_blank" rel="noopener" title="">マスタープラン | 高松空港株式会社</a></li></ol>
-```
+[^1]: [瀬戸内海で濃霧発生　昼頃にかけて視界不良に注意](https://weathernews.jp/s/topics/202504/190065/)
+[^2]: [【2025/4/19 運航見合せ】全航路（2025/4/19 08:30現在） 四国汽船株式会社](https://www.shikokukisen.com/news/traffic-info/entry-925.html)
+[^3]: [IT714 (TTW714) Tigerair 航班跟蹤和歷史資料 2025年 04月 20日 (TPE / RCTP-OKJ / RJOB) - FlightAware](https://zh-tw.flightaware.com/live/flight/TTW714/history/20250420/0500Z/RCTP/RJOB)
+[^4]: [岡山桃太郎空港について](https://www.okayama-airport.org/about#about)
+[^5]: [マスタープラン | 高松空港株式会社](https://www.takamatsu-airport.com/assets/docments/doc_footer_20180327-02.pdf)
