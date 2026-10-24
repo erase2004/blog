@@ -1105,3 +1105,68 @@ describe('feeds', () => {
 		});
 	});
 });
+
+// Expected values from WordPress's sitemaps (tests/fixtures/wordpress-sitemap-2026-10-24/).
+describe('sitemap', () => {
+	const SNAPSHOT_DIR = fileURLToPath(new URL('./fixtures/wordpress-sitemap-2026-10-24/', import.meta.url));
+
+	/** Each page a sitemap lists, as a UTF-8 path, with the URLs of its images. */
+	function sitemapPages(xml: string): Map<string, string[]> {
+		const urlset = parseXml(xml, ['url', 'image:image']).urlset;
+		return new Map(
+			urlset.url.map((url: { loc: string; 'image:image'?: { 'image:loc': string }[] }) => [
+				decodeURI(new URL(url.loc.trim()).pathname),
+				(url['image:image'] ?? []).map((image) => image['image:loc'].trim()),
+			]),
+		);
+	}
+
+	/** The pages WordPress's sub-sitemaps listed, with their images. */
+	function wordpressPages(): Map<string, string[]> {
+		const index = readFileSync(join(SNAPSHOT_DIR, 'sitemap.xml'), 'utf8');
+		const subSitemaps = [...index.matchAll(/<loc><!\[CDATA\[(.*?)\]\]><\/loc>/g)].map(([, loc]) => loc!.split('/').pop()!);
+		return new Map(subSitemaps.flatMap((file) => [...sitemapPages(readFileSync(join(SNAPSHOT_DIR, file), 'utf8'))]));
+	}
+
+	async function newSitemap() {
+		const response = await get('/sitemap.xml');
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toMatch(/xml/);
+		return sitemapPages(await response.text());
+	}
+
+	it('lists the home page, posts, pages, categories and tags WordPress listed, and no date archives or later pages', async () => {
+		const listed = [...(await newSitemap()).keys()];
+
+		expect(listed.sort()).toEqual([...wordpressPages().keys()].sort());
+		expect(listed).toHaveLength(88);
+		expect(listed.filter((path) => /^\/\d{4}\/(\d{2}\/(\d{2}\/)?)?$|\/page\/\d+\/$/.test(path))).toEqual([]);
+	});
+
+	// WordPress also listed the one featured image (the prologue's), which
+	// Twenty Sixteen showed above the post; the new post page does not show it
+	// (it is only the post's og:image).
+	const FEATURED_IMAGE = 'https://aniya.moe/wp-content/uploads/2025/05/highlight.jpg';
+
+	it('lists under each post the new URLs of the images WordPress listed for it, but the featured image', async () => {
+		const listed = await newSitemap();
+		// An old image URL's new URL is where it redirects to.
+		const newUrl = async (old: string) => {
+			const response = await get(new URL(old).pathname);
+			expect(response.status, old).toBe(301);
+			return new URL(response.headers.get('location')!, 'https://aniya.moe/').href;
+		};
+
+		const expected: Record<string, string[]> = {};
+		const actual: Record<string, string[]> = {};
+		let count = 0;
+		for (const [path, images] of wordpressPages()) {
+			const shown = images.filter((image) => image !== FEATURED_IMAGE);
+			expected[path] = (await Promise.all(shown.map(newUrl))).sort();
+			actual[path] = [...(listed.get(path) ?? [])].sort();
+			count += shown.length;
+		}
+		expect(actual).toEqual(expected);
+		expect(count).toBe(771);
+	}, 120_000);
+});
