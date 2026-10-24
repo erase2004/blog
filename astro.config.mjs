@@ -7,7 +7,7 @@ import { defineConfig } from 'astro/config';
 import imageRedirects from './src/integrations/image-redirects';
 import mediaRedirects from './src/integrations/media-redirects';
 import notFoundPage from './src/integrations/not-found-page';
-import oldUrlRedirects from './src/integrations/old-url-redirects';
+import pageRedirects from './src/integrations/page-redirects';
 import pagefindIndex from './src/integrations/pagefind';
 import redirectsBudget from './src/integrations/redirects-budget';
 import trailingSlashRedirects from './src/integrations/trailing-slash-redirects';
@@ -54,7 +54,7 @@ export default defineConfig({
 		imageRedirects(),
 		notFoundPage(),
 		// Ends _redirects with its dynamic rules: keep it after the integrations that add static ones.
-		oldUrlRedirects(),
+		pageRedirects(),
 		pagefindIndex(),
 		redirectsBudget(),
 	],

@@ -13,21 +13,25 @@ const FEED_RULES = ['/*/feed/ /:splat/ 301', '/*/feed /:splat/ 301'];
 const isFeedOf = (url: string, location: string) => url === `${location}feed/`;
 
 /**
- * Adds `_redirects` rules for the old URLs the mapping table redirects to a
- * given URL of the site: a static `<old URL> <new URL> 301` rule for each
- * (the author page, the sitemaps, the comments feed, old slugs), and one for
- * the URL without its trailing slash, which WordPress redirected to the URL
- * with it; then the dynamic rules for the feeds. Not URLs with a query
- * string: the Worker answers them (src/worker.ts).
+ * Redirects the old URLs that the mapping table sends to a page of the site
+ * (or a feed, or the sitemap): old slugs, the author page, the comments feed,
+ * the old sitemaps, and the feeds of posts, pages and archives. The old URLs
+ * of images and of the videos and the PDF have integrations of their own
+ * (image-redirects.ts, media-redirects.ts).
+ *
+ * Adds a static `<old URL> <new URL> 301` rule to `_redirects` for each, and
+ * one for the URL without its trailing slash, which WordPress redirected to
+ * the URL with it; then the dynamic rules for the feeds. Not URLs with a
+ * query string: the Worker answers them (src/worker.ts).
  *
  * Static rules count towards the 2,000 a Worker may have, dynamic ones
  * towards 100, and every rule after the first dynamic one counts as dynamic:
  * keep this integration after the others that write `_redirects`.
  */
-export default function oldUrlRedirects(): AstroIntegration {
+export default function pageRedirects(): AstroIntegration {
 	let root: URL;
 	return {
-		name: 'old-url-redirects',
+		name: 'page-redirects',
 		hooks: {
 			'astro:config:done': ({ config }) => {
 				root = config.root;
