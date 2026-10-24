@@ -1563,38 +1563,95 @@ describe('SEO head', () => {
 		});
 	});
 
-	it('every kind of page counts its visit in the GA4 property of the WordPress site, G-NWNYVH87N4', async () => {
-		const browser = await chromium.launch();
-		try {
-			const context = await browser.newContext();
-			// Google's script is not loaded for real: only that the page asks for it.
+	describe('GA4', () => {
+		let browser: Browser | undefined;
+
+		beforeAll(async () => {
+			browser = await chromium.launch();
+		}, 60_000);
+
+		afterAll(async () => {
+			await browser?.close();
+		});
+
+		/**
+		 * A browser in which the built site is at `origin`: the local server
+		 * answers for it. Google's script is not loaded for real: every other
+		 * site answers with an empty script, and the requests are recorded.
+		 */
+		async function siteAt(origin: string) {
+			const context = await browser!.newContext();
 			const outside: string[] = [];
+			const errors: Error[] = [];
 			await context.route(
-				(url) => url.origin !== server!.url,
-				(route) => {
-					outside.push(route.request().url());
+				() => true,
+				async (route) => {
+					const url = new URL(route.request().url());
+					if (url.origin === server!.url) {
+						return route.continue();
+					}
+					if (url.origin === origin) {
+						// Redirects not followed here: the browser follows them, at `origin`.
+						const local = new URL(url.pathname + url.search, server!.url).href;
+						return route.fulfill({ response: await route.fetch({ url: local, maxRedirects: 0 }) });
+					}
+					outside.push(url.href);
 					return route.fulfill({ contentType: 'text/javascript', body: '' });
 				},
 			);
 			const page = await context.newPage();
-			const paths = ['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'];
-			const configs: Record<string, unknown> = {};
-			for (const path of paths) {
-				await page.goto(new URL(path, server!.url).href, { waitUntil: 'load' });
-				// What the page told gtag.js: its commands, queued in dataLayer.
-				configs[path] = await page.evaluate(() =>
-					((window as unknown as { dataLayer?: IArguments[] }).dataLayer ?? [])
-						.map((command) => Array.from(command))
-						.filter(([name]) => name === 'config'),
-				);
-			}
-
-			expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
-			expect(outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
-		} finally {
-			await browser.close();
+			page.on('pageerror', (error) => errors.push(error));
+			return {
+				/** The other sites' URLs the pages requested. */
+				outside,
+				/** Uncaught errors of the pages' scripts. */
+				errors,
+				/** Opens `path` at `origin`; returns what it told gtag.js, the commands queued in dataLayer, if any. */
+				async open(path: string, { referer }: { referer?: string } = {}) {
+					await page.goto(new URL(path, origin).href, { waitUntil: 'load', referer });
+					return page.evaluate(() =>
+						(window as unknown as { dataLayer?: IArguments[] }).dataLayer?.map((command) => Array.from(command)),
+					);
+				},
+				close: () => context.close(),
+			};
 		}
-	}, 60_000);
+
+		it('every kind of page on aniya.moe counts its visit in the GA4 property of the WordPress site, G-NWNYVH87N4', async () => {
+			const site = await siteAt('https://aniya.moe');
+			try {
+				const paths = ['/', '/page/2/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/contact/', '/tag/vue/', '/2025/05/', '/no-such-page/'];
+				const configs: Record<string, unknown> = {};
+				for (const path of paths) {
+					configs[path] = (await site.open(path))?.filter(([name]) => name === 'config');
+				}
+
+				expect(configs).toEqual(Object.fromEntries(paths.map((path) => [path, [['config', 'G-NWNYVH87N4']]])));
+				expect(site.outside).toContain('https://www.googletagmanager.com/gtag/js?id=G-NWNYVH87N4');
+				expect(site.errors).toEqual([]);
+			} finally {
+				await site.close();
+			}
+		}, 60_000);
+
+		// Visits to a preview deployment, or to the site run locally, are not
+		// readers' visits: they would count in the same GA4 property.
+		it('pages on any other host send nothing to GA4: a preview URL, a local server', async () => {
+			for (const origin of ['https://aniya-moe.example.workers.dev', server!.url]) {
+				const site = await siteAt(origin);
+				try {
+					for (const path of ['/', '/2021/11/30/電子紙閱讀器使用心得/', '/no-such-page/']) {
+						expect(await site.open(path), `${origin}${path}`).toBeUndefined();
+					}
+					// Posts load giscus, for their comments.
+					expect(site.outside.filter((url) => /\.google/.test(new URL(url).hostname)), origin).toEqual([]);
+					expect(site.errors, origin).toEqual([]);
+				} finally {
+					await site.close();
+				}
+			}
+		}, 60_000);
+	});
 
 	// It is served at every unknown URL; WordPress's 404 page had no canonical
 	// URL either (aniya.moe, 2026-10-24).

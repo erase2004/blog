@@ -37,11 +37,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title, description, article, breadcrumbs, robots = 'max-image-preview:large', canonical = true } = Astro.props;
 const image = await socialImageFile(Astro.props.image ?? (await socialImage()));
 const site = new URL('/', Astro.site);
-// Google's snippet. `gtag()` is global, so that the 404 page can send an event with it.
-const gtagConfig = `window.dataLayer = window.dataLayer || [];
-function gtag() { dataLayer.push(arguments); }
-gtag('js', new Date());
-gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});`;
+// Google's snippet, run only on the site's own host: visits to preview
+// deployments and local servers are not readers'. `gtag()` is global, so that
+// the 404 page can send an event with it; elsewhere it is not defined.
+const gtagScript = `https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`;
+const gtagSetup = `if (location.hostname === ${JSON.stringify(new URL(Astro.site!).hostname)}) {
+	window.dataLayer = window.dataLayer || [];
+	window.gtag = function gtag() { dataLayer.push(arguments); };
+	gtag('js', new Date());
+	gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});
+	const script = document.createElement('script');
+	script.async = true;
+	script.src = ${JSON.stringify(gtagScript)};
+	document.head.append(script);
+}`;
 ---
 
 <!-- Global Metadata -->
@@ -95,13 +104,9 @@ gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});`;
 {
 	/*
 	 * Google Analytics 4: the WordPress site's property, so visits before and
-	 * after the move can be compared. Not in `astro dev`, so that writing
-	 * posts locally does not count as visits.
+	 * after the move can be compared. Not in `astro dev`, and in a build only
+	 * on aniya.moe, so that writing posts locally and previews do not count as
+	 * visits.
 	 */
-	import.meta.env.PROD && (
-		<>
-			<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`} />
-			<script is:inline set:html={gtagConfig} />
-		</>
-	)
+	import.meta.env.PROD && <script is:inline set:html={gtagSetup} />
 }
