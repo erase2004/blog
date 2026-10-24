@@ -414,3 +414,81 @@ npm run convert-wordpress -- <其他 dump.sql>   # 換一份備份
 - `tests/wordpress-converter/convert-wordpress.test.ts`：用一個小型的 WordPress 資料（真實資料列刪減而成）轉換整個網站：frontmatter、時區、AIOSEO、頁面階層與描述（期望值是線上網站的實際描述）、分類與標籤資料檔、對應表的每一類舊網址、資料列順序不影響輸出。
 - `tests/site-serving.test.ts`（03 號）：對真正的建置結果跑網址檢查，22 篇文章與 5 個頁面在建置輸出與 HTTP 兩種模式都通過，待完成清單剛好列出還沒做的網址。
 - 加了 `satteri` 作為 devDependency，版本跟 Astro 用的同一個（0.10.5，npm 只裝一份），讓測試用跟網站一樣的引擎渲染 Markdown。
+
+## 07：影片與 PDF 搬到 R2（2026-10-24）
+
+### 上傳與檢查
+
+上傳需要 Cloudflare 的憑證，由站長在本機或 CI 執行；影片和 PDF 不進 repo。
+
+```sh
+npm run upload-media -- --dry-run      # 列出每個檔案要執行的 wrangler 指令，不上傳，不需要憑證
+npm run upload-media                   # 需要環境變數 CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID
+npm run upload-media -- --force        # 不管 R2 上有沒有，全部重新上傳
+npm run upload-media -- --backup <資料夾>   # 備份不在 D:/wordpress-backup 時
+npm run verify-media                   # 每個網址回 200、Content-Type 與大小正確，range request 回 206
+```
+
+- 檔案清單來自舊網址對應表的 `media` section（轉換器產生），每個檔案一行：WordPress 附件 ID、所屬文章、舊的 upload 路徑、附件頁、R2 上的網址、Content-Type、檔案大小。上傳、檢查和 `_redirects` 都讀這一份。
+- 每個檔案執行一次 `wrangler r2 object put media/<key> --file <備份裡的檔案> --content-type <type> --remote`。**wrangler 4 的 `r2 object` 指令預設操作本機的模擬 bucket，一定要加 `--remote`**。wrangler 單次上傳的上限是 300 MiB（最大的影片 77 MiB），所以都是單一 PUT。
+- **可以重複執行**：上傳前先對 R2 的網址發 HEAD，ETag 等於本機檔案的 MD5（單一 PUT 上傳的物件，R2 的 ETag 就是 MD5）且 Content-Type 相同就略過，所以中途失敗時重跑一次只會補傳缺的。這個 HEAD 加了一個 query string，避免檢查時的 404 被 Cloudflare 快取在真正的網址上。
+- 上傳前先確認備份裡每個檔案都在、大小跟 WordPress 記錄的（`_wp_attachment_metadata` 的 `filesize`）一致，有任何不符就一個都不傳。
+- `verify-media` 對每個網址發一般的 GET（只讀 header），再從檔案中間要 1,024 bytes（`<video>` 拖曳進度條時就是這樣要資料），檢查回 206、`Content-Range` 正確。舊網址有沒有轉到這裡，是網址檢查的工作。
+- 2026-10-24 對 `media.aniya.moe` 跑過 dry run 與 verify：9 個檔案都還沒上傳（404），備份裡的 9 個檔案大小都跟資料庫記錄一致。如果剛上傳完 verify 還看到 404，可能是 Cloudflare 快取了之前的 404，等幾分鐘再跑。
+
+### R2 上的位置
+
+`https://media.aniya.moe/videos/<文章 slug>/<檔名>`（影片）、`https://media.aniya.moe/files/<文章 slug>/<檔名>`（PDF），檔名不改。
+
+| 檔案 | 文章 | 大小 |
+|---|---|---|
+| `瀨戶內國際藝術祭-2025-3.pdf` | travel-setonaikai-2025-prologue | 0.6 MB |
+| `20250421_172759284.mp4` | travel-setonaikai-2025-day2 | 23 MiB |
+| `20250426_103131827.mp4`、`20250426_103338052.mp4` | travel-setonaikai-2025-day7 | 77 MiB、46 MiB |
+| `20250427_092603501.mp4` | travel-setonaikai-2025-day8 | 25 MiB |
+| `round-switch-01.mp4`、`fcp-01.mp4`、`virtualized-view-01.mp4`、`virtualized-view-01-1.mp4` | acgn-museum-ssg | 0.4–5.8 MiB |
+
+- 「文章」是內容裡用到這個檔案的那篇；沒有文章用到的，算它當初上傳到的那篇。備份裡兩種特例各一個：
+  - `20250426_103131827.mp4` 上傳時沒有附加到任何文章（`post_parent` 是 0），是 Day 7 用的，所以放在 Day 7。
+  - `virtualized-view-01.mp4` 沒有被任何內容用到（文章用的是重新上傳的 `virtualized-view-01-1.mp4`），照 issue 一樣搬，放在它上傳到的 acgn-museum-ssg。
+- 一個檔案被兩篇以上用到、或沒人用又沒有上傳到已發布文章時，轉換器會直接停下。
+- 8 支 mp4 共 187,229,733 bytes（178.6 MiB，issue 寫的 179 MB）。其中 2026 年的 4 支，WordPress 的 metadata 偵測成 `video/quicktime`，但附件類型與線上網站回的 Content-Type 都是 `video/mp4`，照 `video/mp4` 上傳。
+
+### 內容的轉換（`rules/media.ts`）
+
+- 影片 block 轉成 HTML，在 .md 與 .mdx 裡意思都一樣（測試用 Sätteri 渲染並編譯成 MDX 確認）：
+
+  ```html
+  <figure>
+  <video controls loop muted preload="metadata" src="https://media.aniya.moe/videos/acgn-museum-ssg/round-switch-01.mp4"></video>
+  <figcaption>在不同賽季間切換瀏覽「初音未來」這家公司的資訊</figcaption>
+  </figure>
+  ```
+
+  `loop`、`muted` 等只在原本有設定時保留。`preload="metadata"` 是 Gutenberg 影片 block 的預設值（預設值不寫進 HTML），寫出來讓瀏覽器一開始只抓影片長度和第一格，不會一進頁面就下載 77 MiB。置中的 class 跟其他 block 一樣不保留。
+- PDF 的 file block 轉成一個連結 `[瀨戶內國際藝術祭 2025 旅遊計畫](https://media.aniya.moe/files/…/瀨戶內國際藝術祭-2025-3.pdf)`。原本旁邊的「下載」按鈕是同一個檔案的第二個連結，不保留（它的 `download` 屬性對其他網域的檔案本來就無效）。
+- 05 號留下的 `core/video`（7 個）與 `core/file`（1 個）標記全部處理掉。找不到對應附件的影片或檔案仍然留下標記。
+
+### 舊網址
+
+- 9 個舊的 upload 路徑與 9 個附件頁，全部 301 直接轉到 R2 上的網址（附件頁不先轉到舊 upload 路徑，少一次轉址）。
+- 附件頁的網址照 WordPress 的 `get_attachment_link()`：附加在文章上的是 `<文章網址><附件 slug>/`（PDF 的 slug 是中文：`/2025/05/17/travel-setonaikai-2025-prologue/瀨戶內國際藝術祭-2025-3/`）；沒附加的在最上層：`/20250426_103131827/`。9 個都在線上網站確認過，WordPress 都是 301 到檔案本身（2026-10-24）。
+- `_redirects` 的規則由 `src/integrations/media-redirects.ts` 在建置時從 `media` section 產生，跟 01 號的斜線規則一樣用附加的方式寫進 `_redirects`，共 18 條靜態規則。**`_redirects` 裡第一條動態規則之後的規則都算動態規則**，13 號加動態規則時要放在這些規則後面。
+- 沒有涵蓋：`/?attachment_id=1403` 這種 query string（WordPress 會 301 到附件頁；spec 的 Worker 只處理 `?p=` 與 `?page_id=`）、附件頁少了結尾斜線的寫法、`/<文章網址>/attachment/<slug>/` 這種 WordPress 也接受的別名。
+
+### 待完成清單
+
+沒有變動：影片與 PDF 的網址不在 sitemap 快照裡，05 號也沒有把它們加進對應表，所以從來不在清單上。這次加進對應表的 18 筆預期在建置輸出與 HTTP 兩種模式都直接通過。
+
+### 測試
+
+- `tests/wordpress-converter/media.test.ts`：用 05 號的小型 WordPress 資料加上備份裡的影片與 PDF 附件（真實資料列刪減而成）：影片與 PDF 的轉換結果、資料夾怎麼決定（用到的文章、沒附加的、沒人用的）、附件頁網址、對應表的 `media` section 與轉址預期。
+- `tests/r2-media/upload.test.ts`：用暫存資料夾當備份、本機 HTTP server 模擬 `media.aniya.moe`、記錄呼叫的函式代替 wrangler：dry run 印出指令且不需要憑證、略過內容與類型相同的物件、內容或類型不同時重傳、`--force`、備份檔案缺少或大小不符時一個都不傳、沒有憑證不傳、wrangler 失敗時停下。
+- `tests/r2-media/verify.test.ts`：同一個模擬 server：正常時通過；檔案不存在、類型或大小不對、server 不支援 range request（回 200）時各自報錯。
+- `tests/site-serving.test.ts`（03 號）照舊對真正的建置結果跑網址檢查，現在包含這 18 筆轉址。
+
+### 還沒驗證（上傳之後）
+
+- R2 的自訂網域對 range request 回 206、中文檔名的 key 能用百分比編碼的網址讀到：`npm run verify-media` 會確認。
+- 在瀏覽器裡實際播放、拖曳進度條：上傳後打開 Day 7（77 MiB 那支）試。
+- HTTP 模式的網址檢查（預覽網址，19 號）確認正式環境的 `_redirects` 對 R2 的轉址。
