@@ -3,7 +3,7 @@
 // links to the pages with newer and older posts.
 import { getEntries } from 'astro:content';
 import type { ArchivePage } from '../lib/archives';
-import { formatSiteDate, postPath } from '../lib/content';
+import { displayTitle, formatSiteDate, postPath } from '../lib/content';
 import BaseLayout from './BaseLayout.astro';
 
 interface Props {
@@ -18,7 +18,11 @@ const posts = await Promise.all(
 );
 ---
 
-<BaseLayout title={page.title} description={page.description}>
+<BaseLayout
+	title={page.title}
+	description={page.description}
+	breadcrumbs={isHome ? undefined : [{ name: page.archive.name, path: page.archive.path }]}
+>
 	<Fragment slot="head">
 		{/* WordPress (AIOSEO) kept the pages after the first out of search results. */}
 		{page.number > 1 && <meta name="robots" content="noindex, nofollow" />}
@@ -40,7 +44,7 @@ const posts = await Promise.all(
 					</p>
 					<h2>
 						<a href={postPath(post)} rel="bookmark">
-							{post.data.title}
+							{displayTitle(post.data.title)}
 						</a>
 					</h2>
 					<p class="excerpt">{post.data.excerpt ?? post.data.description}</p>

@@ -4,13 +4,16 @@ import { getEntries, render } from 'astro:content';
 import { SITE_TITLE } from '../../../../consts';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import {
+	displayTitle,
 	formatSiteDate,
 	getPosts,
 	type Post,
 	postDescription,
+	postPath,
 	postUpdated,
 	siteDate,
 } from '../../../../lib/content';
+import { socialImage } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
 	return (await getPosts()).map((post) => ({
@@ -21,13 +24,30 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as { post: Post };
 const { Content } = await render(post);
-const { title, published } = post.data;
+const title = displayTitle(post.data.title);
+const { published } = post.data;
 const updated = postUpdated(post);
 const categories = await getEntries(post.data.categories);
 const tags = await getEntries(post.data.tags);
+const [category] = categories;
 ---
 
-<BaseLayout title={`${title} - ${SITE_TITLE}`} description={postDescription(post)}>
+<BaseLayout
+	title={`${title} - ${SITE_TITLE}`}
+	description={postDescription(post)}
+	image={await socialImage(post)}
+	article={{
+		headline: title,
+		published,
+		modified: updated,
+		categories: categories.map((category) => category.data.name),
+		tags: tags.map((tag) => tag.data.name),
+	}}
+	breadcrumbs={[
+		{ name: category!.data.name, path: `/category/${category!.id}/` },
+		{ name: title, path: postPath(post) },
+	]}
+>
 	<article class="post">
 		<header class="post-header">
 			<ul class="post-categories" aria-label="分類">
