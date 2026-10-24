@@ -63,6 +63,15 @@ export function pagePath(page: Page): string {
 	return `/${page.data.parent ? `${page.data.parent}/` : ''}${page.data.slug}/`;
 }
 
+/**
+ * When a post was last updated, as readers are told: its `updated` time, or
+ * its publish time for a scheduled post last edited before it went out.
+ */
+export function postUpdated(post: Post): Date {
+	const { published, updated } = post.data;
+	return updated > published ? updated : published;
+}
+
 /** The meta description of a post: its own description, else its excerpt. */
 export function postDescription(post: Post): string {
 	return post.data.description ?? post.data.excerpt!;
