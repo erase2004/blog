@@ -1170,3 +1170,17 @@ describe('sitemap', () => {
 		expect(count).toBe(771);
 	}, 120_000);
 });
+
+describe('robots.txt', () => {
+	it('names the sitemap, and keeps crawlers out of nothing now that there is no /wp-admin/', async () => {
+		const response = await get('/robots.txt');
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('content-type')).toMatch(/^text\/plain/);
+		const robots = await response.text();
+		expect(robots).toMatch(/^User-agent: \*$/m);
+		expect(robots).toMatch(/^Sitemap: https:\/\/aniya\.moe\/sitemap\.xml$/m);
+		expect(robots).not.toMatch(/wp-admin/);
+		expect(robots).not.toMatch(/^Disallow: *\S/im);
+	});
+});
