@@ -10,6 +10,8 @@ draft: false
 wordpressId: 265
 ---
 
+import Gallery from '../../components/Gallery.astro';
+
 這次將 ACGN股市歷史博物館[^1] 的頁面，從原先只有單純的 HTML、CSS和JavaScript，逐一導入 webpack 和 loader 套件，鋪設基礎建設後，使其更利於未來的開發與維護。
 
 <figure>
@@ -145,17 +147,14 @@ wordpressId: 265
 <figcaption>最終的專案目錄截圖</figcaption>
 </figure>
 
-```html title="wp-unconverted: core/gallery"
-<!-- wp:gallery {"linkTo":"none"} -->
-<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":288,"sizeSlug":"medium","linkDestination":"none"} -->
-<figure class="wp-block-image size-medium"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_18-20-37-300x188.png" alt="PageSpeed Insight 的分析結果 (行動裝置)" class="wp-image-288"/></figure>
-<!-- /wp:image -->
-
-<!-- wp:image {"id":289,"sizeSlug":"medium","linkDestination":"none"} -->
-<figure class="wp-block-image size-medium"><img src="https://aniya.moe/wp-content/uploads/2022/03/Snipaste_2022-03-30_18-20-48-300x190.png" alt="PageSpeed Insight 的分析結果 (電腦)" class="wp-image-289"/></figure>
-<!-- /wp:image --><figcaption class="blocks-gallery-caption">PageSpeed Insight 的分析結果</figcaption></figure>
-<!-- /wp:gallery -->
-```
+<Gallery
+	images={[
+		{ src: import('../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_18-20-37.png'), alt: 'PageSpeed Insight 的分析結果 (行動裝置)' },
+		{ src: import('../../assets/images/靜態網站導入-webpack-進行重構/Snipaste_2022-03-30_18-20-48.png'), alt: 'PageSpeed Insight 的分析結果 (電腦)' },
+	]}
+>
+PageSpeed Insight 的分析結果
+</Gallery>
 
 [^1]: [ACGN股市歷史博物館](https://museum.acgn-stock.com/)
 [^2]: [How to Bundle a Simple Static Site Using Webpack](https://www.sitepoint.com/bundle-static-site-webpack/)

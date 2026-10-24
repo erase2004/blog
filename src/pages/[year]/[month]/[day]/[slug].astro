@@ -2,6 +2,7 @@
 // A post, at its WordPress URL /YYYY/MM/DD/<slug>/.
 import { getEntries, render } from 'astro:content';
 import Comments from '../../../../components/Comments.astro';
+import MarkdownImage from '../../../../components/MarkdownImage.astro';
 import RelatedPosts from '../../../../components/RelatedPosts.astro';
 import ShareLinks from '../../../../components/ShareLinks.astro';
 import { SITE_TITLE } from '../../../../consts';
@@ -63,7 +64,7 @@ const socialImage = post.data.socialImage && new URL(await imageUrl(post.data.so
 			</dl>
 		</header>
 		<div class="prose">
-			<Content />
+			<Content components={{ img: MarkdownImage }} />
 		</div>
 		{
 			tags.length > 0 && (
