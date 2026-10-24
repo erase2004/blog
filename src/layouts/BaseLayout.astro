@@ -20,9 +20,11 @@ interface Props {
 	breadcrumbs?: Breadcrumb[];
 	/** The robots meta tag, if not the default: indexable, with large image previews. */
 	robots?: string;
+	/** False for the one page without a canonical URL: the 404 page. */
+	canonical?: boolean;
 }
 
-const { title, description, image, article, breadcrumbs, robots } = Astro.props;
+const { title, description, image, article, breadcrumbs, robots, canonical } = Astro.props;
 ---
 
 <!doctype html>
@@ -35,6 +37,7 @@ const { title, description, image, article, breadcrumbs, robots } = Astro.props;
 			article={article}
 			breadcrumbs={breadcrumbs}
 			robots={robots}
+			canonical={canonical}
 		/>
 		<slot name="head" />
 	</head>

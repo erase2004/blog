@@ -24,11 +24,17 @@ interface Props {
 	breadcrumbs?: Breadcrumb[];
 	/** The robots meta tag; by default, as on WordPress, indexable with large image previews. */
 	robots?: string;
+	/**
+	 * Whether the page names its URL as canonical (`<link rel="canonical">`,
+	 * og:url); every page does but the 404 page, which every unknown URL
+	 * answers with.
+	 */
+	canonical?: boolean;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, article, breadcrumbs, robots = 'max-image-preview:large' } = Astro.props;
+const { title, description, article, breadcrumbs, robots = 'max-image-preview:large', canonical = true } = Astro.props;
 const image = await socialImageFile(Astro.props.image ?? (await socialImage()));
 const site = new URL('/', Astro.site);
 // Google's snippet. `gtag()` is global, so that the 404 page can send an event with it.
@@ -51,7 +57,7 @@ gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});`;
 <meta name="theme-color" content="#1a1a1a" />
 
 <!-- Canonical URL -->
-<link rel="canonical" href={canonicalURL} />
+{canonical && <link rel="canonical" href={canonicalURL} />}
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
@@ -65,7 +71,7 @@ gtag('config', ${JSON.stringify(GA4_MEASUREMENT_ID)});`;
 <meta property="og:locale" content="zh_TW" />
 <meta property="og:site_name" content={`${SITE_TITLE} - ${SITE_DESCRIPTION}`} />
 <meta property="og:type" content={article ? 'article' : 'website'} />
-<meta property="og:url" content={canonicalURL} />
+{canonical && <meta property="og:url" content={canonicalURL} />}
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.site)} />

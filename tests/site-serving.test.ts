@@ -1548,6 +1548,15 @@ describe('SEO head', () => {
 		}
 	}, 60_000);
 
+	// It is served at every unknown URL; WordPress's 404 page had no canonical
+	// URL either (aniya.moe, 2026-10-24).
+	it.each(['/no-such-page/', '/2021/11/30/no-such-post/'])('the 404 page at %s names no canonical URL', async (path) => {
+		const html = parse(await (await get(path)).text());
+
+		expect(html.querySelector('head link[rel="canonical"]')?.getAttribute('href')).toBeUndefined();
+		expect(html.querySelector('head meta[property="og:url"]')?.getAttribute('content')).toBeUndefined();
+	});
+
 	it('link previews on X are summary cards, as on WordPress', async () => {
 		for (const path of ['/', '/2021/11/30/電子紙閱讀器使用心得/', '/about/']) {
 			const card = (await head(path)).querySelector('meta[name="twitter:card"]')?.getAttribute('content');
