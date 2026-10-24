@@ -22,17 +22,16 @@ export const images: UrlSource = ({ site, entries }) => {
 		uploads: [`${UPLOADS}${file}`, ...(original ? [`${UPLOADS}${original}`] : [])],
 		attachmentPage: attachmentPage(attachment, site, entryUrls),
 	}));
-	// Query strings are the Worker's (ticket 13); /?attachment_id= is not among them yet.
-	const paths = (urls: string[]) => urls.filter((url) => !url.includes('?'));
+	// Every attachment also had /?attachment_id=ID, which WordPress redirected
+	// to its attachment page; the Worker answers it (src/worker.ts).
+	const oldUrls = ({ wordpressId, uploads, attachmentPage: page }: { wordpressId: number; uploads: string[]; attachmentPage: string }) => [
+		...new Set([...uploads, page, `/?attachment_id=${wordpressId}`]),
+	];
 	return {
 		sections: { images: moved, unusedImages: orphans },
 		urls: [
-			...moved.flatMap(({ uploads, attachmentPage: page }) =>
-				paths([...uploads, page]).map((url) => ({ url, expect: 'redirect' as const })),
-			),
-			...orphans.flatMap(({ uploads, attachmentPage: page }) =>
-				paths([...uploads, page]).map((url) => ({ url, expect: 'not-found' as const })),
-			),
+			...moved.flatMap((image) => oldUrls(image).map((url) => ({ url, expect: 'redirect' as const }))),
+			...orphans.flatMap((image) => oldUrls(image).map((url) => ({ url, expect: 'not-found' as const }))),
 		],
 	};
 };

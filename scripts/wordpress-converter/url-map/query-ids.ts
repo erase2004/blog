@@ -1,6 +1,8 @@
 // `/?p=ID` and `/?page_id=ID`: WordPress redirected both, for any post or
 // page ID, to its permalink (redirect_canonical), and answered IDs it never
-// gave out with 404. The new site does the same in its Worker (ticket 13).
+// gave out with 404. The new site does the same in its Worker (src/worker.ts).
+// `/?attachment_id=ID` of the attachments is in images.ts and media.ts; an
+// ID never given out answers 404 there too.
 import type { UrlSource } from '../mapping-table.ts';
 
 export const queryIds: UrlSource = ({ site, entries }) => {
@@ -10,8 +12,7 @@ export const queryIds: UrlSource = ({ site, entries }) => {
 			...entries.flatMap(({ post, url }) =>
 				['p', 'page_id'].map((key) => ({ url: `/?${key}=${post.id}`, expect: 'redirect' as const, location: url })),
 			),
-			{ url: `/?p=${unusedId}`, expect: 'not-found' },
-			{ url: `/?page_id=${unusedId}`, expect: 'not-found' },
+			...['p', 'page_id', 'attachment_id'].map((key) => ({ url: `/?${key}=${unusedId}`, expect: 'not-found' as const })),
 		],
 	};
 };

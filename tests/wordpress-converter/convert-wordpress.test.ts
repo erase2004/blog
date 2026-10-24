@@ -197,7 +197,7 @@ describe('the old-URL mapping table', () => {
 				{ url: '/?page_id=1902', expect: 'not-found' },
 			]),
 		);
-		expect(urlsOf().filter(({ url }) => url.startsWith('/?'))).toHaveLength(2 * 7 + 2);
+		expect(urlsOf().filter(({ url }) => /^\/\?(p|page_id)=/.test(url))).toHaveLength(2 * 7 + 2);
 	});
 
 	it('redirects old slugs and old dates to the current URL', () => {
@@ -378,10 +378,30 @@ describe('the old-URL mapping table', () => {
 			wordpressId: 639,
 			file: 'src/assets/images/travel-setonaikai-2025-prologue/20250421_133752943.jpg',
 			uploads: ['/wp-content/uploads/2025/05/20250421_133752943-scaled.jpg', '/wp-content/uploads/2025/05/20250421_133752943.jpg'],
-			// Uploaded to an Envira gallery, it only had a query-string URL (left to the Worker, ticket 13).
+			// Uploaded to an Envira gallery, it only had a query-string URL.
 			attachmentPage: '/?attachment_id=639',
 		});
-		expect(urlsOf().map(({ url }) => url)).not.toContain('/?attachment_id=639');
+	});
+
+	// WordPress redirected /?attachment_id=ID of any attachment to its
+	// attachment page, which redirected to the file.
+	it('redirects /?attachment_id=ID of each moved image to the image; images nothing uses and IDs never given out answer 404', () => {
+		const urls = urlsOf();
+
+		expect(urls).toEqual(
+			expect.arrayContaining([
+				// Its only attachment page.
+				{ url: '/?attachment_id=639', expect: 'redirect' },
+				// One that also had an attachment page under its post.
+				{ url: '/?attachment_id=256', expect: 'redirect' },
+				// The site's own image.
+				{ url: '/?attachment_id=41', expect: 'redirect' },
+				{ url: '/?attachment_id=138', expect: 'not-found' },
+				{ url: '/?attachment_id=1902', expect: 'not-found' },
+			]),
+		);
+		// 10 moved images, 2 that nothing uses, and the ID never given out.
+		expect(urls.filter(({ url }) => url.startsWith('/?attachment_id='))).toHaveLength(10 + 2 + 1);
 	});
 
 	it('answers the WordPress system paths with 404', () => {

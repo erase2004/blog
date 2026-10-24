@@ -18,10 +18,12 @@ export const media: UrlSource = ({ site, entries }) => {
 		contentType: attachment.mimeType,
 		bytes,
 	}));
+	// /?attachment_id=ID too, which WordPress redirected to the attachment page
+	// (the Worker answers it, src/worker.ts).
 	return {
 		sections: { media: files },
-		urls: files.flatMap(({ upload, attachmentPage, url }) =>
-			[upload, ...(attachmentPage ? [attachmentPage] : [])].map((old) => ({
+		urls: files.flatMap(({ wordpressId, upload, attachmentPage, url }) =>
+			[upload, ...(attachmentPage ? [attachmentPage] : []), `/?attachment_id=${wordpressId}`].map((old) => ({
 				url: old,
 				expect: 'redirect' as const,
 				location: url,

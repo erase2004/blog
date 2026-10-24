@@ -1297,6 +1297,40 @@ describe('WordPress query-string URLs', () => {
 		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
 	});
 
+	// WordPress redirected /?attachment_id=ID of any attachment to its
+	// attachment page, which redirected to the file.
+	it('/?attachment_id=ID of a moved image redirects to the photo at full size, as its post links it', async () => {
+		// Uploaded to an Envira gallery of Day 2: this was its only attachment page.
+		const post = parse(await (await get('/2025/05/17/travel-setonaikai-2025-day2/')).text());
+		const photo = post
+			.querySelectorAll('main figure.gallery li a')
+			.map((link) => link.getAttribute('href')!)
+			.find((href) => href.includes('/20250421_133752943.'));
+
+		const response = await get('/?attachment_id=639');
+
+		expect(photo).toBeDefined();
+		expect(response.status).toBe(301);
+		expect(redirectTarget(response)).toEqual({ origin: server!.url, path: photo });
+	});
+
+	it('/?attachment_id=ID of a video redirects to the video on R2', async () => {
+		const response = await get('/?attachment_id=1403');
+
+		expect(response.status).toBe(301);
+		expect(response.headers.get('location')).toBe(
+			'https://media.aniya.moe/videos/travel-setonaikai-2025-day7/20250426_103131827.mp4',
+		);
+	});
+
+	// 21 is an image nothing used, which did not move; 1887 was never an ID.
+	it.each(['/?attachment_id=21', '/?attachment_id=1887'])('%s answers with HTTP 404 and the 404 page', async (path) => {
+		const response = await get(path);
+
+		expect(response.status).toBe(404);
+		expect(await response.text()).toBe(readFileSync(join(outDir, '404.html'), 'utf8'));
+	});
+
 	it.each(['/', '/?utm_source=mastodon'])('%s, without any of them, is the home page', async (path) => {
 		const response = await get(path);
 
