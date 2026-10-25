@@ -1583,7 +1583,8 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 - **Linux 與 Windows 的建置差在哪**：逐一比對兩個部署上的檔案，HTML、feed、sitemap 等都相同，不同的 10 個都在 `/pagefind/`（索引與 Pagefind 自帶的 JS、CSS、wasm）。搜尋在兩邊都能用（Linux 上的測試通過），所以不處理。
 - **noindex**：預覽網址的回應有 `X-Robots-Tag: noindex`，是 Cloudflare 自動加的；workers.dev 的正式網址沒有。頁面的 canonical 都指向 aniya.moe。
 - **第二次 CI run**（`db1792c`）：還原到第一次存的圖片快取，Build 縮短成 53 秒、Test 1 分 56 秒、Deploy 1 分 22 秒，從推送到預覽版本檢查完大約 3 分半；預覽版本的網址檢查一樣 2,868 個通過。
-- **還沒驗證**：push 到 `main` 的正式部署，要等 PR 合併進 `main`。
+- **第一次正式部署**：站長同意後，PR #1 用 merge commit 合併進 `main`（`df7c179`）。`main` 的 run 三個 job 都通過：`wrangler deploy` 部署到 `https://aniya-moe.erase2004.workers.dev`，部署後的網址檢查 2,868 個通過、0 個失敗。Build 花了將近 5 分鐘，因為 GitHub 的快取有範圍限制：feature branch 存的快取，`main` 讀不到；反過來 `main` 存的快取，所有 branch 都讀得到。這次 `main` 存了一份，之後的 branch 都會用到。
+- **合併 PR 之前**：`protect-main` 已經加上 Require status checks（`Build`、`Test`、`Deploy`，限定 GitHub Actions 回報的結果），三個都通過才能合併。
 
 ### 留給其他 issue 的發現
 
