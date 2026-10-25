@@ -2,6 +2,14 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "aniya-moe",
 	"compatibility_date": "2026-10-19",
+	// Served at aniya-moe.<subdomain>.workers.dev; no routes or custom domains
+	// until aniya.moe moves over (ticket 20).
+	"workers_dev": true,
+	// Every version gets its own preview URL, <version>-aniya-moe.<subdomain>.workers.dev,
+	// and a branch's versions (CI's `wrangler versions upload --preview-alias`)
+	// one for the branch too. Unset, wrangler 4.152.0 leaves it to Cloudflare's
+	// default. `wrangler deploy` applies it, `versions upload` does not.
+	"preview_urls": true,
 	// Answers WordPress's query-string URLs (/?p=ID, …) at the home page URL.
 	"main": "src/worker.ts",
 	// Cloudflare serves the Astro build output directly.
