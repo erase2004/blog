@@ -92,6 +92,9 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # Type-checks the .astro files, src/, scripts/ and tests/: neither the
+      # build nor Vitest does.
+      - run: npm run check
       # The build job's cache (see there); the test-only pages' few images are
       # not worth saving.
       - name: Restore the optimized images

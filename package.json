@@ -13,6 +13,7 @@
     "build": "astro build",
     "preview": "astro build && wrangler dev",
     "astro": "astro",
+    "check": "astro check",
     "check-urls": "node scripts/check-urls.ts",
     "convert-wordpress": "node scripts/convert-wordpress.ts",
     "upload-media": "node scripts/upload-media.ts",
@@ -31,9 +32,12 @@
     "sharp": "^0.35.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^24.19.2",
     "fast-xml-parser": "^5.11.2",
     "playwright": "^1.64.1",
     "satteri": "^0.10.5",
+    "typescript": "^6.0.3",
     "vitest": "^5.0.5",
     "wrangler": "^4.152.0"
   },
