@@ -1699,3 +1699,8 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 
 - Worker 的新版本有問題：`wrangler rollback`，回到上一個版本。
 - 要退回 WordPress（舊主機還開著的時候）：移除 Custom domain `aniya.moe`，再用步驟 4 記下的內容重建 apex 的 DNS 紀錄。
+
+### 階段 C：收尾
+
+7. 在 Google Search Console 重新提交 `/sitemap.xml`。網址跟 WordPress 時期一樣，內容已經是新網站的；WordPress 的子 sitemap 現在都 301 到它。
+8. 正式網域的網址檢查全部通過後，站長在當天關閉了舊主機。從此以後，要退回 WordPress 只能從 02 號的異地備份還原。
