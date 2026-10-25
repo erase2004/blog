@@ -1582,7 +1582,8 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
   - API token 的權限夠上傳版本。log 裡沒有 account ID 或 token。
 - **Linux 與 Windows 的建置差在哪**：逐一比對兩個部署上的檔案，HTML、feed、sitemap 等都相同，不同的 10 個都在 `/pagefind/`（索引與 Pagefind 自帶的 JS、CSS、wasm）。搜尋在兩邊都能用（Linux 上的測試通過），所以不處理。
 - **noindex**：預覽網址的回應有 `X-Robots-Tag: noindex`，是 Cloudflare 自動加的；workers.dev 的正式網址沒有。頁面的 canonical 都指向 aniya.moe。
-- **還沒驗證**：push 到 `main` 的正式部署（要等 PR 合併進 `main`），以及第二次 run 能不能還原圖片快取。
+- **第二次 CI run**（`db1792c`）：還原到第一次存的圖片快取，Build 縮短成 53 秒、Test 1 分 56 秒、Deploy 1 分 22 秒，從推送到預覽版本檢查完大約 3 分半；預覽版本的網址檢查一樣 2,868 個通過。
+- **還沒驗證**：push 到 `main` 的正式部署，要等 PR 合併進 `main`。
 
 ### 留給其他 issue 的發現
 
