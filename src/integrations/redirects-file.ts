@@ -34,6 +34,21 @@ export async function appendRedirects(dir: URL, rules: RedirectRule[]): Promise<
 	await appendFile(file, separator + lines.join(''));
 }
 
+/**
+ * A non-ASCII path percent-encoded in lowercase, as WordPress wrote it in
+ * canonicals and links (`/category/技術/` → `/category/%e6%8a%80%e8%a1%93/`),
+ * which makes it the form search engines know; null for a path that has no
+ * such form. Browsers send the UTF-8 path in uppercase escapes, and a rule
+ * matches only the form its source has, so an old URL needs a rule from this
+ * form too: without one, Workers static assets answer it with a temporary
+ * redirect (307) to the uppercase form, which may redirect again.
+ */
+export function lowercaseEncoded(path: string): string | null {
+	const encoded = encodeURI(path);
+	const lowercase = encoded.replace(/%[0-9A-F]{2}/g, (escape) => escape.toLowerCase());
+	return lowercase === encoded ? null : lowercase;
+}
+
 /** encodeURI(), except that the percent-escapes `path` already has stay as written, as Cloudflare reads them. */
 function encodePath(path: string): string {
 	return path

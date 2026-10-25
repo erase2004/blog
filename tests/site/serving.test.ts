@@ -1,7 +1,8 @@
 // What the built site answers for its URLs, served by `wrangler dev` as
 // Cloudflare Workers static assets will serve it: pages and their trailing
-// slash, unknown URLs, WordPress's query-string URLs and the Worker that
-// answers them, and the URL checker over the whole site.
+// slash, old URLs in lowercase percent-encoding, unknown URLs, WordPress's
+// query-string URLs and the Worker that answers them, and the URL checker
+// over the whole site.
 // The site is built and served once for all the files of tests/site/
 // (global-setup.ts).
 import { spawnSync } from 'node:child_process';
@@ -47,6 +48,69 @@ describe('trailing slash', () => {
 			.filter((to) => !existsSync(join(outDir, decodeURI(to), 'index.html')));
 		expect(addsSlash.length).toBeGreaterThan(0);
 		expect(targetsWithoutPage).toEqual([]);
+	});
+});
+
+// WordPress wrote non-ASCII paths percent-encoded in lowercase in canonicals
+// and links; without rules of their own, Workers static assets would 307
+// them to the uppercase form.
+describe('old URLs in lowercase percent-encoding', () => {
+	it.each([
+		['/2021/09/30/%e7%ac%ac%e4%b8%80%e7%af%87%e6%96%87%e7%ab%a0/', '/2021/09/30/%E7%AC%AC%E4%B8%80%E7%AF%87%E6%96%87%E7%AB%A0/'],
+		['/category/%e6%8a%80%e8%a1%93/', '/category/%E6%8A%80%E8%A1%93/'],
+		['/tag/book%e2%98%86walker/', '/tag/book%E2%98%86walker/'],
+	])('of a page, %s, 301 to the page', async (path, page) => {
+		const response = await get(path);
+
+		expect(response.status).toBe(301);
+		expect(response.headers.get('location')).toBe(page);
+		expect((await get(page)).status).toBe(200);
+	});
+
+	it.each([
+		// The old slug.
+		[
+			'/2026/01/23/%e5%be%9e-ssr-%e5%88%b0-ssg%ef%bc%9aacgn-%e8%82%a1%e5%b8%82%e6%ad%b7%e5%8f%b2%e5%8d%9a%e7%89%a9%e9%a4%a8-7-%e8%90%ac%e9%a0%81%e9%9d%9c%e6%85%8b%e5%8c%96%e7%9a%84%e5%af%a6%e6%88%b0%e8%bd%89%e5%9e%8b/',
+			'/2026/01/23/acgn-museum-ssg/',
+		],
+		// The PDF's upload path and attachment page.
+		...[
+			'/wp-content/uploads/2025/05/%e7%80%a8%e6%88%b6%e5%85%a7%e5%9c%8b%e9%9a%9b%e8%97%9d%e8%a1%93%e7%a5%ad-2025-3.pdf',
+			'/2025/05/17/travel-setonaikai-2025-prologue/%e7%80%a8%e6%88%b6%e5%85%a7%e5%9c%8b%e9%9a%9b%e8%97%9d%e8%a1%93%e7%a5%ad-2025-3/',
+		].map((path) => [
+			path,
+			'https://media.aniya.moe/files/travel-setonaikai-2025-prologue/%E7%80%A8%E6%88%B6%E5%85%A7%E5%9C%8B%E9%9A%9B%E8%97%9D%E8%A1%93%E7%A5%AD-2025-3.pdf',
+		]),
+	])('that redirect, %s, 301 straight to where they redirect', async (path, location) => {
+		const response = await get(path);
+
+		expect(response.status).toBe(301);
+		expect(response.headers.get('location')).toBe(location);
+	});
+
+	// The new images' URLs have a hash: where the uppercase form redirects.
+	it.each([
+		// With a zero-width space after 池田港.
+		'/wp-content/uploads/2025/05/%e6%b1%a0%e7%94%b0%e6%b8%af%e2%80%8b-2-Ave-Mujica.jpg',
+		'/2025/05/17/travel-setonaikai-2025-day5/%e6%b1%a0%e7%94%b0%e6%b8%af-2-ave-mujica/',
+	])('of an image, %s, 301 straight to the new image', async (path) => {
+		const uppercase = await get(path.replace(/%[0-9a-f]{2}/g, (escape) => escape.toUpperCase()));
+		const response = await get(path);
+
+		expect(uppercase.status).toBe(301);
+		expect(response.status).toBe(301);
+		expect(response.headers.get('location')).toBe(uppercase.headers.get('location'));
+		expect((await get(response.headers.get('location')!)).status).toBe(200);
+	});
+
+	// The feeds' dynamic rule keeps the request's escapes: two 301s, for a
+	// feed search engines do not index.
+	it('of a feed 301 to its page in lowercase, which 301s to the page', async () => {
+		const feed = await get('/category/%e6%8a%80%e8%a1%93/feed/');
+		const page = await get(feed.headers.get('location')!);
+
+		expect([feed.status, feed.headers.get('location')]).toEqual([301, '/category/%e6%8a%80%e8%a1%93/']);
+		expect([page.status, page.headers.get('location')]).toEqual([301, '/category/%E6%8A%80%E8%A1%93/']);
 	});
 });
 
