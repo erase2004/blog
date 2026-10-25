@@ -1463,3 +1463,114 @@ ticket 寫「1 個舊 slug 與 3 篇改過日期的文章」，但備份裡的 3
 - 測試：27 個檔案、414 個測試（原本 16 個檔案、402 個）。
 - `_redirects`：1,789 條靜態規則、2 條動態規則。
 - 待完成清單仍然是空的。網址檢查的建置模式 1,985 個通過、883 個查詢字串網址跳過；HTTP 模式（`npm run preview`）2,868 個全部通過。
+
+## 04：CI/CD 部署管線（2026-10-25）
+
+### 流程
+
+`.github/workflows/ci-cd.yml`，每次 push 到任何 branch 都跑（也可以在 GitHub 上手動執行）：
+
+```
+build（Build）  npm ci → 還原圖片快取 → npm run build → 有新圖片才存快取
+                → npm run check-urls -- build → 把 dist 上傳成 artifact
+test（Test）    同時進行：npm ci → 還原圖片快取 → npx playwright install --with-deps chromium → npm test
+deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
+                  main：wrangler deploy
+                  其他 branch：wrangler versions upload --preview-alias <branch 的 alias>
+                → 從 wrangler 的輸出檔取得網址 → 等網址回 200 → npm run check-urls -- http <網址>
+```
+
+- 任何一步失敗，後面都不跑：建置輸出的網址檢查沒過就不部署；部署後的 HTTP 網址檢查沒過，這次 run 就是失敗。
+- 部署的網址寫在 run 的摘要（`$GITHUB_STEP_SUMMARY`），也是 GitHub 環境 `production`／`preview` 的網址（PR 上的 View deployment）。摘要另外列出 Worker 的版本 ID，要 `wrangler rollback` 時用得到。
+
+### 決策與理由
+
+- **只用 `push`，不用 `pull_request`**：repo 是公開的，fork 開的 PR 不能拿到 Cloudflare 的 secrets。同一個 repo 的 branch 開 PR 時，PR 上看到的就是那個 commit 的 push 結果。`push` 限定 `branches: ['**']`，推 tag 不會觸發。
+- **權限最小**：`permissions: contents: read`；checkout 設 `persist-credentials: false`，GitHub 的 token 不留在 `.git/config`。
+- **憑證只在兩個 wrangler 步驟**：`CLOUDFLARE_API_TOKEN` 與 `CLOUDFLARE_ACCOUNT_ID` 只放在 `wrangler deploy`／`wrangler versions upload` 那一步的 `env`，不寫進 script 本身，也不 echo（GitHub 會在 log 裡遮掉 secrets 的值）。`npm ci`、建置與測試都碰不到它們。所有 `${{ }}` 的值都經過 `env` 再交給 script，branch 名稱之類的文字不會被當成 shell 程式碼。
+- **部署的就是檢查過的那份**：build job 把通過網址檢查的 `dist` 上傳成 artifact（保留 7 天），deploy job 下載它來部署，不重新建置。`include-hidden-files: true`：目前 `dist` 沒有隱藏檔，以後有 `.well-known/` 也不會被漏掉。
+- **用 repo 自己的 wrangler**（`npx wrangler`，版本由 package-lock.json 固定），不用第三方的 deploy action：跑的就是本機用的、看過原始碼的那一份。每個版本的 message 是 commit 的 SHA（`--message "$GITHUB_SHA"`），`wrangler versions list`、`wrangler rollback` 列出的版本對得上 commit。
+- **每個 action 都釘在完整的 commit SHA**，後面註明版本。用 `git ls-remote https://github.com/<owner>/<repo> 'refs/tags/v*'` 查（不需要憑證）；這幾個 tag 都是直接指向 commit 的 lightweight tag：
+
+  | Action | 版本 | Commit |
+  |---|---|---|
+  | `actions/checkout` | v7.0.1 | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+  | `actions/setup-node` | v7.1.0 | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+  | `actions/cache/restore`、`actions/cache/save` | v6.1.0 | `55cc8345863c7cc4c66a329aec7e433d2d1c52a9` |
+  | `actions/upload-artifact` | v7.0.2 | `cf430e030ddbb5b0abf93d22962f4752f3646cd9` |
+  | `actions/download-artifact` | v8.0.2 | `9000827ccba6bdab643e8b6fd33ac0654aef8333` |
+
+- **Node 版本來自 `.nvmrc`**（`setup-node` 的 `node-version-file`），npm 套件快取交給 `setup-node`。runner 固定 `ubuntu-24.04`，不用 `ubuntu-latest`，升級時自己決定。
+- CI 不跑 `convert-wordpress`、`upload-media`、`verify-media`：它們讀 `D:/wordpress-backup` 或要動 R2。`npm test` 只用 repo 裡的 fixture。
+- **concurrency**：同一個 branch 一次只跑一個 run。預覽版本的 run，新的 push 會取消正在跑的那個；`main` 永遠不取消正在跑的部署，新的 push 排隊等它（GitHub 只保留最新的一個排隊中的 run，中間的會被取消，最後部署的一定是最新的 commit）。
+
+### 圖片快取
+
+- 冷建置在這台電腦要 3 分 49 秒，其中 3 分 29 秒在做 3,622 張圖片（快取 588 MB）；有快取時整個建置 21–24 秒。
+- Astro 把做好的圖片放在 `node_modules/.astro/assets`，檔名是「來源圖片內容的 hash + 轉換參數（寬度、格式、品質……）的 hash」，跟 `dist/_astro/` 裡的檔名一樣。所以**任何一份舊的快取都可以拿來用**：來源圖片換了，檔名就不同；用得到的才會被複製。驗證過：用一份比較舊、檔案比較多的快取（主要工作目錄的 711 MB）建置，跟完全沒有快取的冷建置，`dist` 的 3,803 個檔案 sha256 全部相同。
+- 檔名的 hash 不包含 sharp 的版本和圖片服務的設定，這兩個變了，同一個檔名可能是不同的內容。所以快取 key 的前綴是 `astro-images-<OS>-<package-lock.json 與 astro.config.mjs 的 hash>-`，還原時取同一個前綴最新的一份；兩個檔案任一個改了就從頭建置。
+- **有新圖片才存新的快取**：建置之後，key 的後半是快取裡所有檔名的 hash。沒有做出新圖片（只改文字、改程式）就跟還原的那份一樣，不存；新增文章圖片或改了寬度才存。不會每次 push 都多一份 600 MB 的快取。
+- 只快取 `assets/`，不快取 `node_modules/.astro/data-store.json`（content layer 的資料，跟圖片無關，每次重新讀內容只要幾秒）。
+- 還原一定在 `npm ci` 之後：`npm ci` 會先刪掉整個 `node_modules`。
+- test job 只還原、不存：測試建置多了幾個測試專用頁面，它們的圖片不值得另外存。
+- GitHub 的快取以 branch 為範圍：一個 branch 只讀得到自己的和 `main` 的快取。`main` 有快取之前，新 branch 的第一次 run 都是冷建置。整個 repo 的快取上限 10 GB，太久沒用的會被清掉。
+- Astro 不會刪掉快取裡用不到的舊圖片，所以快取只會慢慢變大（只在圖片改變時）；package-lock.json 或 astro.config.mjs 一改就從零開始。
+
+### 預覽版本的 alias
+
+- `wrangler versions upload --preview-alias <alias>` 讓這個 branch 最新的版本有一個固定的網址 `https://<alias>-aniya-moe.<subdomain>.workers.dev`；每個版本另外有自己的 `https://<版本 ID 前 8 碼>-aniya-moe.<subdomain>.workers.dev`。
+- alias 由 `scripts/preview-alias.ts` 從 branch 名稱算出來（`node scripts/preview-alias.ts feature/wordpress-migration` → `feature-wordpress-migration`）：
+  - 轉成小寫，英數字以外的連續字元變成一個 `-`，去掉頭尾的 `-`（`Fix/Bug_#12` → `fix-bug-12`，`feature/中文-slug` → `feature-slug`）。
+  - 一定要以英文字母開頭：數字開頭的加上 `branch-`；什麼都沒剩下的（全是中文）是 `branch-<branch 名稱 SHA-256 的前 4 碼>`。
+  - `<alias>-aniya-moe` 要放得進一個 DNS label（63 字元），所以 alias 最多 53 字元；太長的截短，最後接 `-<hash 前 4 碼>`，截斷處的 `-` 先去掉。
+  - Worker 名稱從 `wrangler.jsonc` 讀（用 wrangler 自己的設定檔讀取函式 `experimental_readRawConfig()`，它看得懂註解）。
+- 規則跟 wrangler 內建的 alias 產生器（`WRANGLER_CI_GENERATE_PREVIEW_ALIAS=true`，原始碼 `deploy-helpers/src/deploy/helpers/preview-alias.ts`）一樣：同樣的字元替換、同樣的驗證 `^[a-z](?:[a-z0-9-]*[a-z0-9])?$`、同樣的 63 字元上限與 4 碼 hash。不直接用內建的，是因為它遇到數字開頭的 branch 就放棄（只印警告、不給 alias），而且自己有測試的規則比較好掌握。
+- 測試：`tests/preview-alias.test.ts`，先寫測試再實作。期望值是另外算好的字串（hash 用 `sha256sum` 算），不是用同一段程式重算。另有一個測試實際執行 `node scripts/preview-alias.ts`，確認它讀到 `wrangler.jsonc` 的 Worker 名稱。
+
+### 部署的網址從哪裡來
+
+- 設了 `WRANGLER_OUTPUT_FILE_PATH`，wrangler 會把做了什麼寫成一行一筆的 JSON（ND-JSON）。格式看 wrangler 4.152.0 的原始碼（`writeOutput()`）與 dry run 的實際輸出確認：
+  - `wrangler deploy`：`{"type":"deploy","version":1,"worker_name":"aniya-moe","version_id":…,"targets":[…],…}`。`targets` 是部署到的網址；workers.dev 的會加上 `https://`，自訂網域與 route 不會。
+  - `wrangler versions upload`：`{"type":"version-upload","version":1,"version_id":…,"preview_url":…,"preview_alias_url":…,…}`。兩個網址只在 Cloudflare 回報這個版本有預覽、而且這個 Worker 開了預覽網址時才有。
+  - 第一行一定是 `{"type":"wrangler-session",…}`，失敗時多一筆 `{"type":"command-failed",…}`。dry run 不會有網址與版本 ID。
+- 用 `jq` 取出網址（ubuntu runner 內建）。找不到網址就失敗，並提示 `preview_urls`。
+- **預覽版本檢查的是版本自己的網址，不是 alias 的網址**：alias 剛改指向時，可能還有一小段時間回答上一個版本；版本自己的網址要嘛還沒生效，要嘛就是這個版本。所以先每 5 秒問一次 `/`，回 200 才開始網址檢查（最多等 5 分鐘）。
+
+### wrangler 的三個問題（讀 wrangler 4.152.0 的原始碼）
+
+1. **Worker 從來沒部署過時，`versions upload` 不能用**：上傳前的檢查（`preUploadApiChecks()`）找不到 Worker 就直接報錯 `You cannot upload a new version of a Worker that does not yet exist. Please run the deploy command first.`。`wrangler deploy` 才會建立 Worker，所以第一次一定要先 `wrangler deploy`（見下面「第一次推送」）。另外，帳號要先註冊過 workers.dev 子網域；沒有的話 `wrangler deploy` 會問要不要註冊，CI 不能互動，預設回答「不要」，直接失敗並給出 dashboard 的 onboarding 連結。
+2. **workers.dev 與預覽網址**：
+   - `workers_dev` 沒設時，沒有 route 就是 `true`。
+   - `preview_urls` 沒設時 wrangler 什麼都不送，交給 Cloudflare 決定（設定 schema 寫預設 `false`，wrangler 的警告訊息說會跟著 workers.dev），兩邊說法不一，所以**兩個都明確寫成 `true`**（`wrangler.jsonc`）。這個 Worker 仍然只在 workers.dev 上，沒有 route 或自訂網域。
+   - 這兩個設定只有 `wrangler deploy` 會套用（triggers 階段對 Worker 的 `/subdomain` 送 `enabled`、`previews_enabled`），`versions upload` 不會。所以第一次 `wrangler deploy` 之後，預覽網址才會開。
+3. **`versions upload` 對 static assets 的處理跟 `deploy` 一樣**：兩者用同一個 `resolveAssetOptions()` 讀 `wrangler.jsonc`（`html_handling`、`not_found_handling`、`run_worker_first` 的 static routing）與 `dist` 裡的 `_redirects`、`_headers`，用同一個 `syncAssets()` 上傳檔案，送出的 `assets` 設定也一模一樣。差別只在 `versions upload` 不處理 triggers（workers.dev、預覽網址、route）與不分版本的設定（observability、logpush），而且上傳的版本不接正式流量（要 `wrangler versions deploy` 才會）。dry run 也不同：`deploy --dry-run` 會讀一遍 assets 資料夾（檢查檔案數與大小），`versions upload --dry-run` 不讀。
+
+### 本機驗證
+
+- 新建置後 `npx wrangler deploy --dry-run` 與 `npx wrangler versions upload --dry-run --preview-alias feature-ci-cd-pipeline` 都通過：Worker 455 KiB（gzip 37 KiB），只有 `env.ASSETS` 一個 binding；`dist` 3,803 個檔案（wrangler 印的 3,930 連資料夾一起算），594 MB，遠低於 20,000 個檔案的上限。
+- workflow 用 actionlint 1.7.12（加上 shellcheck 0.11.0 檢查每段 script）檢查，0 個問題。另外寫了一個不提交的檢查：用 jq 1.7.1 實際執行「取得網址」與「等網址回 200」兩段 script，餵它 wrangler 格式的輸出（正式部署、預覽版本、沒有預覽網址、沒有 targets、指令失敗）與一個先回兩次 503 的本機 server，結果都對；每個 `uses:` 都釘在 40 碼的 SHA 並註明版本；secrets 只出現在兩個 wrangler 步驟的 `env`。
+- **大小寫**：Linux 的檔案系統分大小寫，Windows 不分。寫了一個不提交的檢查，把 `src/content/`、`src/`、`scripts/`、`tests/` 裡所有相對路徑（Markdown 圖片、`import`、`import()`、`socialImage`、CSS `url()`）逐段跟資料夾的實際檔名比對：1,140 個都完全相符，沒有只差大小寫的；轉換器與測試裡以 `src/content/posts/` 為基準的路徑也比對過。git index 的 1,018 個路徑跟磁碟上的檔名一致，也沒有只差大小寫的兩個檔案。不需要修正。
+- **時區**：runner 是 UTC，這台電腦是 Asia/Taipei。`TZ=UTC` 建置的 `dist` 跟平常的建置每個檔案都相同，`TZ=UTC npm test` 也全部通過，所以 workflow 不另外設 `TZ`。（頁尾的年份用的是建置時的當地時間，只有跨年那 8 小時會不同。）
+- 最後的結果：`npm run build` 21 秒（有快取），`_redirects` 1,789 條靜態規則、2 條動態規則；`npm run check-urls -- build` 1,985 個通過、883 個查詢字串網址跳過、0 個失敗；`npm test` 28 個檔案、422 個測試全部通過（117 秒；多了 `tests/preview-alias.test.ts` 的 8 個）。
+
+### 第一次推送前後要做的事
+
+- **推送前，Worker 必須已經存在**（見上面第 1 題），兩種做法擇一：
+  - 站長在本機對這個 branch 的建置結果跑一次 `npx wrangler deploy`（`npx wrangler login` 用瀏覽器登入，或只在那一個指令的環境變數給 token，不寫進任何檔案）。這會建立 `aniya-moe` 並把它部署到 workers.dev 的正式網址；aniya.moe 還沒綁定，不影響現在的網站。
+  - 或先把 branch 合併進 `main`，讓 CI 的 `wrangler deploy` 建立 Worker。在那之前推其他 branch，deploy job 會在上傳預覽版本那一步失敗；Worker 建好之後，對失敗的 run 按 Re-run failed jobs 即可（artifact 保留 7 天）。
+- 確認 Cloudflare 帳號已有 workers.dev 子網域（dashboard 的 Workers & Pages 首頁看得到）。
+- 第一次 run 通過之後，在 ruleset `protect-main` 加上 Require status checks：`Build`、`Test`、`Deploy`（job 的名稱）。
+
+### 只能在第一次實際執行時確認
+
+- API token 的權限夠不夠（建立 Worker、上傳 assets、設定 workers.dev 與預覽網址、上傳版本）。02 號只確認過讀取權限。
+- wrangler 的輸出真的有 `targets` 的 workers.dev 網址、`preview_url` 與 `preview_alias_url`，預覽網址開得起來（第 2 題）。
+- 預覽網址與 workers.dev 正式網址上，HTTP 模式的網址檢查全部通過，包括 883 個由 Worker 回答的查詢字串網址；GitHub Actions 的 IP 發幾千個 request 不會被 Cloudflare 擋。這也是 19 號的第一段結果。
+- 在 Linux（ubuntu-24.04）上建置與 `npm test` 都通過：workerd、sharp、Pagefind、Sätteri 等的 Linux 版本在 package-lock.json 裡都有，但還沒在 Linux 上跑過；Playwright 的 Chromium 與系統套件由 `--with-deps` 安裝。
+- 時間：runner 上的冷建置、約 600 MB 的圖片快取與 `dist` artifact 的上傳下載各要多久，`timeout-minutes`（build、test 30 分鐘，deploy 20 分鐘）夠不夠；第二次 run 有沒有還原到快取、沒有新圖片時有沒有略過存檔。
+- GitHub 自動建立 `production`、`preview` 兩個環境，PR 上看得到 View deployment；concurrency 照預期取消或排隊。
+
+### 留給其他 issue 的發現
+
+- 19：預覽網址跟 workers.dev 的正式網址都是公開的，頁面的 canonical 指向 aniya.moe；看一下預覽網址有沒有 `X-Robots-Tag: noindex`，決定要不要處理被搜尋引擎索引的可能。
+- 20：切換之後如果關掉 workers.dev（`workers_dev: false`）或加上自訂網域，`deploy` 輸出的 `targets` 會變成 aniya.moe（沒有 `https://`），workflow 的「取得網址」目前只找 workers.dev 的網址，要一起改；正式網域的網址檢查會多檢查 www 與 HSTS（`PRODUCTION`）。
