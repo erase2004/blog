@@ -1,6 +1,6 @@
 import type { AstroIntegration } from 'astro';
 import { expectedUrls } from '../lib/old-url-map';
-import { appendRedirects, type RedirectRule } from './redirects-file';
+import { appendRedirects, lowercaseEncoded, type RedirectRule } from './redirects-file';
 
 /**
  * The feed of each post, page, category and tag, `<URL>feed/`, redirects to
@@ -20,10 +20,15 @@ const isFeedOf = (url: string, location: string) => url === `${location}feed/`;
  * of images and of the videos and the PDF have integrations of their own
  * (image-redirects.ts, media-redirects.ts).
  *
- * Adds a static `<old URL> <new URL> 301` rule to `_redirects` for each, and
- * one for the URL without its trailing slash, which WordPress redirected to
- * the URL with it; then the dynamic rules for the feeds. Not URLs with a
- * query string: the Worker answers them (src/worker.ts).
+ * Adds a static `<old URL> <new URL> 301` rule to `_redirects` for each, one
+ * for the URL in the lowercase percent-encoding WordPress linked it with
+ * (lowercaseEncoded()), and one for the URL without its trailing slash, which
+ * WordPress redirected to the URL with it; then the dynamic rules for the
+ * feeds. Not URLs with a query string: the Worker answers them
+ * (src/worker.ts). The URL of each old page, in that lowercase encoding,
+ * redirects to the page. The dynamic rules keep the encoding of the request,
+ * so a feed in lowercase redirects to its page in lowercase, which redirects
+ * on: two 301s, for feeds, which search engines do not index.
  *
  * Static rules count towards the 2,000 a Worker may have, dynamic ones
  * towards 100, and every rule after the first dynamic one counts as dynamic:
@@ -40,13 +45,20 @@ export default function pageRedirects(): AstroIntegration {
 				const rules = redirects
 					.filter(({ url, location }) => !url.includes('?') && !isFeedOf(url, location))
 					.flatMap(({ url, location }) =>
-						(url.endsWith('/') ? [url, url.slice(0, -1)] : [url]).map((from): RedirectRule => ({ from, to: location, status: 301 })),
+						[url, lowercaseEncoded(url), url.endsWith('/') ? url.slice(0, -1) : null]
+							.filter((from) => from !== null)
+							.map((from): RedirectRule => ({ from, to: location, status: 301 })),
 					);
 				const feeds = redirects.filter(({ url, location }) => isFeedOf(url, location)).length;
+				const pageRules = expectedUrls().flatMap(({ url, expect }): RedirectRule[] => {
+					const from = expect === 'page' && !url.includes('?') ? lowercaseEncoded(url) : null;
+					return from === null ? [] : [{ from, to: url, status: 301 }];
+				});
 
-				await appendRedirects(dir, [...rules, ...FEED_RULES]);
+				await appendRedirects(dir, [...rules, ...pageRules, ...FEED_RULES]);
 				logger.info(
-					`added ${rules.length} rules for old URLs, and ${FEED_RULES.length} dynamic rules for ${feeds} feeds, to _redirects`,
+					`added ${rules.length} rules for old URLs, ${pageRules.length} for pages in lowercase percent-encoding, ` +
+						`and ${FEED_RULES.length} dynamic rules for ${feeds} feeds, to _redirects`,
 				);
 			},
 		},

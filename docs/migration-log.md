@@ -1583,9 +1583,75 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 - **Linux 與 Windows 的建置差在哪**：逐一比對兩個部署上的檔案，HTML、feed、sitemap 等都相同，不同的 10 個都在 `/pagefind/`（索引與 Pagefind 自帶的 JS、CSS、wasm）。搜尋在兩邊都能用（Linux 上的測試通過），所以不處理。
 - **noindex**：預覽網址的回應有 `X-Robots-Tag: noindex`，是 Cloudflare 自動加的；workers.dev 的正式網址沒有。頁面的 canonical 都指向 aniya.moe。
 - **第二次 CI run**（`db1792c`）：還原到第一次存的圖片快取，Build 縮短成 53 秒、Test 1 分 56 秒、Deploy 1 分 22 秒，從推送到預覽版本檢查完大約 3 分半；預覽版本的網址檢查一樣 2,868 個通過。
-- **還沒驗證**：push 到 `main` 的正式部署，要等 PR 合併進 `main`。
+- **第一次正式部署**：站長同意後，PR #1 用 merge commit 合併進 `main`（`df7c179`）。`main` 的 run 三個 job 都通過：`wrangler deploy` 部署到 `https://aniya-moe.erase2004.workers.dev`，部署後的網址檢查 2,868 個通過、0 個失敗。Build 花了將近 5 分鐘，因為 GitHub 的快取有範圍限制：feature branch 存的快取，`main` 讀不到；反過來 `main` 存的快取，所有 branch 都讀得到。這次 `main` 存了一份，之後的 branch 都會用到。
+- **合併 PR 之前**：`protect-main` 已經加上 Require status checks（`Build`、`Test`、`Deploy`，限定 GitHub Actions 回報的結果），三個都通過才能合併。
 
 ### 留給其他 issue 的發現
 
 - 19：預覽網址跟 workers.dev 的正式網址都是公開的，頁面的 canonical 指向 aniya.moe；看一下預覽網址有沒有 `X-Robots-Tag: noindex`，決定要不要處理被搜尋引擎索引的可能。
 - 20：切換之後如果關掉 workers.dev（`workers_dev: false`）或加上自訂網域，`deploy` 輸出的 `targets` 會變成 aniya.moe（沒有 `https://`），workflow 的「取得網址」目前只找 workers.dev 的網址，要一起改；正式網域的網址檢查會多檢查 www 與 HSTS（`PRODUCTION`）。
+
+## 18：逐篇人工檢查（2026-10-25）
+
+- 站長逐篇比對了新網站與 WordPress 上的 22 篇文章與 5 個頁面，確認沒有需要修正的轉換錯誤。
+- **常見的轉換問題**：人工檢查沒有發現新的問題。轉換時已經處理過的常見問題，記在 05–10 號各節，例如粗體與中文標點、Markdown 跳脫、標題的 en dash、相簿與滑桿的圖片數量。
+- 先前各 issue 留給 18 號決定的項目，站長檢查後沒有提出修改，所以都維持現狀：
+  - `<mark>`：WordPress 原本是「文字顏色」，現在統一顯示成螢光筆。
+  - WordPress 手動調過寬度的 13 張圖：現在是「最寬到原圖寬度、不超過欄寬」。
+  - 檔名含零寬空格的那張圖（Day 5）：照原樣保留。
+  - Day 5 圖說裡沒有 `<rt>` 的 `<ruby>`，以及「夜行巴士」那組滑桿的裁切。
+  - 前言 2 張 App 截圖的圖說：只在 lightbox 裡顯示。
+  - `acgn-museum-ssg` 的 og:image `heroimage.png`：2.4 MB。
+  - 幾個頁面的 meta description 是截斷的內文（例如 `/about/`），`llms.txt` 裡也一樣。
+- **從現在起 Markdown 是唯一的內容來源**：`npm run convert-wordpress` 不再執行。它會先清空 `src/content/posts/` 與 `src/content/pages/` 再重寫，之後在 Markdown 上的修改都會被蓋掉。
+
+## 19：預覽網址驗證（2026-10-25）
+
+### 小寫百分比編碼的舊網址改成 301
+
+- **為什麼要改**：WordPress 的 canonical 和站內連結，中文、日文路徑都寫成小寫的百分比編碼（`/category/%e6%8a%80%e8%a1%93/`），搜尋引擎索引的很可能就是這個寫法。在 workers.dev 的正式網址（`https://aniya-moe.erase2004.workers.dev`）實測：小寫編碼的請求比對不到任何 `_redirects` 規則，asset worker 把路徑解碼再重新編碼，**307** 到大寫的版本（`/2021/09/30/%e7%ac%ac…/`、`/category/%e6%8a%80%e8%a1%93/`、`/tag/book%e2%98%86walker/` 都是）；大寫的版本回 200，少斜線的大寫版本照既有規則 301。307 是暫時轉址，我們要的是永久、而且一次就到的 301。
+- **做法**：路徑含非 ASCII 字元的每個舊網址，多一條靜態規則，來源寫成小寫的跳脫字元（Cloudflare 拿請求原始的路徑比對，這種規則只對小寫的請求有效，見 03 號），**直接 301 到最終目標**：
+  - 頁面 → 自己的網址（大寫編碼）：33 個，2021 年 4 篇、2022 年 4 篇文章，3 個分類，22 個標籤。
+  - 本來就會轉址的舊網址 → 同一個目標，不先經過大寫的版本：舊 slug 1 條（→ `/2026/01/23/acgn-museum-ssg/`）、圖片 33 條（6 個上傳路徑、27 個附件頁 → `/_astro/….webp`）、PDF 2 條（上傳路徑與附件頁 → R2）。
+  - 共 **69 條**。`_redirects` 從 1,789 條變成 **1,858 條靜態規則**，動態規則仍是 2 條，靜態規則剩 142 條空間。
+  - 規則只從對應表產生。sitemap 快照裡 39 個非 ASCII 的網址（33 個頁面、6 張圖片）都在對應表裡；對應表沒有其他非 ASCII 的上傳路徑（例如 `-scaled` 的版本）。
+- **不做的**：
+  - 少斜線的小寫版本：WordPress 從來沒有這樣連結過。照舊 307 到大寫的少斜線版本，再 301 到頁面。
+  - `…/feed/` 的小寫版本（33 個）：既有的動態規則 `/*/feed/ /:splat/ 301` 保留請求的編碼，所以小寫的 feed 先 301 到頁面的小寫版本，再由新規則 301 到頁面，**兩次 301**。feed 不給搜尋引擎索引（`X-Robots-Tag: noindex`），可以接受，不另外多佔 33 條規則。
+  - 不存在的網址（5 個，沒搬的孤兒圖的上傳路徑與附件頁）：沒有地方可以轉，小寫版本仍是 307 到大寫的版本，再回 404。
+- **程式**：
+  - `appendRedirects()` 原本用 `encodeURI()` 編碼路徑，會把跳脫字元的 `%` 再編成 `%25`，寫不出小寫跳脫字元的來源。現在路徑裡已經是跳脫字元的部分照原樣保留（大小寫都不動，跟 Cloudflare 讀 `_redirects` 的方式一樣），其餘照舊用 `encodeURI()`。既有的 1,789 條規則一個字都沒變（排序後跟原本的 `_redirects` 比對，只多了 69 行）。
+  - `lowercaseEncoded()`（`src/integrations/redirects-file.ts`）算出路徑的小寫編碼版本，ASCII 的路徑沒有。各自負責舊網址的 integration 加上小寫版本：`page-redirects.ts`（頁面、舊 slug；放在動態規則之前）、`image-redirect-rules.ts`（圖片）、`media-redirects.ts`（PDF）。
+- **網址檢查**：`LOWERCASE_PERCENT_ENCODED_PATHS` 定案，預設改成 `'301-to-final-target'`：
+  - 頁面的小寫版本要 301 到自己，而且是回 200 的那個編碼。只比對「是不是同一個字」的話，301 到小寫的自己（迴圈）也會通過。
+  - 會轉址的舊網址，小寫版本要 301 到大寫版本轉去的地方；沒有指定 `location` 的（圖片）就比對大寫版本實際回的 `Location`。
+  - 兩個例外：`location` 的大小寫編碼視為相同（跟其他地方一樣），feed 的兩次 301 才會通過；不存在的網址接受 307 到大寫的自己（那裡已經檢查過回 404）。
+  - 原本的 `'as-expected-or-recase-redirect'` 留著，就是沒有這些規則時的行為，萬一靜態規則不夠用可以退回；`'as-expected'` 刪掉，在 Cloudflare 上沒有頁面能通過。
+  - 確認抓得到：把建置結果的 `_redirects` 換回原本的版本，建置模式剛好 69 個失敗，跟新增的規則數一樣。
+- **測試**（先寫測試再實作）：
+  - `tests/redirects-file.test.ts`：已經是跳脫字元的路徑照原樣寫出。
+  - `tests/url-checker/check-urls.test.ts`：小型網站多了中文頁面、圖片與舊網址的小寫規則，建置與 HTTP（`wrangler dev`）兩種模式各跑一次：小寫版本 301 到頁面才通過；307（沒有規則）、轉到別的頁面、轉到小寫的自己都失敗；圖片的小寫版本要轉到跟大寫版本同一張圖；feed 的兩次 301 通過；不存在的網址接受 307。
+  - `tests/site/serving.test.ts`：真正的建置結果上，文章、分類、標籤的小寫網址 301 到頁面；舊 slug 與 PDF 的小寫網址直接 301 到目標；圖片（包括檔名有零寬空格的 `池田港​-2-Ave-Mujica.jpg`）的小寫網址 301 到跟大寫版本同一張圖；小寫的 feed 經過頁面的小寫版本兩次 301 到頁面。期望值是另外寫好的網址字串。
+- **數字**：`npm run build` 1,858 條靜態規則、2 條動態規則（`wrangler dev` 讀到 1,860 條）。`npm run check-urls -- build` 1,985 個通過、883 個查詢字串網址跳過、0 個失敗；`npm run preview` 之後 `npm run check-urls -- http http://localhost:8787` 2,868 個全部通過。`npm test` 28 個檔案、440 個測試全部通過。
+- 正式環境的實際行為，由 CI 部署預覽版本後的 HTTP 網址檢查確認。
+
+### 在 Cloudflare 上的實測結果
+
+對象是 workers.dev 的正式網址 `https://aniya-moe.erase2004.workers.dev` 與 branch 的預覽網址 `https://feature-wordpress-migration-aniya-moe.erase2004.workers.dev`。兩者的內容相同，只有預覽網址會多一個 Cloudflare 自動加的 `X-Robots-Tag: noindex`。
+
+- **HTTP 模式的網址檢查**：CI 每次部署預覽版本後都會跑。加上小寫規則之後（`a511e66`），2,868 個通過、0 個失敗。待完成清單是空的；www 轉址與 HSTS 只在對 `https://aniya.moe` 檢查時才會檢查，留給 20 號。
+- **中文路徑**：
+  - 大寫的百分比編碼（瀏覽器實際送出的寫法）回 200。
+  - 小寫的編碼（WordPress canonical 的寫法）原本 307 到大寫，加上規則之後改成 301，見上一節。
+  - 沒有測試未編碼的 UTF-8 原始位元組：瀏覽器不會這樣送。
+- **`force-trailing-slash`**：
+  - 少斜線的網址有 `_redirects` 規則，都是 301（`/about` → `/about/`、`/2021` → `/2021/`、`/page/2` → `/page/2/`）。
+  - 沒有規則的路徑是 Workers 自己的轉址，狀態碼是 307，例如 `/index.html` → `/`。WordPress 沒有這類網址，所以不處理。
+- **轉址迴圈**：`_redirects` 的 1,788 條轉址規則逐條跟著轉址走到底，全部一次 301 就到 200 的頁面，沒有迴圈，也沒有連續轉址。唯一不是 200 的是 `/404/`，那條規則本來就回 404。
+- **404**：不存在的網址（`/no-such-page/`、`/wp-login.php`、`/?page_id=` 不存在的 ID）回 404。頁面是「找不到頁面 - TsukiStudio」，有 `noindex`、搜尋框與回首頁的連結。
+- **影片**：用 Playwright 在預覽網址打開 4 篇有影片的文章，把 7 支影片都靜音播放，再跳到 80% 的位置。每一支都能播放與拖曳，沒有錯誤；media.aniya.moe 的回應全部是 206。
+- **Worker 只在首頁執行**：開著 `wrangler tail` 對正式網址發 request。
+  - `/`、`/?p=30`、`/?page_id=2`、`/?attachment_id=819`、`/?s=test`、`/?utm_source=x` 這 6 個都有 Worker 執行的紀錄。
+  - 文章、`/feed/`、`/about`、不存在的網址、`/wp-login.php`、`/index.html`、`/_astro/` 的圖片、舊的 upload 路徑這 8 個都沒有，不會用掉 Worker 的請求額度。
+- **giscus**：站長在預覽網址用 GitHub 帳號發了留言與回覆，確認可以使用，之後刪掉了測試用的 discussion。discussion 是依文章路徑對應的，留著的話，切換之後會出現在 aniya.moe 的同一篇文章下。
+- **剛部署完的暫時 500**：第一次上傳 assets 之後，有少數檔案在部分節點暫時讀不到，最長大約 20 分鐘（見 04 號的「第一次實際執行」）。之後的部署沒有再發生。

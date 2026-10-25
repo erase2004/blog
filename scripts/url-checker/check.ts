@@ -186,11 +186,8 @@ async function checkUrl(
 	const lowercase = requestPath.replace(/%[0-9A-F]{2}/g, (escape) => escape.toLowerCase());
 	if (lowercase !== requestPath) {
 		const lowercaseReply = await target.get(lowercase);
-		const acceptRecase = lowercasePercentEncodedPaths === 'as-expected-or-recase-redirect';
-		if (!(acceptRecase && isRecaseRedirect(lowercaseReply))) {
-			const lowercaseProblems = await replyProblems(entry, lowercaseReply, target);
-			problems.push(...lowercaseProblems.map((problem) => `${lowercase}: ${problem}`));
-		}
+		const lowercaseProblems = await lowercaseFormProblems(entry, reply, lowercaseReply, target, lowercasePercentEncodedPaths);
+		problems.push(...lowercaseProblems.map((problem) => `${lowercase}: ${problem}`));
 	}
 
 	const slashlessLocation = locationWithoutTrailingSlash(entry, requestPath);
@@ -200,6 +197,36 @@ async function checkUrl(
 		problems.push(...slashlessProblems.map((problem) => `${decodeURI(slashless)}: ${problem}`));
 	}
 	return problems;
+}
+
+/**
+ * What the lowercase-encoded form of a URL must answer (see
+ * LOWERCASE_PERCENT_ENCODED_PATHS); `reply` is what the URL itself answered.
+ */
+async function lowercaseFormProblems(
+	entry: ExpectedUrl,
+	reply: Reply,
+	lowercaseReply: Reply,
+	target: Target,
+	mode: LowercasePercentEncodedPaths,
+): Promise<string[]> {
+	if (mode === 'as-expected-or-recase-redirect') {
+		return isRecaseRedirect(lowercaseReply) ? [] : replyProblems(entry, lowercaseReply, target);
+	}
+	switch (entry.expect) {
+		case 'page':
+		case 'file':
+			// In the very encoding that answers 200: any other would redirect again, or loop.
+			return redirectProblems(lowercaseReply, reply.url.pathname + reply.url.search, { sameEncoding: true });
+		case 'redirect': {
+			// Where the URL itself redirects: what its expectation names, or else what it answered.
+			const location = entry.location ?? (reply.status === 301 ? reply.location : null);
+			return location === null ? replyProblems(entry, lowercaseReply, target) : redirectProblems(lowercaseReply, location);
+		}
+		case 'not-found':
+			// No target to redirect to: the URL itself, which answers 404, will do.
+			return isRecaseRedirect(lowercaseReply) ? [] : replyProblems(entry, lowercaseReply, target);
+	}
 }
 
 /**
@@ -309,13 +336,17 @@ function toRequestPath(url: string): string {
 	return pathname + search;
 }
 
-/** A 301 to `location`: a path on the checked site, or a full URL on another site. */
-function redirectProblems(reply: Reply, location: string): string[] {
+/**
+ * A 301 to `location`: a path on the checked site, or a full URL on another
+ * site. In any percent-encoding of it, unless `sameEncoding`.
+ */
+function redirectProblems(reply: Reply, location: string, { sameEncoding = false } = {}): string[] {
 	if (reply.status !== 301) {
 		return [`expected HTTP 301, got ${reply.status}${reply.location ? ` to ${reply.location}` : ''}`];
 	}
 	const actual = reply.location === null ? null : new URL(reply.location, reply.url);
-	if (actual === null || !sameUrl(actual, new URL(location, reply.url))) {
+	const expected = new URL(location, reply.url);
+	if (actual === null || !(sameEncoding ? actual.href === expected.href : sameUrl(actual, expected))) {
 		return [`expected a redirect to ${location}, got ${reply.location ?? 'no Location'}`];
 	}
 	return [];

@@ -4,10 +4,10 @@
 
 **Blocked by:** 01, 02, 03
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] 每次 push 都建置，並以建置輸出模式跑網址檢查；檢查失敗就不部署
-- [ ] push 到 `main` 時部署到正式 Worker（workflow 已寫好；要等站長把 PR 合併進 `main` 才能實際驗證。Worker 已用本機的 `wrangler deploy` 建立在 workers.dev）
+- [x] push 到 `main` 時部署到正式 Worker（PR #1 合併後的 run 部署到 `aniya-moe.erase2004.workers.dev`，網址檢查 2,868 個通過）
 - [x] push 到其他 branch 時上傳成預覽版本，並在 workflow 的輸出顯示預覽網址
 - [x] 部署完成後，用 HTTP 模式對剛部署的網址再跑一次網址檢查（預覽版本 2,868 個通過；正式部署的這一步跟著上一項驗證）
 - [x] 所有憑證只從 GitHub Secrets 讀取，不出現在 repo 或 log 裡
