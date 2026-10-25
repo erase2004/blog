@@ -1704,3 +1704,14 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 
 7. 在 Google Search Console 重新提交 `/sitemap.xml`。網址跟 WordPress 時期一樣，內容已經是新網站的；WordPress 的子 sitemap 現在都 301 到它。
 8. 正式網域的網址檢查全部通過後，站長在當天關閉了舊主機。從此以後，要退回 WordPress 只能從 02 號的異地備份還原。
+
+## 21：切換後監控（2026-10-25 起）
+
+### 每週自動檢查正式站
+
+- 新增 workflow `.github/workflows/production-check.yml`：每週日 01:17 UTC（台北 09:17），對 `https://aniya.moe` 跑 HTTP 模式的網址檢查，包括 www 轉址與每個回應的 HSTS。也可以在 Actions 頁面手動執行（`workflow_dispatch`）。
+- 不部署、不用任何 secrets。HTTP 模式不需要建置結果，只要 `npm ci`。
+- 失敗時，GitHub 會寄信通知最後修改這個排程的人。
+- GitHub 只從預設分支（`main`）執行排程；公開 repo 如果 60 天沒有任何活動，排程會被暫停。
+- 時間選在整點過 17 分，因為整點是 GitHub 排程最擁擠的時候，容易延遲。
+- 這個自動檢查只能抓到「原本就在清單裡的網址壞掉」。清單外漏掉的舊網址，還是要靠每週看 GSC 與 GA4 的 404。
