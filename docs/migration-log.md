@@ -1634,3 +1634,24 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
   - `tests/site/serving.test.ts`：真正的建置結果上，文章、分類、標籤的小寫網址 301 到頁面；舊 slug 與 PDF 的小寫網址直接 301 到目標；圖片（包括檔名有零寬空格的 `池田港​-2-Ave-Mujica.jpg`）的小寫網址 301 到跟大寫版本同一張圖；小寫的 feed 經過頁面的小寫版本兩次 301 到頁面。期望值是另外寫好的網址字串。
 - **數字**：`npm run build` 1,858 條靜態規則、2 條動態規則（`wrangler dev` 讀到 1,860 條）。`npm run check-urls -- build` 1,985 個通過、883 個查詢字串網址跳過、0 個失敗；`npm run preview` 之後 `npm run check-urls -- http http://localhost:8787` 2,868 個全部通過。`npm test` 28 個檔案、440 個測試全部通過。
 - 正式環境的實際行為，由 CI 部署預覽版本後的 HTTP 網址檢查確認。
+
+### 在 Cloudflare 上的實測結果
+
+對象是 workers.dev 的正式網址 `https://aniya-moe.erase2004.workers.dev` 與 branch 的預覽網址 `https://feature-wordpress-migration-aniya-moe.erase2004.workers.dev`。兩者的內容相同，只有預覽網址會多一個 Cloudflare 自動加的 `X-Robots-Tag: noindex`。
+
+- **HTTP 模式的網址檢查**：CI 每次部署預覽版本後都會跑。加上小寫規則之後（`a511e66`），2,868 個通過、0 個失敗。待完成清單是空的；www 轉址與 HSTS 只在對 `https://aniya.moe` 檢查時才會檢查，留給 20 號。
+- **中文路徑**：
+  - 大寫的百分比編碼（瀏覽器實際送出的寫法）回 200。
+  - 小寫的編碼（WordPress canonical 的寫法）原本 307 到大寫，加上規則之後改成 301，見上一節。
+  - 沒有測試未編碼的 UTF-8 原始位元組：瀏覽器不會這樣送。
+- **`force-trailing-slash`**：
+  - 少斜線的網址有 `_redirects` 規則，都是 301（`/about` → `/about/`、`/2021` → `/2021/`、`/page/2` → `/page/2/`）。
+  - 沒有規則的路徑是 Workers 自己的轉址，狀態碼是 307，例如 `/index.html` → `/`。WordPress 沒有這類網址，所以不處理。
+- **轉址迴圈**：`_redirects` 的 1,788 條轉址規則逐條跟著轉址走到底，全部一次 301 就到 200 的頁面，沒有迴圈，也沒有連續轉址。唯一不是 200 的是 `/404/`，那條規則本來就回 404。
+- **404**：不存在的網址（`/no-such-page/`、`/wp-login.php`、`/?page_id=` 不存在的 ID）回 404。頁面是「找不到頁面 - TsukiStudio」，有 `noindex`、搜尋框與回首頁的連結。
+- **影片**：用 Playwright 在預覽網址打開 4 篇有影片的文章，把 7 支影片都靜音播放，再跳到 80% 的位置。每一支都能播放與拖曳，沒有錯誤；media.aniya.moe 的回應全部是 206。
+- **Worker 只在首頁執行**：開著 `wrangler tail` 對正式網址發 request。
+  - `/`、`/?p=30`、`/?page_id=2`、`/?attachment_id=819`、`/?s=test`、`/?utm_source=x` 這 6 個都有 Worker 執行的紀錄。
+  - 文章、`/feed/`、`/about`、不存在的網址、`/wp-login.php`、`/index.html`、`/_astro/` 的圖片、舊的 upload 路徑這 8 個都沒有，不會用掉 Worker 的請求額度。
+- **giscus**：站長在預覽網址用 GitHub 帳號發了留言與回覆，確認可以使用，之後刪掉了測試用的 discussion。discussion 是依文章路徑對應的，留著的話，切換之後會出現在 aniya.moe 的同一篇文章下。
+- **剛部署完的暫時 500**：第一次上傳 assets 之後，有少數檔案在部分節點暫時讀不到，最長大約 20 分鐘（見 04 號的「第一次實際執行」）。之後的部署沒有再發生。
