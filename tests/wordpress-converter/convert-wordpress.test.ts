@@ -1,11 +1,42 @@
 // Converting the whole site from the tables of the WordPress backup: one
 // content file per published post and page, the category and tag data, and
 // the old-URL mapping table.
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { convertWordPress } from '../../scripts/wordpress-converter/convert';
 import { addAttachments, attachment, meta, post, wordpressTables } from './fixtures';
 
 const files = () => convertWordPress(wordpressTables()).files;
+
+const script = fileURLToPath(new URL('../../scripts/convert-wordpress.ts', import.meta.url));
+
+// Since the owner's review (ticket 18) the Markdown is the only source of
+// truth, and a conversion would overwrite it.
+describe('node scripts/convert-wordpress.ts', () => {
+	it('refuses to write anything without --overwrite-content, and says why', () => {
+		// A backup that does not exist: without the guard, the command fails
+		// reading it, before it writes anything.
+		const dir = mkdtempSync(join(tmpdir(), 'aniya-moe-convert-'));
+		try {
+			const { status, stdout, stderr } = spawnSync(process.execPath, [script, join(dir, 'dump.sql'), join(dir, 'uploads')], {
+				encoding: 'utf8',
+			});
+
+			expect(status).toBe(1);
+			expect(stdout).toBe('');
+			expect(stderr).toContain('the Markdown in src/content/ is the only source of truth');
+			expect(stderr).toContain('kept only as history and for its tests');
+			expect(stderr).toContain('npm run convert-wordpress -- --overwrite-content');
+			expect(existsSync(join(dir, 'uploads'))).toBe(false);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+});
 
 /** The frontmatter lines of a file, by key. */
 function frontmatterOf(file: string | undefined): Record<string, string> {

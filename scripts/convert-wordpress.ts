@@ -2,13 +2,15 @@
 // the new site's content files, the category and tag data, and the old-URL
 // mapping table, and copies the images the content uses from the backup's
 // uploads directory. Running it again on the same backup writes the same
-// bytes, so generated files that conflict in a merge are resolved by running it.
+// bytes.
 //
-//   node scripts/convert-wordpress.ts [<dump.sql> [<uploads dir>]]   (defaults: settings.ts)
+//   node scripts/convert-wordpress.ts --overwrite-content [<dump.sql> [<uploads dir>]]   (defaults: settings.ts)
 //
 // The content directories are emptied first, and the image directory made to
-// hold exactly the images the content uses: until the manual review (ticket
-// 18) every file in them comes from the converter. The backup is only read.
+// hold exactly the images the content uses. Since the owner's review (ticket
+// 18) the Markdown is the only source of truth and may have hand edits, so the
+// command refuses to run without --overwrite-content: the converter is kept as
+// history and for its tests. The backup is only read.
 import { copyFileSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,11 +20,24 @@ import { WORDPRESS_DUMP, WORDPRESS_UPLOADS } from './wordpress-converter/setting
 import { readSqlDump } from './wordpress-converter/sql-dump.ts';
 import { WORDPRESS_TABLES } from './wordpress-converter/wordpress.ts';
 
+const OVERWRITE_CONTENT = '--overwrite-content';
+
 const root = fileURLToPath(new URL('../', import.meta.url));
-const [dumpArgument, uploadsArgument, ...extra] = process.argv.slice(2);
-if (extra.length > 0) {
-	console.error('usage: node scripts/convert-wordpress.ts [<dump.sql> [<uploads dir>]]');
+const args = process.argv.slice(2);
+const [dumpArgument, uploadsArgument, ...extra] = args.filter((arg) => arg !== OVERWRITE_CONTENT);
+if (extra.length > 0 || [dumpArgument, uploadsArgument].some((arg) => arg?.startsWith('--'))) {
+	console.error(`usage: node scripts/convert-wordpress.ts ${OVERWRITE_CONTENT} [<dump.sql> [<uploads dir>]]`);
 	process.exit(2);
+}
+if (!args.includes(OVERWRITE_CONTENT)) {
+	console.error(`Refusing to convert: since the owner's review (ticket 18), the Markdown in src/content/ is the only source of truth.
+A conversion empties ${POSTS_DIR}/ and ${PAGES_DIR}/ and rewrites them from the WordPress backup,
+along with src/data/ and ${IMAGES_DIR}/, so every hand edit since would be lost.
+The converter is kept only as history and for its tests.
+
+To overwrite the content anyway, on purpose:
+  npm run convert-wordpress -- ${OVERWRITE_CONTENT} [<dump.sql> [<uploads dir>]]`);
+	process.exit(1);
 }
 const dump = resolve(dumpArgument ?? WORDPRESS_DUMP);
 const uploadsDir = resolve(uploadsArgument ?? WORDPRESS_UPLOADS);

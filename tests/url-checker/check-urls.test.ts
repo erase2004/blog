@@ -637,7 +637,8 @@ describe('checking the production site', () => {
 		site = await startStandIn((url) => {
 			const name = url.pathname.replace(/^\/hsts\//, '');
 			const hsts = name in HSTS ? HSTS[name] : HSTS.ok;
-			return { status: 200, headers: hsts ? { 'Strict-Transport-Security': hsts } : {} };
+			const headers: Record<string, string> = hsts ? { 'Strict-Transport-Security': hsts } : {};
+			return { status: 200, headers };
 		});
 		www = await startStandIn((url) => {
 			const target = new URL(wwwAnswers === 'home page' ? '/' : url.pathname + url.search, site.url).href;

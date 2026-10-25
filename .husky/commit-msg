@@ -1,0 +1,3 @@
+# Conventional Commits (commitlint.config.mjs), as the Conventions job in CI
+# checks. Runs before git signs the commit.
+commitlint --edit "$1"

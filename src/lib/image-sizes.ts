@@ -3,6 +3,7 @@
 // rather than as the screen: Markdown images (through contentImageSizes) and
 // the Compare slider's. Follows the layout in src/styles/global.css
 // (`.sheet`): keep the two in step.
+import type { HastPluginDefinition } from 'satteri';
 
 /**
  * The width of the main column (`.prose`), by screen width: phones (the
@@ -17,20 +18,17 @@ export const CONTENT_IMAGE_SIZES = [
 	'45.5rem',
 ].join(', ');
 
-type Element = { properties?: Record<string, unknown> };
-type Context = { setProperty(node: Element, name: string, value: unknown): void };
-
 /**
  * A plugin for Astro's Markdown processor (Sätteri; markdown.processor in
  * astro.config.mjs) giving the images of Markdown and MDX files the column's
  * `sizes`, unless they have their own. It runs before Astro turns the images
  * into responsive ones, which keeps the `sizes` it finds.
  */
-export const contentImageSizes = {
+export const contentImageSizes: HastPluginDefinition = {
 	name: 'content-image-sizes',
 	element: {
 		filter: ['img'],
-		visit(node: Element, context: Context) {
+		visit(node, context) {
 			if (node.properties?.sizes === undefined) context.setProperty(node, 'sizes', CONTENT_IMAGE_SIZES);
 		},
 	},

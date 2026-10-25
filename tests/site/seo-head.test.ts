@@ -17,6 +17,7 @@ describe('SEO head', () => {
 		title: string;
 		description: string | null;
 		ogType: string | null;
+		ogImage: string | null;
 		publishedTime: string | null;
 		modifiedTime: string | null;
 	};
