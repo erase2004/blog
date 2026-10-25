@@ -1715,3 +1715,12 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 - GitHub 只從預設分支（`main`）執行排程；公開 repo 如果 60 天沒有任何活動，排程會被暫停。
 - 時間選在整點過 17 分，因為整點是 GitHub 排程最擁擠的時候，容易延遲。
 - 這個自動檢查只能抓到「原本就在清單裡的網址壞掉」。清單外漏掉的舊網址，還是要靠每週看 GSC 與 GA4 的 404。
+
+### 切換後的其他收尾（2026-10-25）
+
+- **Cloudflare API token 重新產生**：token 在規劃時曾經貼進對話，所以站長重新產生了一組，GitHub Secrets 也更新了。之後 PR #4 的預覽部署用新 token 成功。
+- **郵件的 DNS**：切換時發現 MX 指向 `mail.aniay.moe`。`aniya` 拼錯了，而且 `mail.aniay.moe` 和 `mail.aniya.moe` 都不存在，所以寄到 @aniya.moe 的信本來就收不到。站長沒有在用這個網域的信箱，所以改成「不收信、不寄信」：
+  - MX 改成 null MX `0 .`（RFC 7505），寄件端會立刻退信，不會重試好幾天。
+  - 新增 TXT `v=spf1 -all`，宣告這個網域不寄信；原本 GSC 的驗證 TXT 保留。
+  - 新增 `_dmarc` TXT `v=DMARC1; p=reject;`，讓收件端拒收冒用 aniya.moe 寄出的信。
+  - 三筆都用 Cloudflare 與 Google 的 DNS-over-HTTPS 查詢確認過。
