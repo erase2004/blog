@@ -1570,6 +1570,20 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 - 時間：runner 上的冷建置、約 600 MB 的圖片快取與 `dist` artifact 的上傳下載各要多久，`timeout-minutes`（build、test 30 分鐘，deploy 20 分鐘）夠不夠；第二次 run 有沒有還原到快取、沒有新圖片時有沒有略過存檔。
 - GitHub 自動建立 `production`、`preview` 兩個環境，PR 上看得到 View deployment；concurrency 照預期取消或排隊。
 
+### 第一次實際執行（2026-10-25）
+
+- **建立 Worker**：站長用 `npx wrangler login` 在瀏覽器授權，我對 `379d1ae` 的建置結果跑 `npx wrangler deploy`。3,801 個檔案上傳了 129 秒，Worker 建在 `https://aniya-moe.erase2004.workers.dev`。帳號原本就有 workers.dev 子網域 `erase2004`。
+- **剛部署完的暫時 500**：從台灣（Cloudflare 的新加坡節點）跑 HTTP 模式的網址檢查，2,858 個通過，10 個逾時。追下去是 4 個檔案（`/feed/atom/` 與 3 張 webp）卡 47 秒後回 500。每次重試失敗的檔案不太一樣，陸續恢復，最後一張大約 20 分鐘後恢復，之後 3,800 個檔案全部回 200。看起來是剛上傳的 assets 在部分節點還讀不到。對 20 號的意義：切換前先部署，隔一段時間跑完整的網址檢查，通過之後才改 DNS。
+- **推送被擋**：gh 的登入沒有 `workflow` scope，GitHub 拒絕推送 `.github/workflows/` 底下的檔案（`refusing to allow an OAuth App to create or update workflow … without workflow scope`）。站長跑 `gh auth refresh -h github.com -s workflow` 補上權限。
+- **第一次 CI run**（`feature/wordpress-migration`，`379d1ae`）：三個 job 都通過。
+  - Build 4 分 57 秒：沒有快取，冷建置 4 分 5 秒；網址檢查 1,985 個通過、0 個失敗。
+  - Test 4 分 13 秒，跟 Build 同時跑：Linux 上的 workerd、sharp、Pagefind、Playwright 都正常。
+  - Deploy 1 分 37 秒：`versions upload` 只上傳了 10 個內容不同的 assets。預覽網址是 `https://a046a1cb-aniya-moe.erase2004.workers.dev`，branch alias 是 `https://feature-wordpress-migration-aniya-moe.erase2004.workers.dev`。部署後從 GitHub 的 runner 跑 HTTP 模式的網址檢查，2,868 個通過、0 個失敗。
+  - API token 的權限夠上傳版本。log 裡沒有 account ID 或 token。
+- **Linux 與 Windows 的建置差在哪**：逐一比對兩個部署上的檔案，HTML、feed、sitemap 等都相同，不同的 10 個都在 `/pagefind/`（索引與 Pagefind 自帶的 JS、CSS、wasm）。搜尋在兩邊都能用（Linux 上的測試通過），所以不處理。
+- **noindex**：預覽網址的回應有 `X-Robots-Tag: noindex`，是 Cloudflare 自動加的；workers.dev 的正式網址沒有。頁面的 canonical 都指向 aniya.moe。
+- **還沒驗證**：push 到 `main` 的正式部署（要等 PR 合併進 `main`），以及第二次 run 能不能還原圖片快取。
+
 ### 留給其他 issue 的發現
 
 - 19：預覽網址跟 workers.dev 的正式網址都是公開的，頁面的 canonical 指向 aniya.moe；看一下預覽網址有沒有 `X-Robots-Tag: noindex`，決定要不要處理被搜尋引擎索引的可能。
