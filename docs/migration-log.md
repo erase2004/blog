@@ -1655,3 +1655,72 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
   - 文章、`/feed/`、`/about`、不存在的網址、`/wp-login.php`、`/index.html`、`/_astro/` 的圖片、舊的 upload 路徑這 8 個都沒有，不會用掉 Worker 的請求額度。
 - **giscus**：站長在預覽網址用 GitHub 帳號發了留言與回覆，確認可以使用，之後刪掉了測試用的 discussion。discussion 是依文章路徑對應的，留著的話，切換之後會出現在 aniya.moe 的同一篇文章下。
 - **剛部署完的暫時 500**：第一次上傳 assets 之後，有少數檔案在部分節點暫時讀不到，最長大約 20 分鐘（見 04 號的「第一次實際執行」）。之後的部署沒有再發生。
+
+## 20：切換上線（2026-10-25）
+
+約 11:30（UTC+8）把 `aniya.moe` 從 WordPress 切到 Worker `aniya-moe`。全程由站長在 Cloudflare 後台操作，我在每一步之後用 curl 和網址檢查確認。
+
+### 切換前的現況
+
+- DNS 已經在 Cloudflare（`chloe`／`marty.ns.cloudflare.com`），apex 與 www 都有開代理。
+- Rocket Loader 是開的，WordPress 的頁面裡有 `rocket-loader.min.js`。
+- HSTS 是 Cloudflare 加的，不是舊主機：連 Cloudflare 自己回應的 `/cdn-cgi/trace` 都帶 `max-age=31536000; includeSubDomains; preload`。
+- www 由 WordPress 自己轉址，會直接 301 到文章頁，不保留 `?p=30`。
+- HTML 沒有被 Cloudflare 快取（`cf-cache-status: DYNAMIC`），所以切換後不需要清快取。
+
+### 階段 A：準備（不影響當時的網站）
+
+1. 關閉 Rocket Loader（Speed → Optimization → Content Optimization）。
+2. 確認 SSL/TLS → Edge Certificates 的 HSTS：Max Age 12 個月、含子網域、Preload。
+3. 建立 zone 層級的 Redirect Rule `www to apex`：
+   - 條件 `http.host eq "www.aniya.moe"`，動作 `concat("https://aniya.moe", http.request.uri.path)`，301，保留 query string。
+   - 確認：`www.aniya.moe/?p=30` 301 到 `https://aniya.moe/?p=30`，中文路徑與多個參數都只轉一次。
+   - 踩到的坑：後台的 Rules 要先點進網域才看得到。也可以直接開 `https://dash.cloudflare.com/?to=/:account/aniya.moe/rules/redirect-rules`。
+
+### 階段 B：切換
+
+4. 記下 apex 原本的 DNS 紀錄，退回時要用。`www`、MX、TXT（含 GSC 的驗證紀錄）都不動。
+5. 在 Workers & Pages → aniya-moe → Settings → Domains & Routes 加上 Custom domain `aniya.moe`。完成後，aniya.moe 回應的就是新網站（`generator: Astro v7.4.2`）。
+6. **意外：www 消失了**。切換後 `www.aniya.moe` 查不到 DNS（NXDOMAIN），整個打不開。可能是刪 apex 紀錄時一起刪掉了，或者它原本是指向 apex 的 CNAME。站長補了一筆 `AAAA www 100::`（Proxied）。這是 Cloudflare 建議給只需要轉址的 hostname 用的佔位地址，request 會先被 Redirect Rule 轉走，不會送到這個地址。補上後 www 恢復。**教訓**：切換之後要馬上檢查 www。
+
+### 切換後的檢查
+
+- `npm run check-urls -- http https://aniya.moe`：**2,871 個通過、0 個失敗**，包括 2,868 個舊網址、3 個 www 轉址，以及每個回應的 HSTS。
+- 抓建置結果裡的每個檔案：3,800 個裡只有 5 個 404，都是 Pagefind 的索引檔。原因是比對用的是本機 Windows 的建置結果，線上是 CI 在 Linux 上建的，Pagefind 的索引檔名本來就不同（見 04 號）。線上 `pagefind-entry.json` 指到的索引檔回 200，搜尋正常。
+- GSC 的 TXT 驗證紀錄還在。
+
+### CI 與 Custom Domain
+
+- Custom domain 是在後台加的，沒有寫進 `wrangler.jsonc`。讀過 wrangler 4.152.0 的原始碼：`wrangler deploy` 只有在設定檔列了 custom domain 時才會處理（`customDomainsOnly.length > 0`），所以 CI 每次部署都不會移除 `aniya.moe`。
+- 如果之後要把它寫進設定檔，wrangler 會用 `replace_state=true` 讓設定檔取代現有的狀態，到時候設定檔就必須列出 `aniya.moe`。
+- 在沒有 TTY 的環境（例如 CI），wrangler 遇到衝突的 DNS 紀錄會直接覆蓋，不會詢問。
+
+### 怎麼退回
+
+- Worker 的新版本有問題：`wrangler rollback`，回到上一個版本。
+- 要退回 WordPress（舊主機還開著的時候）：移除 Custom domain `aniya.moe`，再用步驟 4 記下的內容重建 apex 的 DNS 紀錄。
+
+### 階段 C：收尾
+
+7. 在 Google Search Console 重新提交 `/sitemap.xml`。網址跟 WordPress 時期一樣，內容已經是新網站的；WordPress 的子 sitemap 現在都 301 到它。
+8. 正式網域的網址檢查全部通過後，站長在當天關閉了舊主機。從此以後，要退回 WordPress 只能從 02 號的異地備份還原。
+
+## 21：切換後監控（2026-10-25 起）
+
+### 每週自動檢查正式站
+
+- 新增 workflow `.github/workflows/production-check.yml`：每週日 01:17 UTC（台北 09:17），對 `https://aniya.moe` 跑 HTTP 模式的網址檢查，包括 www 轉址與每個回應的 HSTS。也可以在 Actions 頁面手動執行（`workflow_dispatch`）。
+- 不部署、不用任何 secrets。HTTP 模式不需要建置結果，只要 `npm ci`。
+- 失敗時，GitHub 會寄信通知最後修改這個排程的人。
+- GitHub 只從預設分支（`main`）執行排程；公開 repo 如果 60 天沒有任何活動，排程會被暫停。
+- 時間選在整點過 17 分，因為整點是 GitHub 排程最擁擠的時候，容易延遲。
+- 這個自動檢查只能抓到「原本就在清單裡的網址壞掉」。清單外漏掉的舊網址，還是要靠每週看 GSC 與 GA4 的 404。
+
+### 切換後的其他收尾（2026-10-25）
+
+- **Cloudflare API token 重新產生**：token 在規劃時曾經貼進對話，所以站長重新產生了一組，GitHub Secrets 也更新了。之後 PR #4 的預覽部署用新 token 成功。
+- **郵件的 DNS**：切換時發現 MX 指向 `mail.aniay.moe`。`aniya` 拼錯了，而且 `mail.aniay.moe` 和 `mail.aniya.moe` 都不存在，所以寄到 @aniya.moe 的信本來就收不到。站長沒有在用這個網域的信箱，所以改成「不收信、不寄信」：
+  - MX 改成 null MX `0 .`（RFC 7505），寄件端會立刻退信，不會重試好幾天。
+  - 新增 TXT `v=spf1 -all`，宣告這個網域不寄信；原本 GSC 的驗證 TXT 保留。
+  - 新增 `_dmarc` TXT `v=DMARC1; p=reject;`，讓收件端拒收冒用 aniya.moe 寄出的信。
+  - 三筆都用 Cloudflare 與 Google 的 DNS-over-HTTPS 查詢確認過。
