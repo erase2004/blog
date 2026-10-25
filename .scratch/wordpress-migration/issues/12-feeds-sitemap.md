@@ -4,13 +4,13 @@
 
 **Blocked by:** 05, 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] `/feed/` 輸出 RSS 2.0，`/feed/atom/` 輸出 Atom；兩者都是全文、最新 10 篇，Content-Type 正確
-- [ ] feed 裡的連結與圖片都是絕對網址
-- [ ] `/sitemap.xml` 列出首頁、文章、頁面、分類、標籤，附上圖片的新網址
-- [ ] `/sitemap.xml` 不列日期彙整與分頁
-- [ ] `robots.txt` 重新產生，保留 `Sitemap:` 那一行，拿掉 `/wp-admin/` 相關規則
-- [ ] 產生 `llms.txt`
-- [ ] 網址檢查：`/feed/`、`/feed/atom/`、`/sitemap.xml`、`/robots.txt` 通過，並從待完成清單移除
-- [ ] 更新搬遷日誌
+- [x] `/feed/` 輸出 RSS 2.0，`/feed/atom/` 輸出 Atom；兩者都是全文、最新 10 篇，Content-Type 正確
+- [x] feed 裡的連結與圖片都是絕對網址
+- [x] `/sitemap.xml` 列出首頁、文章、頁面、分類、標籤，附上圖片的新網址
+- [x] `/sitemap.xml` 不列日期彙整與分頁
+- [x] `robots.txt` 重新產生，保留 `Sitemap:` 那一行，拿掉 `/wp-admin/` 相關規則
+- [x] 產生 `llms.txt`
+- [x] 網址檢查：`/feed/`、`/feed/atom/`、`/sitemap.xml`、`/robots.txt` 通過，並從待完成清單移除
+- [x] 更新搬遷日誌

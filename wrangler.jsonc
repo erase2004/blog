@@ -1,0 +1,31 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "aniya-moe",
+	"compatibility_date": "2026-10-19",
+	// Served at aniya-moe.<subdomain>.workers.dev; no routes or custom domains
+	// until aniya.moe moves over (ticket 20).
+	"workers_dev": true,
+	// Every version gets its own preview URL, <version>-aniya-moe.<subdomain>.workers.dev,
+	// and a branch's versions (CI's `wrangler versions upload --preview-alias`)
+	// one for the branch too. Unset, wrangler 4.152.0 leaves it to Cloudflare's
+	// default. `wrangler deploy` applies it, `versions upload` does not.
+	"preview_urls": true,
+	// Answers WordPress's query-string URLs (/?p=ID, …) at the home page URL.
+	"main": "src/worker.ts",
+	// Cloudflare serves the Astro build output directly.
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS",
+		// The Worker runs only for the home page URL, whatever its query
+		// string; every other request is a static asset request, which costs
+		// nothing (a Worker run counts towards the daily limit). Unknown URLs
+		// get the 404 page from the assets, not the Worker.
+		"run_worker_first": ["/"],
+		// /foo and /foo/index.html redirect to /foo/, but with HTTP 307 (seen in
+		// wrangler dev; to be confirmed on the preview URL). The 301s for pages
+		// come from the _redirects rules written at build time.
+		"html_handling": "force-trailing-slash",
+		// Unknown URLs get dist/404.html with HTTP status 404.
+		"not_found_handling": "404-page"
+	}
+}

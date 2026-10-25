@@ -1,0 +1,44 @@
+---
+// The sidebar's search box: Pagefind's searchbox component, which searches the
+// index src/integrations/pagefind.ts writes at build time (so not under
+// `astro dev`). Its texts follow the page's language (zh-TW), except the
+// keyboard hints under the results, which stay in English: they are hidden,
+// as is the Ctrl+K shortcut badge.
+interface Props {
+	/**
+	 * Pagefind's name for the box's search, for a second box on a page (the
+	 * 404 page's): boxes of the same instance share their query and results.
+	 */
+	instance?: string;
+}
+
+const { instance } = Astro.props;
+---
+
+<link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
+<script is:inline type="module" src="/pagefind/pagefind-component-ui.js"></script>
+<pagefind-searchbox
+	class="search"
+	instance={instance}
+	placeholder="搜尋文章"
+	hide-shortcut
+	show-keyboard-hints="false"></pagefind-searchbox>
+
+<style>
+	/* Pagefind's colours and sizes, set to the site's. */
+	.search {
+		--pf-font: var(--font-sans);
+		--pf-text: var(--color-text);
+		--pf-text-secondary: var(--color-muted);
+		--pf-text-muted: var(--color-muted);
+		--pf-background: var(--color-paper);
+		--pf-border: var(--color-rule);
+		--pf-border-focus: var(--color-link);
+		--pf-outline-focus: var(--color-link);
+		--pf-hover: var(--color-surface);
+		--pf-mark: var(--color-highlight);
+		--pf-border-radius: 0.25rem;
+		--pf-searchbox-max-width: 100%;
+		display: block;
+	}
+</style>

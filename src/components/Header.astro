@@ -1,0 +1,151 @@
+---
+// The site header: the site name and tagline, and the menu the WordPress site
+// had (首頁, then the pages, labelled with their titles).
+import { getEntry } from 'astro:content';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { pagePath } from '../lib/content';
+
+/** The pages in the menu, by ID (their file path in src/content/pages/), in the WordPress menu's order. */
+const MENU_PAGES = ['about', 'about/autobiography', 'about/contact', 'subscribe', 'policy'];
+
+const menu = [
+	{ label: '首頁', path: '/' },
+	...(await Promise.all(
+		MENU_PAGES.map(async (id) => {
+			const page = await getEntry('pages', id);
+			if (!page) throw new Error(`The menu links to page "${id}", which is not in src/content/pages/`);
+			return { label: page.data.title, path: pagePath(page) };
+		}),
+	)),
+];
+
+const current = decodeURI(Astro.url.pathname);
+---
+
+<header class="site-header">
+	<div class="inner">
+		<div class="title">
+			<a class="brand" href="/">
+				{/* A crescent moon: Tsuki (月). */}
+				<svg class="moon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+					<path d="M15.5 2.5a9.5 9.5 0 1 0 6 16.9A8 8 0 0 1 15.5 2.5Z" />
+				</svg>{SITE_TITLE}
+			</a>
+			<p class="tagline">{SITE_DESCRIPTION}</p>
+		</div>
+		<nav aria-label="主要選單">
+			<ul>
+				{
+					menu.map(({ label, path }) => (
+						<li>
+							<a href={path} aria-current={path === current ? 'page' : undefined}>
+								{label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		color: var(--color-on-frame);
+	}
+	.inner {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1.25rem 2rem;
+		max-width: var(--page-width);
+		margin: 0 auto;
+		padding: 2.25rem 3rem 1.75rem;
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: #fff;
+		font-size: 1.875rem;
+		font-weight: 700;
+		letter-spacing: 0.01em;
+		line-height: 1.2;
+		text-decoration: none;
+	}
+	.brand:hover {
+		color: #fff;
+	}
+	.moon {
+		flex: none;
+		fill: #f3e2a9;
+	}
+	.tagline {
+		margin: 0.35rem 0 0;
+		color: var(--color-on-frame-muted);
+		font-size: 0.9375rem;
+		letter-spacing: 0.08em;
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	nav a {
+		display: block;
+		padding: 0.4rem 0.75rem;
+		border-bottom: 2px solid transparent;
+		color: var(--color-on-frame);
+		font-size: 0.9375rem;
+		line-height: 1.5;
+		text-decoration: none;
+	}
+	nav a:hover {
+		border-bottom-color: var(--color-on-frame-muted);
+		color: #fff;
+	}
+	nav a[aria-current='page'] {
+		border-bottom-color: var(--color-link-on-frame);
+		color: #fff;
+	}
+
+	@media (max-width: 64rem) {
+		.inner {
+			padding-inline: 1.25rem;
+		}
+	}
+
+	/* On a phone: the menu in a grid of 3 under the site name. */
+	@media (max-width: 40rem) {
+		.inner {
+			padding: 1.5rem var(--gutter) 1rem;
+		}
+		.brand {
+			font-size: 1.625rem;
+		}
+		nav {
+			width: 100%;
+		}
+		ul {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 0.375rem;
+		}
+		nav a {
+			padding: 0.45rem 0.25rem;
+			border-bottom: 0;
+			border-radius: 0.25rem;
+			background: rgb(255 255 255 / 7%);
+			text-align: center;
+		}
+		nav a[aria-current='page'] {
+			background: var(--color-link);
+		}
+	}
+</style>

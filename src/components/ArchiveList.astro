@@ -1,0 +1,51 @@
+---
+// Sidebar widget: a list of links to archives, in the order given, each
+// with its post count: `技術 (9)`. The categories that have posts, by name;
+// the years, newest first.
+import type { Archive } from '../lib/archives';
+
+interface Props {
+	/** What the archives are, for screen readers: `分類`, `年份`. */
+	label: string;
+	archives: Archive[];
+}
+
+const { label, archives } = Astro.props;
+---
+
+<nav aria-label={label}>
+	<ul>
+		{
+			archives.map(({ name, path, posts }) => (
+				<li>
+					<a href={path}>{name}</a> <span class="count">({posts.length})</span>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<style>
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.45rem 0;
+		border-bottom: 1px solid var(--color-rule);
+	}
+	a {
+		text-decoration: none;
+	}
+	a:hover {
+		text-decoration: underline;
+	}
+	.count {
+		color: var(--color-muted);
+		font-variant-numeric: tabular-nums;
+	}
+</style>

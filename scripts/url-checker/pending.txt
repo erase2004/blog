@@ -1,0 +1,4 @@
+# Expected URLs that may still fail the URL checker (scripts/check-urls.ts).
+# One URL per line, as a UTF-8 path, sorted as `LC_ALL=C sort` sorts them.
+# Blank lines between groups and # comments are ignored.
+# Take a URL off as soon as it passes: the check fails while a listed URL passes.

@@ -1,0 +1,48 @@
+---
+import { SITE_TITLE } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="inner">
+		<p>&copy; {year} {SITE_TITLE}</p>
+		{
+			/*
+			 * rel="me" verifies the site on the Mastodon profile. Hidden, as on the
+			 * WordPress site: Mastodon reads it from the HTML, readers never see it.
+			 */
+		}
+		<a href="https://g0v.social/@erase2004" rel="me" hidden>Mastodon</a>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		color: var(--color-on-frame-muted);
+		font-size: 0.875rem;
+	}
+	.inner {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.5rem 2rem;
+		max-width: var(--page-width);
+		margin: 0 auto;
+		padding: 2rem 3rem 3rem;
+	}
+	p {
+		margin: 0;
+	}
+
+	@media (max-width: 64rem) {
+		.inner {
+			padding-inline: 1.25rem;
+		}
+	}
+	@media (max-width: 40rem) {
+		.inner {
+			padding: 1.5rem var(--gutter) 2rem;
+		}
+	}
+</style>

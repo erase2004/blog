@@ -1,0 +1,9 @@
+---
+// The home page: the 10 newest posts; older ones on /page/N/.
+import ArchiveLayout from '../layouts/ArchiveLayout.astro';
+import { archivePages, homeArchive } from '../lib/archives';
+
+const [page] = archivePages(await homeArchive());
+---
+
+<ArchiveLayout page={page!} />

@@ -4,13 +4,13 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 83 個 Envira 相簿轉成 `<Gallery>`，圖片清單取自 block 裡的 JSON；原本有圖說的保留圖說
-- [ ] 3 個 Gutenberg 內建的 gallery block 也用 `<Gallery>` 呈現
-- [ ] 含相簿的文章改成 MDX
-- [ ] 相簿以網格排列；點圖片用 PhotoSwipe 開啟 lightbox，可以左右翻看與關閉
-- [ ] 相簿的 JS 只在有相簿的頁面載入
-- [ ] 轉換後的圖片總數與原相簿一致（約 509 張）
-- [ ] 轉換規則有 fixture 測試
-- [ ] 更新搬遷日誌
+- [x] 83 個 Envira 相簿轉成 `<Gallery>`，圖片清單取自 block 裡的 JSON；原本有圖說的保留圖說
+- [x] 3 個 Gutenberg 內建的 gallery block 也用 `<Gallery>` 呈現
+- [x] 含相簿的文章改成 MDX
+- [x] 相簿以網格排列；點圖片用 PhotoSwipe 開啟 lightbox，可以左右翻看與關閉
+- [x] 相簿的 JS 只在有相簿的頁面載入
+- [x] 轉換後的圖片總數與原相簿一致（約 509 張）
+- [x] 轉換規則有 fixture 測試
+- [x] 更新搬遷日誌
