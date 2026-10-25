@@ -1,3 +1,7 @@
+## Conventions
+
+Read `docs/agents/conventions.md` before changing code, content, tests, CI or deploys.
+
 ## Agent skills
 
 ### Issue tracker
