@@ -1,0 +1,12 @@
+# Conventional Branch names (scripts/branch-name.ts), as the Conventions job
+# in CI checks: each branch pushed to, by the name it gets on the remote.
+# Deleting a branch (an all-zero local object name) is not checked.
+while read -r _ local_oid remote_ref _; do
+	case $remote_ref in
+	refs/heads/*)
+		case $local_oid in
+		*[!0]*) node scripts/branch-name.ts "${remote_ref#refs/heads/}" ;;
+		esac
+		;;
+	esac
+done
