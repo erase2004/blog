@@ -2,7 +2,8 @@
 # build output, and runs the tests alongside. When both pass, it deploys the
 # checked build: main to the production Worker (`wrangler deploy`), any other
 # branch as a preview version (`wrangler versions upload`), and checks every
-# old URL again over HTTP on the URL it was deployed to.
+# old URL again over HTTP on the URL it was deployed to. Alongside, the
+# Conventions job checks the commit messages and the branch name.
 #
 # Pushes only, never `pull_request`: the repo is public, and the Cloudflare
 # secrets must never reach code from a fork.
@@ -105,6 +106,49 @@ jobs:
           restore-keys: astro-images-${{ runner.os }}-${{ hashFiles('package-lock.json', 'astro.config.mjs') }}-
       - run: npx playwright install --with-deps chromium
       - run: npm test
+
+  # Commit messages follow Conventional Commits (commitlint.config.mjs) and
+  # the branch name Conventional Branch (scripts/branch-name.ts), as the local
+  # hooks check (.husky/). Not a condition of the deploy: the protect-main
+  # ruleset requires it before a merge instead.
+  conventions:
+    name: Conventions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The whole history and origin/main, to find the pushed commits.
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Check the branch name
+        run: node scripts/branch-name.ts "$GITHUB_REF_NAME"
+      - run: npm ci
+      # A branch: its commits that main does not have. main: the commits the
+      # push added. A new main (an all-zero `before`) or a manual run (none):
+      # the commit main points at.
+      - name: Check the commit messages
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$GITHUB_REF_NAME" != main ]; then
+            from=origin/main
+          elif [ -n "${BEFORE//0/}" ]; then
+            from=$BEFORE
+          else
+            from=
+          fi
+          if [ -z "$from" ]; then
+            npx --no -- commitlint --last --verbose
+          elif [ "$(git rev-list --count "$from..$GITHUB_SHA")" = 0 ]; then
+            echo "No commits to check: $GITHUB_SHA has none that $from does not."
+          else
+            npx --no -- commitlint --from "$from" --to "$GITHUB_SHA" --verbose
+          fi
 
   deploy:
     name: Deploy
