@@ -1590,3 +1590,17 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 
 - 19：預覽網址跟 workers.dev 的正式網址都是公開的，頁面的 canonical 指向 aniya.moe；看一下預覽網址有沒有 `X-Robots-Tag: noindex`，決定要不要處理被搜尋引擎索引的可能。
 - 20：切換之後如果關掉 workers.dev（`workers_dev: false`）或加上自訂網域，`deploy` 輸出的 `targets` 會變成 aniya.moe（沒有 `https://`），workflow 的「取得網址」目前只找 workers.dev 的網址，要一起改；正式網域的網址檢查會多檢查 www 與 HSTS（`PRODUCTION`）。
+
+## 18：逐篇人工檢查（2026-10-25）
+
+- 站長逐篇比對了新網站與 WordPress 上的 22 篇文章與 5 個頁面，確認沒有需要修正的轉換錯誤。
+- **常見的轉換問題**：人工檢查沒有發現新的問題。轉換時已經處理過的常見問題，記在 05–10 號各節，例如粗體與中文標點、Markdown 跳脫、標題的 en dash、相簿與滑桿的圖片數量。
+- 先前各 issue 留給 18 號決定的項目，站長檢查後沒有提出修改，所以都維持現狀：
+  - `<mark>`：WordPress 原本是「文字顏色」，現在統一顯示成螢光筆。
+  - WordPress 手動調過寬度的 13 張圖：現在是「最寬到原圖寬度、不超過欄寬」。
+  - 檔名含零寬空格的那張圖（Day 5）：照原樣保留。
+  - Day 5 圖說裡沒有 `<rt>` 的 `<ruby>`，以及「夜行巴士」那組滑桿的裁切。
+  - 前言 2 張 App 截圖的圖說：只在 lightbox 裡顯示。
+  - `acgn-museum-ssg` 的 og:image `heroimage.png`：2.4 MB。
+  - 幾個頁面的 meta description 是截斷的內文（例如 `/about/`），`llms.txt` 裡也一樣。
+- **從現在起 Markdown 是唯一的內容來源**：`npm run convert-wordpress` 不再執行。它會先清空 `src/content/posts/` 與 `src/content/pages/` 再重寫，之後在 Markdown 上的修改都會被蓋掉。
