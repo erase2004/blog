@@ -1589,3 +1589,33 @@ deploy（Deploy）build 與 test 都通過才跑：npm ci → 下載 dist →
 
 - 19：預覽網址跟 workers.dev 的正式網址都是公開的，頁面的 canonical 指向 aniya.moe；看一下預覽網址有沒有 `X-Robots-Tag: noindex`，決定要不要處理被搜尋引擎索引的可能。
 - 20：切換之後如果關掉 workers.dev（`workers_dev: false`）或加上自訂網域，`deploy` 輸出的 `targets` 會變成 aniya.moe（沒有 `https://`），workflow 的「取得網址」目前只找 workers.dev 的網址，要一起改；正式網域的網址檢查會多檢查 www 與 HSTS（`PRODUCTION`）。
+
+## 19：預覽網址驗證（2026-10-25）
+
+### 小寫百分比編碼的舊網址改成 301
+
+- **為什麼要改**：WordPress 的 canonical 和站內連結，中文、日文路徑都寫成小寫的百分比編碼（`/category/%e6%8a%80%e8%a1%93/`），搜尋引擎索引的很可能就是這個寫法。在 workers.dev 的正式網址（`https://aniya-moe.erase2004.workers.dev`）實測：小寫編碼的請求比對不到任何 `_redirects` 規則，asset worker 把路徑解碼再重新編碼，**307** 到大寫的版本（`/2021/09/30/%e7%ac%ac…/`、`/category/%e6%8a%80%e8%a1%93/`、`/tag/book%e2%98%86walker/` 都是）；大寫的版本回 200，少斜線的大寫版本照既有規則 301。307 是暫時轉址，我們要的是永久、而且一次就到的 301。
+- **做法**：路徑含非 ASCII 字元的每個舊網址，多一條靜態規則，來源寫成小寫的跳脫字元（Cloudflare 拿請求原始的路徑比對，這種規則只對小寫的請求有效，見 03 號），**直接 301 到最終目標**：
+  - 頁面 → 自己的網址（大寫編碼）：33 個，2021 年 4 篇、2022 年 4 篇文章，3 個分類，22 個標籤。
+  - 本來就會轉址的舊網址 → 同一個目標，不先經過大寫的版本：舊 slug 1 條（→ `/2026/01/23/acgn-museum-ssg/`）、圖片 33 條（6 個上傳路徑、27 個附件頁 → `/_astro/….webp`）、PDF 2 條（上傳路徑與附件頁 → R2）。
+  - 共 **69 條**。`_redirects` 從 1,789 條變成 **1,858 條靜態規則**，動態規則仍是 2 條，靜態規則剩 142 條空間。
+  - 規則只從對應表產生。sitemap 快照裡 39 個非 ASCII 的網址（33 個頁面、6 張圖片）都在對應表裡；對應表沒有其他非 ASCII 的上傳路徑（例如 `-scaled` 的版本）。
+- **不做的**：
+  - 少斜線的小寫版本：WordPress 從來沒有這樣連結過。照舊 307 到大寫的少斜線版本，再 301 到頁面。
+  - `…/feed/` 的小寫版本（33 個）：既有的動態規則 `/*/feed/ /:splat/ 301` 保留請求的編碼，所以小寫的 feed 先 301 到頁面的小寫版本，再由新規則 301 到頁面，**兩次 301**。feed 不給搜尋引擎索引（`X-Robots-Tag: noindex`），可以接受，不另外多佔 33 條規則。
+  - 不存在的網址（5 個，沒搬的孤兒圖的上傳路徑與附件頁）：沒有地方可以轉，小寫版本仍是 307 到大寫的版本，再回 404。
+- **程式**：
+  - `appendRedirects()` 原本用 `encodeURI()` 編碼路徑，會把跳脫字元的 `%` 再編成 `%25`，寫不出小寫跳脫字元的來源。現在路徑裡已經是跳脫字元的部分照原樣保留（大小寫都不動，跟 Cloudflare 讀 `_redirects` 的方式一樣），其餘照舊用 `encodeURI()`。既有的 1,789 條規則一個字都沒變（排序後跟原本的 `_redirects` 比對，只多了 69 行）。
+  - `lowercaseEncoded()`（`src/integrations/redirects-file.ts`）算出路徑的小寫編碼版本，ASCII 的路徑沒有。各自負責舊網址的 integration 加上小寫版本：`page-redirects.ts`（頁面、舊 slug；放在動態規則之前）、`image-redirect-rules.ts`（圖片）、`media-redirects.ts`（PDF）。
+- **網址檢查**：`LOWERCASE_PERCENT_ENCODED_PATHS` 定案，預設改成 `'301-to-final-target'`：
+  - 頁面的小寫版本要 301 到自己，而且是回 200 的那個編碼。只比對「是不是同一個字」的話，301 到小寫的自己（迴圈）也會通過。
+  - 會轉址的舊網址，小寫版本要 301 到大寫版本轉去的地方；沒有指定 `location` 的（圖片）就比對大寫版本實際回的 `Location`。
+  - 兩個例外：`location` 的大小寫編碼視為相同（跟其他地方一樣），feed 的兩次 301 才會通過；不存在的網址接受 307 到大寫的自己（那裡已經檢查過回 404）。
+  - 原本的 `'as-expected-or-recase-redirect'` 留著，就是沒有這些規則時的行為，萬一靜態規則不夠用可以退回；`'as-expected'` 刪掉，在 Cloudflare 上沒有頁面能通過。
+  - 確認抓得到：把建置結果的 `_redirects` 換回原本的版本，建置模式剛好 69 個失敗，跟新增的規則數一樣。
+- **測試**（先寫測試再實作）：
+  - `tests/redirects-file.test.ts`：已經是跳脫字元的路徑照原樣寫出。
+  - `tests/url-checker/check-urls.test.ts`：小型網站多了中文頁面、圖片與舊網址的小寫規則，建置與 HTTP（`wrangler dev`）兩種模式各跑一次：小寫版本 301 到頁面才通過；307（沒有規則）、轉到別的頁面、轉到小寫的自己都失敗；圖片的小寫版本要轉到跟大寫版本同一張圖；feed 的兩次 301 通過；不存在的網址接受 307。
+  - `tests/site/serving.test.ts`：真正的建置結果上，文章、分類、標籤的小寫網址 301 到頁面；舊 slug 與 PDF 的小寫網址直接 301 到目標；圖片（包括檔名有零寬空格的 `池田港​-2-Ave-Mujica.jpg`）的小寫網址 301 到跟大寫版本同一張圖；小寫的 feed 經過頁面的小寫版本兩次 301 到頁面。期望值是另外寫好的網址字串。
+- **數字**：`npm run build` 1,858 條靜態規則、2 條動態規則（`wrangler dev` 讀到 1,860 條）。`npm run check-urls -- build` 1,985 個通過、883 個查詢字串網址跳過、0 個失敗；`npm run preview` 之後 `npm run check-urls -- http http://localhost:8787` 2,868 個全部通過。`npm test` 28 個檔案、440 個測試全部通過。
+- 正式環境的實際行為，由 CI 部署預覽版本後的 HTTP 網址檢查確認。
