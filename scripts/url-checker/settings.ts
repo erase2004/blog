@@ -53,17 +53,26 @@ export const NOT_FOUND_PAGE_URL = '/404/';
 
 /**
  * What a request for a non-ASCII path written with lowercase percent-encoding
- * (`/category/%e6%8a%80%e8%a1%93/`, the form WordPress used in canonicals and
- * links) must get. OPEN QUESTION, to be settled on the preview URL in ticket 19:
- * locally, Workers static assets answer these with a 307 to the uppercase
- * form.
+ * (`/category/%e6%8a%80%e8%a1%93/`) must get. WordPress wrote its paths that
+ * way in canonicals and links, so it is the form search engines know. Unless
+ * a `_redirects` rule matches the request, Workers static assets answer it
+ * with a 307 to the uppercase form (measured on the preview URL in ticket
+ * 19), and only a rule whose source is in lowercase escapes matches it: the
+ * site has one for each old URL with a non-ASCII path (lowercaseEncoded() in
+ * src/integrations/redirects-file.ts).
  *
+ * - `'301-to-final-target'`: a 301 straight to where the URL ends up: for a
+ *   page (or file), its own URL in the very encoding that answers 200; for a
+ *   URL that redirects, where the URL itself redirects. Two exceptions. That
+ *   location passes in any encoding, as everywhere else, because the feeds'
+ *   dynamic rule keeps the request's escapes: a feed 301s to its page in
+ *   lowercase, which 301s on. And a URL that must not exist has nowhere to
+ *   go: it may get the 307 to itself in uppercase, which answers 404.
  * - `'as-expected-or-recase-redirect'`: what the URL's expectation asks for
- *   (e.g. 200 for a page), or a redirect to the same path in a different
- *   percent-encoding case.
- * - `'as-expected'`: exactly what the URL's expectation asks for.
+ *   (e.g. 200 for a page), or a redirect of any status to the same path in a
+ *   different percent-encoding case: what the site gets without those rules,
+ *   should the 2,000 static rules run short.
  */
-export const LOWERCASE_PERCENT_ENCODED_PATHS: LowercasePercentEncodedPaths =
-	'as-expected-or-recase-redirect';
+export const LOWERCASE_PERCENT_ENCODED_PATHS: LowercasePercentEncodedPaths = '301-to-final-target';
 
-export type LowercasePercentEncodedPaths = 'as-expected-or-recase-redirect' | 'as-expected';
+export type LowercasePercentEncodedPaths = '301-to-final-target' | 'as-expected-or-recase-redirect';
