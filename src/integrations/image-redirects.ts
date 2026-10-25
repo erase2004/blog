@@ -11,7 +11,7 @@ const RULES_PATH = 'image-redirect-rules.json';
  * pages, from the old-URL mapping table) to the images Astro made of them.
  * Those URLs have a hash known only once the images are built, so the rules
  * are built as a page (image-redirect-rules.ts), then moved into _redirects.
- * About 1,600 static rules.
+ * About 1,700 static rules.
  */
 export default function imageRedirects(): AstroIntegration {
 	return {

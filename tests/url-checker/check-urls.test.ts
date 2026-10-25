@@ -79,6 +79,8 @@ const fixtureSite: Record<string, string> = {
 	'no-slash-rule/index.html': page('/no-slash-rule/'),
 	'中文/index.html': page('/中文/'),
 	'混/index.html': page('/混/'),
+	'技術/index.html': page('/技術/'),
+	'循/index.html': page('/循/'),
 	'img/new.png': 'not really a PNG',
 	'img/new.webp': 'not really a webp',
 	'robots.txt': 'User-agent: *\n',
@@ -101,7 +103,18 @@ const fixtureSite: Record<string, string> = {
 		'/relative-og-image /relative-og-image/ 301',
 		'/中文 /中文/ 301',
 		'/混 /混/ 301',
+		'/技術 /技術/ 301',
+		'/循 /循/ 301',
+		// _redirects keeps a lowercase escape as written, so these rules match
+		// only the lowercase form, as WordPress wrote non-ASCII paths.
 		'/%e6%b7%b7/ /ok/ 301',
+		'/%e6%8a%80%e8%a1%93/ /技術/ 301',
+		'/%e5%be%aa/ /%e5%be%aa/ 301',
+		'/舊/ /ok/ 301',
+		'/舊 /ok/ 301',
+		'/%e8%88%8a/ /ok/ 301',
+		'/遺/ /ok/ 301',
+		'/遺 /ok/ 301',
 		'/old/ /ok/ 301',
 		'/old /ok/ 301',
 		'/old-elsewhere/ /no-title/ 301',
@@ -116,6 +129,11 @@ const fixtureSite: Record<string, string> = {
 		'/wp-content/uploads/old.png /img/new.png 301',
 		'/wp-content/uploads/dangling.png /img/missing.png 301',
 		'/wp-content/uploads/video.mp4 https://media.aniya.moe/videos/a/video.mp4 301',
+		'/wp-content/uploads/圖.png /img/new.png 301',
+		'/wp-content/uploads/%e5%9c%96.png /img/new.png 301',
+		'/wp-content/uploads/畫.png /img/new.png 301',
+		'/wp-content/uploads/%e7%95%ab.png /img/new.webp 301',
+		'/wp-content/uploads/像.png /img/new.png 301',
 		// Proxy rules: served as the other path is.
 		'/proxied/ /ok/ 200',
 		'/proxied-to-nothing/ /nowhere/ 200',
@@ -391,38 +409,95 @@ describe.each(Object.keys(targets))('checking the %s', (targetName) => {
 	});
 
 	describe('a non-ASCII URL', () => {
-		it('is also requested with lowercase percent-encoding, as WordPress wrote it', async () => {
-			const report = await check([{ url: '/中文/', expect: 'page' }], {
-				lowercasePercentEncodedPaths: 'as-expected',
-			});
+		it('of a page is also requested with lowercase percent-encoding, as WordPress wrote it, which must 301 to the page', async () => {
+			const report = await check([
+				{ url: '/技術/', expect: 'page' },
+				{ url: '/中文/', expect: 'page' },
+			]);
 
-			// Workers static assets redirect it to the uppercase form.
+			// Without a rule for the lowercase form, Workers static assets redirect it to the uppercase form with a 307.
 			expect(report.results).toEqual([
+				{ url: '/技術/', outcome: 'pass', problems: [] },
 				{
 					url: '/中文/',
 					outcome: 'fail',
-					problems: [expect.stringMatching(/^\/%e4%b8%ad%e6%96%87\/: expected HTTP 200, got 307/)],
+					problems: ['/%e4%b8%ad%e6%96%87/: expected HTTP 301, got 307 to /%E4%B8%AD%E6%96%87/'],
 				},
 			]);
 		});
 
-		it('by default may answer the lowercase form with a redirect to the same path in uppercase', async () => {
-			const report = await check([{ url: '/中文/', expect: 'page' }]);
+		it('may get a redirect to the same path in uppercase, of any status, when the setting says so', async () => {
+			const report = await check([{ url: '/中文/', expect: 'page' }], {
+				lowercasePercentEncodedPaths: 'as-expected-or-recase-redirect',
+			});
 
 			expect(outcomes(report)).toEqual({ '/中文/': 'pass' });
 		});
 
 		it('fails when the lowercase form redirects to a different path', async () => {
-			// _redirects keeps a lowercase escape as written, so this rule matches only the lowercase form.
 			const report = await check([{ url: '/混/', expect: 'page' }]);
 
 			expect(report.results).toEqual([
+				{ url: '/混/', outcome: 'fail', problems: ['/%e6%b7%b7/: expected a redirect to /%E6%B7%B7/, got /ok/'] },
+			]);
+		});
+
+		it('fails when the lowercase form redirects to the page in lowercase, that is to itself', async () => {
+			const report = await check([{ url: '/循/', expect: 'page' }]);
+
+			expect(report.results).toEqual([
 				{
-					url: '/混/',
+					url: '/循/',
 					outcome: 'fail',
-					problems: [expect.stringMatching(/^\/%e6%b7%b7\/: expected HTTP 200, got 301/)],
+					problems: ['/%e5%be%aa/: expected a redirect to /%E5%BE%AA/, got /%e5%be%aa/'],
 				},
 			]);
+		});
+
+		it('that redirects with no given location must, in lowercase, 301 to where the URL itself redirects', async () => {
+			const report = await check([
+				{ url: '/wp-content/uploads/圖.png', expect: 'redirect' },
+				{ url: '/wp-content/uploads/畫.png', expect: 'redirect' },
+				{ url: '/wp-content/uploads/像.png', expect: 'redirect' },
+			]);
+
+			expect(report.results).toEqual([
+				{ url: '/wp-content/uploads/圖.png', outcome: 'pass', problems: [] },
+				{
+					url: '/wp-content/uploads/畫.png',
+					outcome: 'fail',
+					problems: ['/wp-content/uploads/%e7%95%ab.png: expected a redirect to /img/new.png, got /img/new.webp'],
+				},
+				{
+					url: '/wp-content/uploads/像.png',
+					outcome: 'fail',
+					problems: [
+						'/wp-content/uploads/%e5%83%8f.png: expected HTTP 301, got 307 to /wp-content/uploads/%E5%83%8F.png',
+					],
+				},
+			]);
+		});
+
+		it('that redirects to a given location must, in lowercase, 301 there too', async () => {
+			const report = await check([
+				{ url: '/舊/', expect: 'redirect', location: '/ok/' },
+				// The feeds' dynamic rule keeps the request's escapes: in lowercase,
+				// a feed 301s to its page in lowercase, which 301s on.
+				{ url: '/tag/中文/feed/', expect: 'redirect', location: '/tag/中文/' },
+				{ url: '/遺/', expect: 'redirect', location: '/ok/' },
+			]);
+
+			expect(report.results).toEqual([
+				{ url: '/舊/', outcome: 'pass', problems: [] },
+				{ url: '/tag/中文/feed/', outcome: 'pass', problems: [] },
+				{ url: '/遺/', outcome: 'fail', problems: ['/%e9%81%ba/: expected HTTP 301, got 307 to /%E9%81%BA/'] },
+			]);
+		});
+
+		it('that must not exist may, in lowercase, get the redirect to itself in uppercase that Workers static assets give', async () => {
+			const report = await check([{ url: '/不存在/', expect: 'not-found' }]);
+
+			expect(outcomes(report)).toEqual({ '/不存在/': 'pass' });
 		});
 	});
 });

@@ -41,4 +41,19 @@ describe('rules added to _redirects', () => {
 			'',
 		]);
 	});
+
+	// Cloudflare matches a rule's source against the request's own path, so a
+	// source in lowercase escapes matches the requests WordPress's links make.
+	it('keep the percent-escapes a path already has as they are written', async () => {
+		await appendRedirects(pathToFileURL(`${dir}/`), [
+			{ from: '/category/%e6%8a%80%e8%a1%93/', to: '/category/技術/', status: 301 },
+			{ from: '/tag/book%e2%98%86walker/', to: '/tag/book%E2%98%86walker/', status: 301 },
+		]);
+
+		expect(redirects().split('\n')).toEqual([
+			'/category/%e6%8a%80%e8%a1%93/ /category/%E6%8A%80%E8%A1%93/ 301',
+			'/tag/book%e2%98%86walker/ /tag/book%E2%98%86walker/ 301',
+			'',
+		]);
+	});
 });
